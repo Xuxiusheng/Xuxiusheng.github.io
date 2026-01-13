@@ -28,7 +28,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/7.png">
 <meta property="article:published_time" content="2025-12-31T18:00:00.000Z">
-<meta property="article:modified_time" content="2026-01-03T05:33:53.945Z">
+<meta property="article:modified_time" content="2026-01-13T16:48:43.450Z">
 <meta property="article:author" content="Xuxiusheng">
 <meta property="article:tag" content="Java">
 <meta name="twitter:card" content="summary_large_image">
@@ -270,7 +270,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.9k 字
+          2.6k 字
         
       </span>
     
@@ -281,7 +281,7 @@
         
         
         
-          16 分钟
+          22 分钟
         
       </span>
     
@@ -340,6 +340,15 @@
           </div>
 
 <h1 id="泛型"><a href="#泛型" class="headerlink" title="泛型"></a>泛型</h1><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/javadaydayup/p/18631366">https://www.cnblogs.com/javadaydayup/p/18631366</a></p>
+<p>补充一点泛型参数T和通配符?的区别:<br>泛型参数用于在定义类、接口或方法时声明类型，类内部的类型保持一致。泛型参数要求类型确定且一致，所以以下代码编译期间会报错.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// Integer是Number的子类，但List&lt;Integer&gt;不是List&lt;Number&gt;的子类，通配符不支持协变</span><br>List&lt;Number&gt; list = List&lt;Integer&gt;<br></code></pre></td></tr></table></figure>
+<p>为了提高泛型的灵活性，支持协变和逆变，引入了通配符.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// Integer是Number的子类，同时List&lt;Integer&gt;是List&lt;Number&gt;的子类，通配符不支持协变</span><br>List&lt;? <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Number</span>&gt; list = List&lt;Integer&gt;<br></code></pre></td></tr></table></figure>
+
+<div class="note note-warning">
+            <p>通配符有一个PECS规则:</p> <ul> <li>上界通配符只能get</li> <li>下界通配符只能add</li> </ul> <h4 id="上界通配符只能get"><a href="#上界通配符只能get" class="headerlink" title="上界通配符只能get"></a>上界通配符只能get</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs java">List&lt;? <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Number</span>&gt; list = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();<br><br>list.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Integer</span>(<span class="hljs-number">10</span>)); <span class="hljs-comment">// 编译报错</span><br><span class="hljs-type">Number</span> <span class="hljs-variable">n</span> <span class="hljs-operator">=</span> list.get(<span class="hljs-number">0</span>); <span class="hljs-comment">//正常执行</span><br></code></pre></td></tr></table></figure> <p>list内部类型只知道是Number的子类，但不知道具体是哪个子类，所以只能get</p> <h4 id="下界通配符只能add"><a href="#下界通配符只能add" class="headerlink" title="下界通配符只能add"></a>下界通配符只能add</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs java">List&lt;? <span class="hljs-built_in">super</span> Integer&gt; list = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();<br><br>list.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Integer</span>(<span class="hljs-number">10</span>)); <span class="hljs-comment">// 正常执行</span><br><span class="hljs-type">Number</span> <span class="hljs-variable">n</span> <span class="hljs-operator">=</span> list.get(<span class="hljs-number">0</span>); <span class="hljs-comment">// 编译报错</span><br></code></pre></td></tr></table></figure> <p>list内部类型只知道是Integer的父类，但不知道具体是哪个父类，所以只能add</p> 
+          </div>
+
 <h1 id="内存屏障"><a href="#内存屏障" class="headerlink" title="内存屏障"></a>内存屏障</h1><p>Java 通过 <strong>happens-before</strong> 关系定义操作间的可见性和顺序。内存屏障是实现这些规则的底层手段，主要用于禁止指令重排序和保证内存可见性。</p>
 <p>在现代多核 CPU 和编译器优化下，程序执行可能被 重排序（Reordering），以提升性能，<strong>内存屏障的作用就是禁止某些重排序，并强制刷新缓存，确保“happens-before”关系成立</strong></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// 线程 A</span><br>a = <span class="hljs-number">1</span>;          <span class="hljs-comment">// (1)</span><br>flag = <span class="hljs-literal">true</span>;    <span class="hljs-comment">// (2)</span><br><span class="hljs-comment">// 编译器可能将 (1) 和 (2) 重排序，先执行 (2) 再执行 (1),导致线程B看到不同的结果</span><br><br><span class="hljs-comment">// 线程 B</span><br><span class="hljs-keyword">if</span> (flag) &#123;     <span class="hljs-comment">// (3)</span><br>    print(a);   <span class="hljs-comment">// (4)</span><br>&#125;<br></code></pre></td></tr></table></figure>
