@@ -1,0 +1,115 @@
+/* --- Hexo Fluid 局部加密现代样式 --- */
+
+:root {
+  --enc-bg: #ffffff;
+  --enc-border: #e0e0e0;
+  --enc-text-main: #333333;
+  --enc-accent: #70c1ff;       /* 胶囊按钮主色调：天蓝色 */
+  --enc-accent-hover: #40a9ff; /* 悬停时深蓝色 */
+  --enc-dashed-border: #dcdcdc;
+}
+
+/* 适配 Fluid 主题黑夜模式 */
+html[data-user-color-scheme='dark'] {
+  --enc-bg: #252d38;           /* 匹配 Fluid 深色面板色 */
+  --enc-border: #444444;
+  --enc-text-main: #eeeeee;
+  --enc-accent: #4dabf7;
+  --enc-accent-hover: #74c0fc;
+  --enc-dashed-border: #4a5568;
+}
+
+/* 1. 外层卡片容器 */
+.encrypt-input-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1.5rem;
+  margin: 2rem auto;
+  max-width: 500px;
+  background-color: var(--enc-bg);
+  border: 1.5px dashed var(--enc-dashed-border); /* 匹配你截图中的虚线框样式 */
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+/* 2. 提示文字与锁图标 */
+.encrypt-hint-box {
+  margin-bottom: 1.2rem;
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--enc-text-main);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 3. 输入框样式优化 */
+.encrypt-field {
+  width: 100%;
+  max-width: 300px;
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.encrypt-pwd {
+  width: 100%;
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--enc-border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--enc-text-main);
+  text-align: center; /* 输入文字居中 */
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.encrypt-pwd:focus {
+  border-color: var(--enc-accent);
+  box-shadow: 0 0 0 3px rgba(112, 193, 255, 0.15);
+}
+
+/* 4. 胶囊形状按钮 (核心修改) */
+.encrypt-btn {
+  display: inline-block;
+  padding: 0.6rem 3rem;       /* 左右加宽，形成修长胶囊感 */
+  border-radius: 50px;        /* 完美半圆弧度 */
+  margin-top: 20px;
+  background-color: var(--enc-bg);
+  color: var(--enc-accent);
+  border: 1.5px solid var(--enc-accent);
+  font-size: 1.1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  outline: none;
+  box-shadow: none;           /* 去除阴影，保持线条感 */
+}
+
+/* 按钮悬停效果 */
+.encrypt-btn:hover {
+  background-color: rgba(112, 193, 255, 0.05); /* 淡淡的蓝色背景 */
+  color: var(--enc-accent-hover);
+  border-color: var(--enc-accent-hover);
+  transform: scale(1.02);     /* 轻微放大 */
+}
+
+.encrypt-btn:active {
+  transform: scale(0.98);
+}
+
+/* 5. 解密后的内容容器 */
+.encrypt-content {
+  display: none;              /* 默认隐藏 */
+  padding: 1.5rem;
+  border-radius: 10px;
+  border: 1px solid var(--enc-border);
+  margin-top: 1.5rem;
+  animation: fadeIn 0.6s ease; /* 解锁时平滑淡入 */
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

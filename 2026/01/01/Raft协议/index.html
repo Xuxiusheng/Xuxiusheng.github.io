@@ -1,0 +1,814 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/config/fluid.png">
+  <link rel="icon" href="/img/config/personal.jpg">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Xuxiusheng">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="总体思想Raft协议是CAP理论中的CP协议，也就是分布式系统下的一个强一致性协议。Raft协议的基本思想是一个分布式系统存在Leader节点和Follower节点，客户端的所有请求全部由Leader处理，以此来保证一致性，Follower只负责同步Leader的数据，并在Leader故障时进行选主。通过中心化的领导节点来简化一致性保证 Raft算法的详细介绍参考Raft协议，这里做简单介绍。 算">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Raft协议">
+<meta property="og:url" content="http://xuxiusheng.github.io/2026/01/01/Raft%E5%8D%8F%E8%AE%AE/index.html">
+<meta property="og:site_name" content="Xuxiusheng">
+<meta property="og:description" content="总体思想Raft协议是CAP理论中的CP协议，也就是分布式系统下的一个强一致性协议。Raft协议的基本思想是一个分布式系统存在Leader节点和Follower节点，客户端的所有请求全部由Leader处理，以此来保证一致性，Follower只负责同步Leader的数据，并在Leader故障时进行选主。通过中心化的领导节点来简化一致性保证 Raft算法的详细介绍参考Raft协议，这里做简单介绍。 算">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/67.png">
+<meta property="article:published_time" content="2026-01-01T11:30:00.000Z">
+<meta property="article:modified_time" content="2026-01-01T11:38:52.748Z">
+<meta property="article:author" content="Xuxiusheng">
+<meta property="article:tag" content="分布式">
+<meta property="article:tag" content="理论">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://xuxiusheng.github.io/img/article_img/67.png">
+  
+  
+  
+  <title>Raft协议 - Xuxiusheng</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/cnblogs/iconfont.css">
+<link rel="stylesheet" href="/css/email/iconfont.css">
+<link rel="stylesheet" href="/css/card.css">
+<link rel="stylesheet" href="/css/stats/iconfont.css">
+<link rel="stylesheet" href="/css/partial_encrypt.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"xuxiusheng.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/config/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"2HT5rmC5XQuRugoXS6jx93oG-gzGzoHsz","app_key":"34FVPpMZGQcLXWdGF6FnOx9T","server_url":"https://2ht5rmc5.lc-cn-n1-shared.com","path":"window.location.pathname","ignore_local":true},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>XuxiushengのBlog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/data/" target="_self">
+                <i class="icon iconfont icon-tongjijisuan"></i>
+                <span>本站统计</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/config/content1.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Raft协议"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-01-01 19:30" pubdate>
+          2026年1月1日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.8k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          16 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Raft协议</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="总体思想"><a href="#总体思想" class="headerlink" title="总体思想"></a>总体思想</h1><p>Raft协议是CAP理论中的CP协议，也就是分布式系统下的一个强一致性协议。Raft协议的基本思想是一个分布式系统存在Leader节点和Follower节点，客户端的所有请求全部由Leader处理，以此来保证一致性，Follower只负责同步Leader的数据，并在Leader故障时进行选主。通过中心化的领导节点来简化一致性保证</p>
+<p>Raft算法的详细介绍参考<a target="_blank" rel="noopener" href="https://www.cnblogs.com/mokafamily/p/11303534.html">Raft协议</a>，这里做简单介绍。</p>
+<h1 id="算法思想"><a href="#算法思想" class="headerlink" title="算法思想"></a>算法思想</h1><p>一个Raft协议集群包含三种角色：</p>
+<ul>
+<li>Leader：负责处理客户端请求，并定期向其他节点发送心跳消息</li>
+<li>Candidate：Leader选举过程产生的临时角色，由 Follower 转化而来，能够参与竞选Leader</li>
+<li>Follower：除Leader外的其他节点，接收Leader心跳，可以对Candidate投票</li>
+</ul>
+<p>Leader节点负责处理客户端的所有请求，那如果Leader宕机怎么办呢？那自然是重新选取Leader，自然延申出来两个问题：如何发现Leader宕机以及发现Leader宕机后，怎么重新选取Leader呢？</p>
+<h2 id="如何发现Leader宕机"><a href="#如何发现Leader宕机" class="headerlink" title="如何发现Leader宕机"></a>如何发现Leader宕机</h2><p>Leader定期向所有Follower发送心跳消息，若Follower在超时时间（超时时间由Follower自己控制，完全随机）内未收到Leader心跳消息，则认为Leader宕机。Leader在这个过程中只负责定期发起心跳</p>
+<div class="note note-info">
+            <p>为什么超时时间由Follower自己控制且完全随机呢？</p> <ul> <li>Follower的超时时间在一次选举结束后重新生成，不能是固定的超时时间，否则Leader宕机后，每次新选举出的Leader都是超时时间最短的Follower，会造成其中两个Follower循环成为Leader，负载不均衡（A和B的超时时间最短，A宕机，B成为Leader，在B宕机之前，A恢复，B宕机后，A又成为Leader，循环往复）</li> <li>极端情况下，如果所有Follower的超时时间相同，那么他们会同时发现Leader宕机，全部都给自己投票成为新的Leader，导致没有任何一个节点获得超过半数选票</li> <li>另一种极端场景，生成的随机超时时间也相同，也会出现无法获得半数选票，选举失败的情况。每次Follower角色转换时，重新生成超时时间，这样即使第一轮选举失败，第二轮失败的可能性非常小。</li> </ul> 
+          </div>
+<h2 id="如何选取新的Leader"><a href="#如何选取新的Leader" class="headerlink" title="如何选取新的Leader"></a>如何选取新的Leader</h2><ul>
+<li>Follower在超时时间内未收到Leader的心跳消息，认定Leader宕机，自身转化为Candidate</li>
+<li>Candidate首先向自己投票，然后向其他Follower发起投票，一个Follower一个任期内只能投出一票</li>
+<li>优先获得超过半数选票的Candidate成为新的Leader</li>
+</ul>
+<div class="note note-info">
+            <p>成为Candidate是有条件的，只有包含所有已提交日志的节点才能成为Candidate</p> 
+          </div>
+
+<h3 id="任期号机制"><a href="#任期号机制" class="headerlink" title="任期号机制"></a>任期号机制</h3><p>任期号机制是避免集群脑裂以及保证选举唯一性和安全性的最关键保障，下面展开介绍</p>
+<p><strong>脑裂问题</strong>： 假设一种情况，Leader发送心跳消息，由于网络阻塞导致超过了Follower的超时时间，触发了选举新的Leader的过程，出现了脑裂。但是这个脑裂是可以被解决的，原Leader发送的心跳消息被Follower接收到后，Follower会回复告知其新的任期号，原Leader收到回复后，会主动降级成为Follower，所以不存在脑裂问题。<br><strong>投票唯一性</strong>： 任期号机制保证了Follower投票的唯一性，即一个任期内只能投递一张选票<br><strong>选举安全性</strong>： 新的Leader需要拥有完整的日志段，当一个Follower收到Candidate要求投票的消息后，首先检查任期号是否比自己大，任期号高于自己的话，再看日志的索引偏移量，偏移量越大，说明数据越完整。只有任期号和日志偏移量均高于自己，才会给出自己的选票</p>
+<h1 id="读写一致性保证"><a href="#读写一致性保证" class="headerlink" title="读写一致性保证"></a>读写一致性保证</h1><p>读请求很简单，通过Leader读取最新的数据。主要是写请求如何做到一致。</p>
+<table>
+<thead>
+<tr>
+<th align="center">客户端请求处理</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><img src="/img/article_img/67.png" srcset="/img/config/loading.gif" lazyload></td>
+</tr>
+</tbody></table>
+<ol>
+<li>Leader收到请求后，不会立即修改本地数据。而是先将这个命令作为一个新的日志条目追加到自己的本地日志中，该日志是未提交的，对客户端不可见</li>
+<li>Leader并行地向所有Follower节点发送这条新的日志</li>
+<li>Follower将新的日志条目追加到自己的本地日志中，回复Leader一个成功的响应</li>
+<li>Leader会持续等待，直到它收到超过半数节点（包括它自己）的成功响应，标记日志为提交状态，执行该命令，响应客户端</li>
+<li>Leader会异步通知Follower执行该命令</li>
+</ol>
+<div class="note note-info">
+            <p>这种先写日志再执行命令的机制叫做<strong>WAL</strong>（Write-Ahead-Logging）机制</p> 
+          </div>
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%88%86%E5%B8%83%E5%BC%8F/" class="category-chain-item">分布式</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/" class="print-no-link">#分布式</a>
+      
+        <a href="/tags/%E7%90%86%E8%AE%BA/" class="print-no-link">#理论</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Raft协议</div>
+      <div>http://xuxiusheng.github.io/2026/01/01/Raft协议/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Xuxiusheng</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年1月1日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/01/01/CAP%E7%90%86%E8%AE%BA/" title="CAP理论">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">CAP理论</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/01/01/Kafka/" title="Kafka">
+                        <span class="hidden-mobile">Kafka</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.5.1/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"2HT5rmC5XQuRugoXS6jx93oG-gzGzoHsz","appKey":"34FVPpMZGQcLXWdGF6FnOx9T","path":"window.location.pathname","placeholder":"说点什么吧","avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"","emojiCDN":null,"emojiMaps":null,"enableQQ":false,"appid":"2HT5rmC5XQuRugoXS6jx93oG-gzGzoHsz","appkey":"34FVPpMZGQcLXWdGF6FnOx9T","app_id":"2HT5rmC5XQuRugoXS6jx93oG-gzGzoHsz","app_key":"34FVPpMZGQcLXWdGF6FnOx9T"},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/card.js"></script>
+<script src="/js/encrypt_core.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

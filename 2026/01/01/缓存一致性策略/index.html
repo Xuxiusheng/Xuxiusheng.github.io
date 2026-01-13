@@ -1,0 +1,885 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/config/fluid.png">
+  <link rel="icon" href="/img/config/personal.jpg">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Xuxiusheng">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="概念业务中通常使用MySQL作为持久化数据库，并使用缓存来提升系统性能，同时使用缓存和数据库会存在数据一致性问题，而缓存一致性策略，或者也可以叫做缓存读写策略，是指在写数据或读数据时，数据库与缓存之间如何去维护数据一致性的方案。 换一个视角，从CAP理论视角来看，缓存属于AP系统，即保证分区容错和高可用，一致性采用最终一致性策略，所以，对于追求绝对一致性的场景，不适合引入缓存。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="缓存一致性策略">
+<meta property="og:url" content="http://xuxiusheng.github.io/2026/01/01/%E7%BC%93%E5%AD%98%E4%B8%80%E8%87%B4%E6%80%A7%E7%AD%96%E7%95%A5/index.html">
+<meta property="og:site_name" content="Xuxiusheng">
+<meta property="og:description" content="概念业务中通常使用MySQL作为持久化数据库，并使用缓存来提升系统性能，同时使用缓存和数据库会存在数据一致性问题，而缓存一致性策略，或者也可以叫做缓存读写策略，是指在写数据或读数据时，数据库与缓存之间如何去维护数据一致性的方案。 换一个视角，从CAP理论视角来看，缓存属于AP系统，即保证分区容错和高可用，一致性采用最终一致性策略，所以，对于追求绝对一致性的场景，不适合引入缓存。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/13.png">
+<meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/14.png">
+<meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/15.png">
+<meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/16.png">
+<meta property="article:published_time" content="2026-01-01T08:00:00.000Z">
+<meta property="article:modified_time" content="2026-01-01T08:19:08.026Z">
+<meta property="article:author" content="Xuxiusheng">
+<meta property="article:tag" content="数据库">
+<meta property="article:tag" content="缓存">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://xuxiusheng.github.io/img/article_img/13.png">
+  
+  
+  
+  <title>缓存一致性策略 - Xuxiusheng</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/cnblogs/iconfont.css">
+<link rel="stylesheet" href="/css/email/iconfont.css">
+<link rel="stylesheet" href="/css/card.css">
+<link rel="stylesheet" href="/css/stats/iconfont.css">
+<link rel="stylesheet" href="/css/partial_encrypt.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"xuxiusheng.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/config/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"2HT5rmC5XQuRugoXS6jx93oG-gzGzoHsz","app_key":"34FVPpMZGQcLXWdGF6FnOx9T","server_url":"https://2ht5rmc5.lc-cn-n1-shared.com","path":"window.location.pathname","ignore_local":true},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>XuxiushengのBlog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/data/" target="_self">
+                <i class="icon iconfont icon-tongjijisuan"></i>
+                <span>本站统计</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/config/content1.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="缓存一致性策略"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-01-01 16:00" pubdate>
+          2026年1月1日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.9k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          17 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">缓存一致性策略</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><p>业务中通常使用MySQL作为持久化数据库，并使用缓存来提升系统性能，同时使用缓存和数据库会存在数据一致性问题，而缓存一致性策略，或者也可以叫做缓存读写策略，是指在写数据或读数据时，数据库与缓存之间如何去维护数据一致性的方案。</p>
+<p>换一个视角，从CAP理论视角来看，缓存属于AP系统，即保证分区容错和高可用，一致性采用最终一致性策略，所以，对于追求绝对一致性的场景，不适合引入缓存。</p>
+<div class="note note-info">
+            <p>CAP理论：简单来说，一个分布式系统只能同时满足AP或者CP，不存在CAP系统，CA系统只存在于单机环境</p> <ul> <li>Consistency：强一致性，任何节点在任何时间返回的数据相同</li> <li>Availability：高可用，所有请求能够在有限时间内被响应，即使某些节点故障，依然能够返回有效数据（不一定是最新数据）</li> <li>Partition Tolerance：分区容错性，发生网络分区后能够继续提供服务</li> </ul> 
+          </div>
+
+<h1 id="三大策略"><a href="#三大策略" class="headerlink" title="三大策略"></a>三大策略</h1><h2 id="旁路缓存模式"><a href="#旁路缓存模式" class="headerlink" title="旁路缓存模式"></a>旁路缓存模式</h2><h3 id="写场景"><a href="#写场景" class="headerlink" title="写场景"></a>写场景</h3><ul>
+<li>更新DB</li>
+<li>删除cache</li>
+</ul>
+<p><img src="/img/article_img/13.png" srcset="/img/config/loading.gif" lazyload></p>
+<table style="width: 100%; border-collapse: collapse;">
+<thead>
+<tr>
+<th style="width: 15%; text-align: left; padding: 8px; border: 1px solid #ddd;">策略</th>
+<th style="width: 60%; text-align: left; padding: 8px; border: 1px solid #ddd;">一致性风险</th>
+<th style="width: 10%; text-align: center; padding: 8px; border: 1px solid #ddd;">推荐度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="padding: 8px; border: 1px solid #ddd;"><strong>先更新缓存，再更新数据库</strong></td>
+<td style="padding: 8px; border: 1px solid #ddd;">⚠️ <strong>高风险</strong>：缓存更新成功，数据库更新失败 → 缓存新值，数据库旧值</td>
+<td style="padding: 8px; border: 1px solid #ddd; text-align: center;">❌ 不推荐</td>
+</tr>
+<tr>
+<td style="padding: 8px; border: 1px solid #ddd;"><strong>先更新数据库，再更新缓存</strong></td>
+<td style="padding: 8px; border: 1px solid #ddd;">⚠️ <strong>高风险</strong>：数据库更新成功，缓存更新失败 → 数据库新值，缓存旧值</td>
+<td style="padding: 8px; border: 1px solid #ddd; text-align: center;">❌ 不推荐</td>
+</tr>
+<tr>
+<td style="padding: 8px; border: 1px solid #ddd;"><strong>先删除缓存，再更新数据库</strong></td>
+<td style="padding: 8px; border: 1px solid #ddd;">⚠️ <strong>高并发下风险高</strong>：读请求可能读到旧值并写入缓存</td>
+<td style="padding: 8px; border: 1px solid #ddd; text-align: center;">❌ 不推荐</td>
+</tr>
+<tr>
+<td style="padding: 8px; border: 1px solid #ddd;"><strong>先更新数据库，再删除缓存</strong></td>
+<td style="padding: 8px; border: 1px solid #ddd;">⚠️ <strong>风险低</strong>：理论上存在不一致，但概率极小</td>
+<td style="padding: 8px; border: 1px solid #ddd; text-align: center;">✅ 推荐</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>为什么先更新DB，再删除Cache？</strong> 先删除Cache，再更新DB可以吗，<strong>当然不可以</strong>，数据一致性风险很高，考虑下边这个场景：</p>
+<ol>
+<li>客户端A发起写请求，删除Cache</li>
+<li>客户端B发起读请求，发现Cache不在，查询DB并写入缓存（缓存旧值）</li>
+<li>客户端A写DB（DB新值）</li>
+</ol>
+<p>所以，采用<strong>先删后写</strong>的策略，那先删后写一定可以保证数据一致性嘛？不能够完全保证，但是！<strong>出现一致性问题的概率很低</strong></p>
+<ol>
+<li>客户端A发起读请求，没有命中缓存，查询DB</li>
+<li>客户端B发起写请求，没有命中缓存，写DB（DB新值）</li>
+<li>客户端A将查询到的数据写缓存（缓存旧值）</li>
+</ol>
+<p>以上场景会出现数据一致性问题，但是为什么说概率很小呢？</p>
+<ul>
+<li>两个请求需要命中同一份数据且数据在缓存中不存在</li>
+<li>13执行时间远小于2执行时间，但是13是读DB+写缓存，2是写DB，缓存写的时间要远小于硬盘写，前者纳秒级，后者毫秒级</li>
+</ul>
+<p>那这么说的话，为什么是删缓存而不是直接写缓存呢？<strong>删除操作执行速度更快</strong>，在多写情况下，频繁更新容易出现瓶颈</p>
+<h3 id="读场景"><a href="#读场景" class="headerlink" title="读场景"></a>读场景</h3><ul>
+<li>读Cache，未命中读DB</li>
+<li>数据加载到Cache<br><img src="/img/article_img/14.png" srcset="/img/config/loading.gif" lazyload></li>
+</ul>
+<p>旁路缓存模式下，DB和Cache操作是同步的，因为需要<strong>保证缓存写和DB写的顺序一致</strong>，因此旁路缓存不适合多写场景，而且频繁的删除会影响缓存命中率；此外，首次请求的数据一定不在Cache中</p>
+<p>有杠精要问了，那我一定要先删缓存再写DB呢？怎么办？<strong>延时双删！！！！</strong><br>先说一句，如果是强一致场景，必须先写DB，再删缓存，先删再写适合于能容忍一定程度不一致的场景，延时双删是指删除缓存之后，间隔一小段时间再次进行删除，中间的这段间隔存在数据不一致风险，因此这个间隔需要尽可能地小，但同时也要保证间隔时间大于写DB的时间</p>
+<h2 id="读写穿透"><a href="#读写穿透" class="headerlink" title="读写穿透"></a>读写穿透</h2><p>读写穿透和旁路缓存一样，区别只在于将操作DB的任务交给了缓存去做，不需要RD去操作DB，完全面向缓存</p>
+<h3 id="写场景-1"><a href="#写场景-1" class="headerlink" title="写场景"></a>写场景</h3><p><img src="/img/article_img/15.png" srcset="/img/config/loading.gif" lazyload></p>
+<h3 id="读场景-1"><a href="#读场景-1" class="headerlink" title="读场景"></a>读场景</h3><p><img src="/img/article_img/16.png" srcset="/img/config/loading.gif" lazyload></p>
+<h2 id="异步写入"><a href="#异步写入" class="headerlink" title="异步写入"></a>异步写入</h2><p>之前也说了，旁路缓存和读写穿透DB和缓存属于同步操作，在高并发写场景下性能极差，异步缓存写入思想很简单，就是同步更新缓存，异步写DB，但是这种方案的一致性风险很高，因此需要额外的机制保证异步写DB一定成功，分布式系统主从同步、MySQL的Buffer Pool刷盘都用到了异步写入</p>
+<h1 id="删除缓存重试机制"><a href="#删除缓存重试机制" class="headerlink" title="删除缓存重试机制"></a>删除缓存重试机制</h1><p>上边说的三种一致性策略，无论是删除还是写入，其实都存在由于各种各样原因导致失败的情况，比如删除缓存失败，一旦失败，除非后续有新的写请求，否则缓存中的一直是旧值，可以通过缓存删除重试来解决这个问题。</p>
+
+<pre>
+<code class="mermaid">
+flowchart TD
+    A[应用服务: 更新数据库] --> B[应用服务: 尝试删除缓存]
+    B --> C{删除是否成功?}
+    C -- 是 --> D[流程结束]
+    C -- 否/异常 --> E[应用服务: 发送删除消息到消息队列]
+
+    E --> F[消息队列持久化存储消息]
+
+    F --> G[重试消费者: 拉取消息]
+    G --> H[重试消费者: 尝试删除缓存]
+    H --> I{删除是否成功?}
+    I -- 是 --> J[重试消费者: 确认消费消息从队列移除]
+    I -- 否 --> K[重试消费者: 消息处理失败]
+
+    K --> L{重试次数超过上限?}
+    L -- 否 --> M[消息队列: 重新投递消息等待下一次重试]
+    L -- 是 --> N[重试消费者: 放入死信队列并告警人工介入]
+
+    M --> G
+</code>
+</pre>
+<h1 id="一种无侵入式一致性解决方案"><a href="#一种无侵入式一致性解决方案" class="headerlink" title="一种无侵入式一致性解决方案"></a>一种无侵入式一致性解决方案</h1><p>通过监听MySQL binlog，自动触发缓存删除，本质上属于异步写入策略，但是其对业务代码没有侵入性，高并发性能很好</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Redis/" class="category-chain-item">Redis</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E7%BC%93%E5%AD%98/" class="print-no-link">#缓存</a>
+      
+        <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="print-no-link">#数据库</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>缓存一致性策略</div>
+      <div>http://xuxiusheng.github.io/2026/01/01/缓存一致性策略/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Xuxiusheng</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年1月1日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/01/01/Redis%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B/" title="Redis基本数据类型">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Redis基本数据类型</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/01/01/TCP%E7%B2%98%E5%8C%85%E9%97%AE%E9%A2%98/" title="TCP粘包问题">
+                        <span class="hidden-mobile">TCP粘包问题</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.5.1/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"2HT5rmC5XQuRugoXS6jx93oG-gzGzoHsz","appKey":"34FVPpMZGQcLXWdGF6FnOx9T","path":"window.location.pathname","placeholder":"说点什么吧","avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"","emojiCDN":null,"emojiMaps":null,"enableQQ":false,"appid":"2HT5rmC5XQuRugoXS6jx93oG-gzGzoHsz","appkey":"34FVPpMZGQcLXWdGF6FnOx9T","app_id":"2HT5rmC5XQuRugoXS6jx93oG-gzGzoHsz","app_key":"34FVPpMZGQcLXWdGF6FnOx9T"},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  <script>
+  Fluid.utils.createScript('https://lib.baomitu.com/mermaid/11.10.1/mermaid.min.js', function() {
+    mermaid.initialize({"theme":"default"});
+
+    Fluid.utils.listenDOMLoaded(function() {
+      Fluid.events.registerRefreshCallback(function() {
+        if ('mermaid' in window) {
+          mermaid.init();
+        }
+      });
+    });
+  });
+</script>
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/card.js"></script>
+<script src="/js/encrypt_core.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

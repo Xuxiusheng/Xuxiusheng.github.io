@@ -1,0 +1,930 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/config/fluid.png">
+  <link rel="icon" href="/img/config/personal.jpg">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Xuxiusheng">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="核心架构   RocketMQ架构                    RocketMQ的整体架构和Kafka相似，只不过RMQ以NameServer作为注册中心。             NameServerRMQ的NameServer与Kafka中的ZooKeeper作用相同，负责路由注册、服务发现与心跳维护等功能。但是RMQ的NamerServer属于去中心化设计，NameServer之间">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RocketMQ">
+<meta property="og:url" content="http://xuxiusheng.github.io/2026/01/01/RocketMQ/index.html">
+<meta property="og:site_name" content="Xuxiusheng">
+<meta property="og:description" content="核心架构   RocketMQ架构                    RocketMQ的整体架构和Kafka相似，只不过RMQ以NameServer作为注册中心。             NameServerRMQ的NameServer与Kafka中的ZooKeeper作用相同，负责路由注册、服务发现与心跳维护等功能。但是RMQ的NamerServer属于去中心化设计，NameServer之间">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/117.png">
+<meta property="article:published_time" content="2026-01-01T14:10:00.000Z">
+<meta property="article:modified_time" content="2026-01-01T14:12:44.872Z">
+<meta property="article:author" content="Xuxiusheng">
+<meta property="article:tag" content="RocketMQ">
+<meta property="article:tag" content="消息队列">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://xuxiusheng.github.io/img/article_img/117.png">
+  
+  
+  
+  <title>RocketMQ - Xuxiusheng</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/cnblogs/iconfont.css">
+<link rel="stylesheet" href="/css/email/iconfont.css">
+<link rel="stylesheet" href="/css/card.css">
+<link rel="stylesheet" href="/css/stats/iconfont.css">
+<link rel="stylesheet" href="/css/partial_encrypt.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"xuxiusheng.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/config/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"2HT5rmC5XQuRugoXS6jx93oG-gzGzoHsz","app_key":"34FVPpMZGQcLXWdGF6FnOx9T","server_url":"https://2ht5rmc5.lc-cn-n1-shared.com","path":"window.location.pathname","ignore_local":true},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>XuxiushengのBlog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/data/" target="_self">
+                <i class="icon iconfont icon-tongjijisuan"></i>
+                <span>本站统计</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/config/content1.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="RocketMQ"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-01-01 22:10" pubdate>
+          2026年1月1日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          30 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">RocketMQ</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="核心架构"><a href="#核心架构" class="headerlink" title="核心架构"></a>核心架构</h1><table>
+<thead>
+<tr>
+<th align="center">RocketMQ架构</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><img src="/img/article_img/117.png" srcset="/img/config/loading.gif" lazyload></td>
+</tr>
+</tbody></table>
+<div class="note note-info">
+            <p>RocketMQ的整体架构和Kafka相似，只不过RMQ以NameServer作为注册中心。</p> 
+          </div>
+<h2 id="NameServer"><a href="#NameServer" class="headerlink" title="NameServer"></a>NameServer</h2><p>RMQ的NameServer与Kafka中的ZooKeeper作用相同，负责路由注册、服务发现与心跳维护等功能。但是RMQ的NamerServer属于去中心化设计，NameServer之间互不通信，非常轻量。</p>
+<p>NameServer属于去中心化设计，NameServer节点彼此独立，没有任何网络连接或数据同步机制。每个NameServer 都只接收来自 Broker、Producer、Consumer 的请求，并维护自己本地的路由表。多个NameServer之间的数据一致性由客户端的主动全量注册行为保证。</p>
+<h2 id="Producer"><a href="#Producer" class="headerlink" title="Producer"></a>Producer</h2><p>RocketMQ支持同步发送、异步发送以及单向消息，这里区分下单向发送和异步发送：</p>
+<ul>
+<li>单向发送：发送完直接返回，也不需要回调监听</li>
+<li>异步发送：发送完直接返回，但会设置回调函数监听发送结果</li>
+</ul>
+<div class="note note-warning">
+            <p>NameServer属于最终一致性，因此存在数据不一致窗口，NameServer 需要等 120 秒（默认心跳超时） 才剔除宕机Broker，期间 Consumer 可能连到已宕机的 Broker，捕获异常后会进行重试。生产者和消费者也会定期拉取NameServer更新自己的本地路由</p> 
+          </div>
+
+<h1 id="高可用-高性能机制"><a href="#高可用-高性能机制" class="headerlink" title="高可用 &amp; 高性能机制"></a>高可用 &amp; 高性能机制</h1><h2 id="持久化机制"><a href="#持久化机制" class="headerlink" title="持久化机制"></a>持久化机制</h2><table>
+<thead>
+<tr>
+<th>维度</th>
+<th>RocketMQ</th>
+<th>Kafka</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>核心存储单元</strong></td>
+<td>所有 Topic 共享一个 CommitLog（全局顺序写）</td>
+<td>每个 Partition 独立文件（按 Topic-Partition 分目录）</td>
+</tr>
+<tr>
+<td><strong>索引结构</strong></td>
+<td>ConsumeQueue（逻辑队列，记录 offset&#x2F;size&#x2F;tag） + IndexFile</td>
+<td>直接基于 Partition 文件偏移量（offset &#x3D; 文件字节偏移）</td>
+</tr>
+<tr>
+<td><strong>写入方式</strong></td>
+<td>所有消息追加到 CommitLog → 异步构建 ConsumeQueue</td>
+<td>消息直接追加到对应 Partition 的日志段（.log 文件）</td>
+</tr>
+</tbody></table>
+<p>RocketMQ采用<strong>顺序写磁盘 + PageCache 异步刷盘&#x2F;同步刷盘</strong>策略来实现消息的持久化，存储结构主要由三部分构成：<strong>CommitLog、ConsumerQueue和IndexFile</strong>。和Kafka不同，Kafka是为Broker上的每一个Topic-Partation都维护了一个log文件，而RMQ是将<strong>所有消息统一写入一个物理文件</strong>CommitLog，每个文件大小默认1GB。ConsumerQueue是基于CommitLog建立的索引，可以根据Topic-Queue定位消息。IndexFile不是必要的，RMQ支持基于某些key维护索引，IndexFile就是这些额外的索引文件。</p>
+<p>Kafka的基于分区构建日志文件与RMQ的统一日志文件+ConsumerQueue持久化各有什么优缺点呢？</p>
+<table>
+<thead>
+<tr>
+<th align="center">维度</th>
+<th align="center">Kafka</th>
+<th align="center">RocketMQ</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">读性能</td>
+<td align="center">一次内存访问，最多加一次磁盘访问</td>
+<td align="center">两次内存访问，最多加一次磁盘访问（先访问ConsumerQueue，再通过索引位置去拿消息）</td>
+</tr>
+<tr>
+<td align="center">顺序写性能</td>
+<td align="center">相对较差，虽然每个Topic的不同分区的日志文件是顺序写，但不同Topic或不同分区属于随机写</td>
+<td align="center">所有Topic的所有Queue共用一个CommitLog，顺序写的性能更好</td>
+</tr>
+<tr>
+<td align="center">小Topic&#x2F;多Topic场景性能</td>
+<td align="center">不适合，大量的Topic消息很少的话严重浪费I&#x2F;O资源，文件描述符资源，<strong>小文件会很多</strong></td>
+<td align="center">无论多少Topic都全部写入同一个CommitLog</td>
+</tr>
+<tr>
+<td align="center">横向扩容成本</td>
+<td align="center">分区扩容成本高，消息需要根据key哈希重新进行映射迁移</td>
+<td align="center">扩容成本低，只需要增加一个逻辑索引ConsumerQueue，不涉及消息在物理存储结构上的迁移</td>
+</tr>
+</tbody></table>
+<div class="note note-info">
+            <p>虽然上边表格分析RMQ的顺序写性能更好，但是在超多生产者并发生产写入消息的情况下，对append锁的竞争可能导致顺序写性能严重下降</p> 
+          </div>
+
+<div class="note note-info">
+            <p>Kafka和RocketMQ都使用了零拷贝优化读性能，DMA+sendfile，<strong>避免了CPU内部的数据拷贝</strong></p> 
+          </div>
+
+<h2 id="多副本机制"><a href="#多副本机制" class="headerlink" title="多副本机制"></a>多副本机制</h2><p>Kafka的副本粒度是分区级别的，从节点同步Leader数据时，按照自己的分区进行同步。但RMQ的副本粒度是Broker级别的，也就是只存在主从Broker，不存在主从分区，这是由RMQ的持久化机制决定的，RMQ底层所有Queue共用一个CommitLog，不支持分区级别的数据同步。</p>
+<p>RocketMQ的主从同步基于DLedger方案，底层采用Raft协议。具体的同步流程如下：</p>
+<ul>
+<li>Producer发送消息，Leader Broker将消息追加到DLedger日志文件（非CommitLog）</li>
+<li>Leader Broker向所有 Follower 发送消息，要求他们追加同样的日志</li>
+<li>当Leader收到超过半数的ACK之后，将消息追加到CommitLog日志，响应客户端，并发送commit指令</li>
+<li>Follower收到Commit指令后，将消息追加到本地CommitLog</li>
+</ul>
+<p>这个过程看起来RMQ的效率很低对不对，其实RMQ进行了优化：</p>
+<ul>
+<li>Raft Log批量提交，不是每一个消息都要进行一次网络请求，RMQ积攒Raft log然后批量发送，提升吞吐量</li>
+<li>流水线发送，RMQ并不会等待前一条消息的ACK返回之后再发送下一条，长连接流水线发送</li>
+<li>零拷贝性能提升</li>
+</ul>
+<h2 id="故障检测与恢复机制"><a href="#故障检测与恢复机制" class="headerlink" title="故障检测与恢复机制"></a>故障检测与恢复机制</h2><p>参考<a target="_blank" rel="noopener" href="https://www.cnblogs.com/XiushengXu/p/19404603">RocketMQ高性能 &amp; 高可用机制</a>。</p>
+<h1 id="消息类型"><a href="#消息类型" class="headerlink" title="消息类型"></a>消息类型</h1><h2 id="顺序消息"><a href="#顺序消息" class="headerlink" title="顺序消息"></a>顺序消息</h2><p>Kafka支持全局有序和局部有序，和Kafka相同，RocketMQ也支持全局有序和局部有序。同一个MessageQueue钟大哥消息消费顺序是固定的，属于局部有序。如果需要全局有序，则指定MessageQueue数量为1保证全局顺序，但是性能很差。</p>
+<p>Kafka没有死信队列，不会主动跳过或隔离失败消息，所以不存在顺序消息未被消费跳过的风险。RocketMQ原生支持死信队列，消息重试消费次数达到上限后会进入死信队列，对于顺序消息来说，如果消息没有消费成功被跳过，会导致消费混乱。RocketMQ顺序消费时，如果遇到消费失败，需要一直重试，不允许跳过。</p>
+<h2 id="事务消息"><a href="#事务消息" class="headerlink" title="事务消息"></a>事务消息</h2><p>RocketMQ支持事务消息，和kafka中的事务不同，kafka中的事务是保证一组消息要么都发送成功，要么都失败。RocketMQ的事务消息是为了支持分布式事务而存在的，通过<strong>两阶段提交+事务状态回查</strong>实现。</p>
+<ul>
+<li>本地数据库事务成功 → 消息一定被投递</li>
+<li>本地数据库事务失败 → 消息一定不会被投递<br>具体的执行流程如下：</li>
+</ul>
+<ol>
+<li>生产者发送半消息给Broker，Broker将其持久化，但<strong>并不写入ConsumeQueue</strong>，所以消费者不可见，半消息属于消息的预备状态</li>
+<li>生产者收到Broker的成功响应后，执行本地事务，根据执行结果，向Broker发送二次确认：<ul>
+<li>COMMIT：消息变为可消费状态，投递给消费者。</li>
+<li>ROLLBACK：Broker 删除该半消息，消费者永远不会看到</li>
+</ul>
+</li>
+<li>如果 Broker 在一段时间内未收到明确的 COMMIT&#x2F;ROLLBACK，会发起回查请求</li>
+<li>生产者接收到回查请求后，根据本地事务日志或数据记录，返回事务的真实状态</li>
+<li>Broker 根据回查结果决定是否投递消息，回查最多执行15次，超过15次后，Broker丢弃半消息</li>
+</ol>
+<h1 id="Pull模式与Push模式"><a href="#Pull模式与Push模式" class="headerlink" title="Pull模式与Push模式"></a>Pull模式与Push模式</h1><h2 id="Pull模式"><a href="#Pull模式" class="headerlink" title="Pull模式"></a>Pull模式</h2><p>消费者主动向Broker发起请求获取消息，所有的非业务逻辑(重试、offset提交、拉取消息)等都由开发者手动实现。消费者消费完缓存到本地的消息后，主动去Broker拉取消息，如果MessageQueue中无消息，会阻塞等待一段时间再发起Pull请求，避免空轮询。</p>
+<h2 id="Push模式"><a href="#Push模式" class="headerlink" title="Push模式"></a>Push模式</h2><p>RocketMQ的Push模式是框架帮助开发者封装了拉取消息、重试、轮询等非业务逻辑，<strong>本质上还是Pull模式</strong>，只不过执行Pull请求的对象从开发者变为了框架。Push模式的关键是<strong>PullService线程池+长轮询</strong>。</p>
+<p>PushConsumer启动后，内部会维护一个PullService线程池，用于从消费者消费的MessageQueue拉取消息，线程启动后会不断地从Queue中拉取消息。</p>
+<ul>
+<li>若MessageQueue有消息，线程会直接拉取消息到本地并回调消费者的消费接口</li>
+<li>若MessageQueue无消息，则等待一段时间，超时后如果依然没有消息，直接响应消费者</li>
+</ul>
+<div class="note note-info">
+            <p>PushConsumer采用的是长轮询模式，避免CPU无效空转</p> 
+          </div>
+<p>虽然RocketMQ并未实现真正的Push，这里还是介绍下两种模式各自的优缺点：</p>
+<table>
+<thead>
+<tr>
+<th align="center">维度</th>
+<th align="center">Push</th>
+<th align="center">Pull</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">稳定性</td>
+<td align="center">稳定性低，不考虑消费端的消费速率无脑推送</td>
+<td align="center">消费者可以根据自己的消费速率调整拉取速度，适合稳定消费的场景</td>
+</tr>
+<tr>
+<td align="center">吞吐量</td>
+<td align="center">高，有消息就推送</td>
+<td align="center">相对较低，需要等待消费者主动拉取</td>
+</tr>
+<tr>
+<td align="center">延迟</td>
+<td align="center">延迟低，立即发送</td>
+<td align="center">相对较高，消息到来和被拉取之间存在时间差</td>
+</tr>
+<tr>
+<td align="center">实现复杂性</td>
+<td align="center">Broker端需要处理非业务逻辑</td>
+<td align="center">非业务逻辑由消费端实现</td>
+</tr>
+</tbody></table>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/RocketMQ/" class="category-chain-item">RocketMQ</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" class="print-no-link">#消息队列</a>
+      
+        <a href="/tags/RocketMQ/" class="print-no-link">#RocketMQ</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>RocketMQ</div>
+      <div>http://xuxiusheng.github.io/2026/01/01/RocketMQ/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Xuxiusheng</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年1月1日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/01/01/Kafka%E4%BA%8B%E5%8A%A1/" title="Kafka事务">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Kafka事务</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/01/01/RocketMQ%E9%AB%98%E5%8F%AF%E7%94%A8%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%BA%E5%88%B6%E5%AE%9E%E7%8E%B0/" title="RocketMQ高可用 高性能机制实现">
+                        <span class="hidden-mobile">RocketMQ高可用 高性能机制实现</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.5.1/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"2HT5rmC5XQuRugoXS6jx93oG-gzGzoHsz","appKey":"34FVPpMZGQcLXWdGF6FnOx9T","path":"window.location.pathname","placeholder":"说点什么吧","avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"","emojiCDN":null,"emojiMaps":null,"enableQQ":false,"appid":"2HT5rmC5XQuRugoXS6jx93oG-gzGzoHsz","appkey":"34FVPpMZGQcLXWdGF6FnOx9T","app_id":"2HT5rmC5XQuRugoXS6jx93oG-gzGzoHsz","app_key":"34FVPpMZGQcLXWdGF6FnOx9T"},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/card.js"></script>
+<script src="/js/encrypt_core.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
