@@ -26,15 +26,15 @@
 <meta property="og:site_name" content="Xuxiusheng">
 <meta property="og:description" content="内存资源有限且珍贵，Redis作为高性能内存数据库，充分有效利用内存是充分且必要的，下面简单来看下Redis的内存管理模型。 过期机制内存是有限的，所以需要将不被使用或者偶尔被使用的数据移出内存，以提升内存的有效利用率。Redis提供了过期机制来实现这个功能，即在创建key的时候可以指定过期时间，如果key已存在可以通过expire命令设置过期时间。  如果不指定过期时间，则永不过期   那Red">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://xuxiusheng.github.io/mg/article_img/30.png">
-<meta property="og:image" content="http://xuxiusheng.github.io/mg/article_img/31.png">
-<meta property="og:image" content="http://xuxiusheng.github.io/mg/article_img/32.png">
+<meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/30.png">
+<meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/31.png">
+<meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/32.png">
 <meta property="article:published_time" content="2026-01-01T08:30:00.000Z">
-<meta property="article:modified_time" content="2026-01-01T08:48:17.539Z">
+<meta property="article:modified_time" content="2026-01-13T18:28:35.971Z">
 <meta property="article:author" content="Xuxiusheng">
 <meta property="article:tag" content="Redis">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://xuxiusheng.github.io/mg/article_img/30.png">
+<meta name="twitter:image" content="http://xuxiusheng.github.io/img/article_img/30.png">
   
   
   
@@ -339,7 +339,7 @@
 <blockquote>
 <p>如果不指定过期时间，则永不过期</p>
 </blockquote>
-<p><img src="/mg/article_img/30.png" srcset="/img/config/loading.gif" lazyload></p>
+<p><img src="/img/article_img/30.png" srcset="/img/config/loading.gif" lazyload></p>
 <p>那Redis是如何判断数据过期的呢？redisDB，可以看作是一个hash数据结构，在处理请求之前，先查询redisDB验证数据是否存在或是否过期，如果存在且在有效时间内再执行真正的访问。如果发现过期就删除数据。</p>
 <h2 id="过期删除机制"><a href="#过期删除机制" class="headerlink" title="过期删除机制"></a>过期删除机制</h2><p>常见的过期删除机制有以下四个：</p>
 <ul>
@@ -356,7 +356,7 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-comment">// 默认为 10</span><br>hz <span class="hljs-number">10</span><br><span class="hljs-comment">// 默认开启</span><br>dynamic-hz yes<br></code></pre></td></tr></table></figure>
 
 <h1 id="内存淘汰机制"><a href="#内存淘汰机制" class="headerlink" title="内存淘汰机制"></a>内存淘汰机制</h1><p>虽然过期机制能够尽量避免内存占用过高，但是在特定场景下，机器内存也会不可避免地被耗尽，需要根据特定的内存淘汰算法淘汰部分key</p>
-<p>Redis 的内存淘汰策略只有在运行内存达到了配置的最大内存阈值时才会触发，这个阈值是通过 redis.conf 的 maxmemory 参数来定义的，默认为0，表示不限制最大内存阈值<br><img src="/mg/article_img/31.png" srcset="/img/config/loading.gif" lazyload></p>
+<p>Redis 的内存淘汰策略只有在运行内存达到了配置的最大内存阈值时才会触发，这个阈值是通过 redis.conf 的 maxmemory 参数来定义的，默认为0，表示不限制最大内存阈值<br><img src="/img/article_img/31.png" srcset="/img/config/loading.gif" lazyload></p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c">configEnum maxmemory_policy_enum[] = &#123;<br>    &#123;<span class="hljs-string">&quot;volatile-lru&quot;</span>, MAXMEMORY_VOLATILE_LRU&#125;, <span class="hljs-comment">// 根据LRU从设置过期时间的key中淘汰</span><br>    &#123;<span class="hljs-string">&quot;volatile-lfu&quot;</span>, MAXMEMORY_VOLATILE_LFU&#125;, <span class="hljs-comment">// 根据LFU从设置过期时间的key中淘汰</span><br>    &#123;<span class="hljs-string">&quot;volatile-random&quot;</span>,MAXMEMORY_VOLATILE_RANDOM&#125;, <span class="hljs-comment">// 随机从设置过期时间的key中淘汰</span><br>    &#123;<span class="hljs-string">&quot;volatile-ttl&quot;</span>,MAXMEMORY_VOLATILE_TTL&#125;, <span class="hljs-comment">// 根据到期时间从设置过期时间的key中淘汰</span><br>    &#123;<span class="hljs-string">&quot;allkeys-lru&quot;</span>,MAXMEMORY_ALLKEYS_LRU&#125;, <span class="hljs-comment">// 根据LRU从所有key中淘汰</span><br>    &#123;<span class="hljs-string">&quot;allkeys-lfu&quot;</span>,MAXMEMORY_ALLKEYS_LFU&#125;, <span class="hljs-comment">// 根据LFU从所有key中淘汰</span><br>    &#123;<span class="hljs-string">&quot;allkeys-random&quot;</span>,MAXMEMORY_ALLKEYS_RANDOM&#125;, <span class="hljs-comment">// 随机从所有key中淘汰</span><br>    &#123;<span class="hljs-string">&quot;noeviction&quot;</span>,MAXMEMORY_NO_EVICTION&#125;, <span class="hljs-comment">// 内存满抛异常,默认策略</span><br>&#125;;<br></code></pre></td></tr></table></figure>
 <p>noeviction是默认的内存淘汰策略，即内存满后抛异常</p>
 <p>Redis LRU算法实现：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/vivotech/p/17531827.html">https://www.cnblogs.com/vivotech/p/17531827.html</a></p>
@@ -367,7 +367,7 @@
 <li>LRU的弊端在于不适合冷热数据，一份数据在之前可能累积了很大的请求量，但是最近一直没有被访问，但一直驻留在内存，可以通过LFU算法解决，结合了访问次数和存活时间来计算key的热度</li>
 </ul>
 </blockquote>
-<h1 id="内存碎片管理机制"><a href="#内存碎片管理机制" class="headerlink" title="内存碎片管理机制"></a>内存碎片管理机制</h1><p><img src="/mg/article_img/32.png" srcset="/img/config/loading.gif" lazyload><br>内存碎片是怎么来的呢？</p>
+<h1 id="内存碎片管理机制"><a href="#内存碎片管理机制" class="headerlink" title="内存碎片管理机制"></a>内存碎片管理机制</h1><p><img src="/img/article_img/32.png" srcset="/img/config/loading.gif" lazyload><br>内存碎片是怎么来的呢？</p>
 <ul>
 <li>Redis采用空间预分配机制，申请的内存一般要比实际使用的要多</li>
 <li>过期机制，数据的过期时间不同，进一步加剧了内存的碎片化</li>
