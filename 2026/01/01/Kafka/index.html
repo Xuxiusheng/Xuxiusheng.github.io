@@ -33,7 +33,7 @@
 <meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/72.png">
 <meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/73.png">
 <meta property="article:published_time" content="2026-01-01T11:30:00.000Z">
-<meta property="article:modified_time" content="2026-01-01T11:44:36.944Z">
+<meta property="article:modified_time" content="2026-01-14T16:27:14.960Z">
 <meta property="article:author" content="Xuxiusheng">
 <meta property="article:tag" content="Kafka">
 <meta property="article:tag" content="消息队列">
@@ -357,6 +357,10 @@
 <li>Partation：同一个topic划分成多个Partation存储</li>
 <li>Broker：节点的概念，用于存储消息数据。不同的Partation存储在不同的Broker上，同一个Topic的不同Partation最好存储在不同的Broker</li>
 </ul>
+<div class="note note-info">
+            <p>Kafka只支持增加分区数量，不支持减少分区，减少分区会增加数据丢失风险</p> 
+          </div>
+
 <h1 id="高可用机制-高性能机制"><a href="#高可用机制-高性能机制" class="headerlink" title="高可用机制 &amp; 高性能机制"></a>高可用机制 &amp; 高性能机制</h1><h2 id="持久化机制"><a href="#持久化机制" class="headerlink" title="持久化机制"></a>持久化机制</h2><p>Kafka的消息是存储在硬盘上的，确保数据在发生故障或重启时不会丢失。</p>
 <p>Kafka的消息持久化通过日志段实现，一个Topic的消息分布在多个Partation中，每个Partation在计算机物理结构上体现为多个日志段，Kafka采用追加写将消息写入到日志段，日志段的引入使 Kafka 能够有效管理磁盘空间，避免日志过大降低性能。</p>
 <p>日志段也实现了过期删除压缩机制，当存活时间超过了保留时间，或者日志段大小超过阈值，会进行删除或压缩。</p>
