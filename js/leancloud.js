@@ -92,7 +92,7 @@
   }
 
   function addCount(Counter) {
-    var enableIncr = CONFIG.web_analytics.enable && !Fluid.ctx.dnt && validHost() && localStorage.getItem('is_admin') !== 'true';;
+    var enableIncr = CONFIG.web_analytics.enable && !Fluid.ctx.dnt && validHost() && localStorage.getItem('is_admin') !== 'true';
     var getterArr = [];
     var incrArr = [];
 
