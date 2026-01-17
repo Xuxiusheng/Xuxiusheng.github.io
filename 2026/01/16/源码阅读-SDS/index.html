@@ -1,0 +1,831 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/config/fluid.png">
+  <link rel="icon" href="/img/config/personal.jpg">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Xuxiusheng">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="SDS底层结构Redis为了尽可能地节省内存，根据字符串的长度设计了5种类型的字符串底层结构，在实际使用时，会根据字符串的长度选择合适的类型。 12345678910111213141516171819202122232425262728struct __attribute__ ((__packed__)) sdshdr5 &#123;    unsigned char flags; &#x2F;* 3 l">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis SDS">
+<meta property="og:url" content="http://xuxiusheng.github.io/2026/01/16/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB-SDS/index.html">
+<meta property="og:site_name" content="Xuxiusheng">
+<meta property="og:description" content="SDS底层结构Redis为了尽可能地节省内存，根据字符串的长度设计了5种类型的字符串底层结构，在实际使用时，会根据字符串的长度选择合适的类型。 12345678910111213141516171819202122232425262728struct __attribute__ ((__packed__)) sdshdr5 &#123;    unsigned char flags; &#x2F;* 3 l">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-01-16T12:10:00.000Z">
+<meta property="article:modified_time" content="2026-01-17T13:07:53.505Z">
+<meta property="article:author" content="Xuxiusheng">
+<meta property="article:tag" content="Redis">
+<meta property="article:tag" content="源码解读">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>Redis SDS - Xuxiusheng</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/cnblogs/iconfont.css">
+<link rel="stylesheet" href="/css/email/iconfont.css">
+<link rel="stylesheet" href="/css/card.css">
+<link rel="stylesheet" href="/css/stats/iconfont.css">
+<link rel="stylesheet" href="/css/partial_encrypt.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"xuxiusheng.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/config/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"2HT5rmC5XQuRugoXS6jx93oG-gzGzoHsz","app_key":"34FVPpMZGQcLXWdGF6FnOx9T","server_url":"https://2ht5rmc5.lc-cn-n1-shared.com","path":"window.location.pathname","ignore_local":true},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>XuxiushengのBlog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/data/" target="_self">
+                <i class="icon iconfont icon-tongjijisuan"></i>
+                <span>本站统计</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/config/content1.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Redis SDS"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-01-16 20:10" pubdate>
+          2026年1月16日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          9.5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          80 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Redis SDS</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="SDS底层结构"><a href="#SDS底层结构" class="headerlink" title="SDS底层结构"></a>SDS底层结构</h1><p>Redis为了尽可能地节省内存，根据字符串的长度设计了5种类型的字符串底层结构，在实际使用时，会根据字符串的长度选择合适的类型。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> __<span class="hljs-title">attribute__</span> ((__<span class="hljs-title">packed__</span>)) <span class="hljs-title">sdshdr5</span> &#123;</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> flags; <span class="hljs-comment">/* 3 lsb of type, and 5 msb of string length */</span><br>    <span class="hljs-type">char</span> buf[];<br>&#125;;<br><span class="hljs-class"><span class="hljs-keyword">struct</span> __<span class="hljs-title">attribute__</span> ((__<span class="hljs-title">packed__</span>)) <span class="hljs-title">sdshdr8</span> &#123;</span><br>    <span class="hljs-type">uint8_t</span> len; <span class="hljs-comment">/* 当前已使用的字节数 */</span><br>    <span class="hljs-type">uint8_t</span> alloc; <span class="hljs-comment">/* buf分配的总字节数 */</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> flags; <span class="hljs-comment">/* 编码类型 */</span><br>    <span class="hljs-type">char</span> buf[];<br>&#125;;<br><span class="hljs-class"><span class="hljs-keyword">struct</span> __<span class="hljs-title">attribute__</span> ((__<span class="hljs-title">packed__</span>)) <span class="hljs-title">sdshdr16</span> &#123;</span><br>    <span class="hljs-type">uint16_t</span> len; <span class="hljs-comment">/* used */</span><br>    <span class="hljs-type">uint16_t</span> alloc; <span class="hljs-comment">/* excluding the header and null terminator */</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> flags; <span class="hljs-comment">/* 3 lsb of type, 5 unused bits */</span><br>    <span class="hljs-type">char</span> buf[];<br>&#125;;<br><span class="hljs-class"><span class="hljs-keyword">struct</span> __<span class="hljs-title">attribute__</span> ((__<span class="hljs-title">packed__</span>)) <span class="hljs-title">sdshdr32</span> &#123;</span><br>    <span class="hljs-type">uint32_t</span> len; <span class="hljs-comment">/* used */</span><br>    <span class="hljs-type">uint32_t</span> alloc; <span class="hljs-comment">/* excluding the header and null terminator */</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> flags; <span class="hljs-comment">/* 3 lsb of type, 5 unused bits */</span><br>    <span class="hljs-type">char</span> buf[];<br>&#125;;<br><span class="hljs-class"><span class="hljs-keyword">struct</span> __<span class="hljs-title">attribute__</span> ((__<span class="hljs-title">packed__</span>)) <span class="hljs-title">sdshdr64</span> &#123;</span><br>    <span class="hljs-type">uint64_t</span> len; <span class="hljs-comment">/* used */</span><br>    <span class="hljs-type">uint64_t</span> alloc; <span class="hljs-comment">/* excluding the header and null terminator */</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> flags; <span class="hljs-comment">/* 3 lsb of type, 5 unused bits */</span><br>    <span class="hljs-type">char</span> buf[];<br>&#125;;<br></code></pre></td></tr></table></figure>
+<p>以上代码是Redis中 <strong>SDS（Simple Dynamic String）</strong> 的底层数据结构定义，用于实现可变长度、二进制安全的字符串。为了节省内存，在不同字符串长度下使用了5种不同的头部结构体</p>
+<div class="note note-info">
+            <p>sdshdr5比较特殊，只有flags和buf字段，极致节省内存，之前的版本主要用于<strong>存储常量字符串</strong>，但由于无法扩容，所以在之后的版本被舍弃，最小的类型是sdshdr8</p> 
+          </div>
+
+<p>以sdshdr8为例，内存布局如下：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs text">+--------+--------+--------+------------------+-----+<br>|  len=5 | alloc=5| flags=1| &#x27;h&#x27;,&#x27;e&#x27;,&#x27;l&#x27;,&#x27;l&#x27;,&#x27;o&#x27;| &#x27;\0&#x27;|<br>+--------+--------+--------+------------------+-----+<br>                           ^<br>指向 sds 字符串的指针（即 buf 地址）<br></code></pre></td></tr></table></figure>
+<p>用户拿到的 sds 指针实际是指向 buf 的。要访问 header，需通过 (void*)(s - sizeof(struct sdshdr8)) 回退。</p>
+<h1 id="Set-命令执行过程"><a href="#Set-命令执行过程" class="headerlink" title="Set 命令执行过程"></a>Set 命令执行过程</h1><p>下面来看下set命令的执行过程</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// &#123;&quot;set&quot;,setCommand,-3,&quot;wm&quot;,0,NULL,1,1,1,0,0&#125;</span><br><span class="hljs-type">void</span> <span class="hljs-title function_">setCommand</span><span class="hljs-params">(client *c)</span> &#123;<br>    <span class="hljs-type">int</span> j;<br>    robj *expire = <span class="hljs-literal">NULL</span>;<br>    <span class="hljs-type">int</span> unit = UNIT_SECONDS;<br>    <span class="hljs-type">int</span> flags = OBJ_SET_NO_FLAGS;<br><br>    <span class="hljs-comment">/* 解析set k v ...中v之后的参数，比如 set key value ex 10*/</span><br>    <span class="hljs-keyword">for</span> (j = <span class="hljs-number">3</span>; j &lt; c-&gt;argc; j++) &#123;<br>        <span class="hljs-type">char</span> *a = c-&gt;argv[j]-&gt;ptr;<br>        robj *next = (j == c-&gt;argc<span class="hljs-number">-1</span>) ? <span class="hljs-literal">NULL</span> : c-&gt;argv[j+<span class="hljs-number">1</span>];<br><br>        <span class="hljs-keyword">if</span> ((a[<span class="hljs-number">0</span>] == <span class="hljs-string">&#x27;n&#x27;</span> || a[<span class="hljs-number">0</span>] == <span class="hljs-string">&#x27;N&#x27;</span>) &amp;&amp;<br>            (a[<span class="hljs-number">1</span>] == <span class="hljs-string">&#x27;x&#x27;</span> || a[<span class="hljs-number">1</span>] == <span class="hljs-string">&#x27;X&#x27;</span>) &amp;&amp; a[<span class="hljs-number">2</span>] == <span class="hljs-string">&#x27;\0&#x27;</span> &amp;&amp;<br>            !(flags &amp; OBJ_SET_XX))<br>        &#123;<br>            flags |= OBJ_SET_NX;<br>        &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> ((a[<span class="hljs-number">0</span>] == <span class="hljs-string">&#x27;x&#x27;</span> || a[<span class="hljs-number">0</span>] == <span class="hljs-string">&#x27;X&#x27;</span>) &amp;&amp;<br>                   (a[<span class="hljs-number">1</span>] == <span class="hljs-string">&#x27;x&#x27;</span> || a[<span class="hljs-number">1</span>] == <span class="hljs-string">&#x27;X&#x27;</span>) &amp;&amp; a[<span class="hljs-number">2</span>] == <span class="hljs-string">&#x27;\0&#x27;</span> &amp;&amp;<br>                   !(flags &amp; OBJ_SET_NX))<br>        &#123;<br>            flags |= OBJ_SET_XX;<br>        &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> ((a[<span class="hljs-number">0</span>] == <span class="hljs-string">&#x27;e&#x27;</span> || a[<span class="hljs-number">0</span>] == <span class="hljs-string">&#x27;E&#x27;</span>) &amp;&amp;<br>                   (a[<span class="hljs-number">1</span>] == <span class="hljs-string">&#x27;x&#x27;</span> || a[<span class="hljs-number">1</span>] == <span class="hljs-string">&#x27;X&#x27;</span>) &amp;&amp; a[<span class="hljs-number">2</span>] == <span class="hljs-string">&#x27;\0&#x27;</span> &amp;&amp;<br>                   !(flags &amp; OBJ_SET_PX) &amp;&amp; next)<br>        &#123;<br>            flags |= OBJ_SET_EX;<br>            unit = UNIT_SECONDS;<br>            expire = next;<br>            j++;<br>        &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> ((a[<span class="hljs-number">0</span>] == <span class="hljs-string">&#x27;p&#x27;</span> || a[<span class="hljs-number">0</span>] == <span class="hljs-string">&#x27;P&#x27;</span>) &amp;&amp;<br>                   (a[<span class="hljs-number">1</span>] == <span class="hljs-string">&#x27;x&#x27;</span> || a[<span class="hljs-number">1</span>] == <span class="hljs-string">&#x27;X&#x27;</span>) &amp;&amp; a[<span class="hljs-number">2</span>] == <span class="hljs-string">&#x27;\0&#x27;</span> &amp;&amp;<br>                   !(flags &amp; OBJ_SET_EX) &amp;&amp; next)<br>        &#123;<br>            flags |= OBJ_SET_PX;<br>            unit = UNIT_MILLISECONDS;<br>            expire = next;<br>            j++;<br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>            addReply(c,shared.syntaxerr);<br>            <span class="hljs-keyword">return</span>;<br>        &#125;<br>    &#125;<br><br>    c-&gt;argv[<span class="hljs-number">2</span>] = tryObjectEncoding(c-&gt;argv[<span class="hljs-number">2</span>]); <span class="hljs-comment">// 优化value的内部布局，采用更节省内存的编码方式</span><br>    setGenericCommand(c,flags,c-&gt;argv[<span class="hljs-number">1</span>],c-&gt;argv[<span class="hljs-number">2</span>],expire,unit,<span class="hljs-literal">NULL</span>,<span class="hljs-literal">NULL</span>);<br>&#125;<br><br><br>robj *<span class="hljs-title function_">tryObjectEncoding</span><span class="hljs-params">(robj *o)</span> &#123;<br>    <span class="hljs-type">long</span> value;<br>    sds s = o-&gt;ptr;<br>    <span class="hljs-type">size_t</span> len;<br><br>    <span class="hljs-comment">/* 判断是否为String类型 */</span><br>    serverAssertWithInfo(<span class="hljs-literal">NULL</span>,o,o-&gt;type == OBJ_STRING);<br><br>    <span class="hljs-comment">/* 只对encoding类型为embstr或raw的string作类型转化处理 */</span><br>    <span class="hljs-keyword">if</span> (!sdsEncodedObject(o)) <span class="hljs-keyword">return</span> o;<br><br>    <span class="hljs-comment">/* 如果这个对象被多个地方引用，就直接返回原对象，不要修改它。</span><br><span class="hljs-comment">     * Redis 中很多对象是共享的，多个指针指向同一个redisObject。为</span><br><span class="hljs-comment">     * 了防止意外修改影响其他使用者，任何可能改变对象内容的操作，都</span><br><span class="hljs-comment">     * 必须先确保该对象是“独占”的</span><br><span class="hljs-comment">     */</span><br>     <span class="hljs-keyword">if</span> (o-&gt;refcount &gt; <span class="hljs-number">1</span>) <span class="hljs-keyword">return</span> o;<br><br>    len = sdslen(s);<br>    <span class="hljs-comment">/* 当长度小于等于20并且字符串为纯数字时，用整数表示字符串</span><br><span class="hljs-comment">     * 阈值为20是由整数的十进制位数决定的，64位整数的最大长度为20</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">if</span> (len &lt;= <span class="hljs-number">20</span> &amp;&amp; string2l(s,len,&amp;value)) &#123;<br>        <span class="hljs-comment">/* 当内存淘汰策略为LRU时，不允许使用共享对象，因为共享对</span><br><span class="hljs-comment">         * 象无法为指向它的多个key独立计数 </span><br><span class="hljs-comment">         * 共享对象有缓存范围，整数默认范围是0-9999</span><br><span class="hljs-comment">         * #define OBJ_SHARED_INTEGERS 10000</span><br><span class="hljs-comment">         */</span><br>        <span class="hljs-keyword">if</span> ((server.maxmemory == <span class="hljs-number">0</span> ||<br>             (server.maxmemory_policy != MAXMEMORY_VOLATILE_LRU &amp;&amp;<br>              server.maxmemory_policy != MAXMEMORY_ALLKEYS_LRU)) &amp;&amp;<br>            value &gt;= <span class="hljs-number">0</span> &amp;&amp;<br>            value &lt; OBJ_SHARED_INTEGERS)<br>        &#123;<br>            decrRefCount(o);<br>            incrRefCount(shared.integers[value]);<br>            <span class="hljs-keyword">return</span> shared.integers[value]; <span class="hljs-comment">// 直接返回整数对象</span><br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>            <span class="hljs-keyword">if</span> (o-&gt;encoding == OBJ_ENCODING_RAW) sdsfree(o-&gt;ptr);<br>            o-&gt;encoding = OBJ_ENCODING_INT;<br>            o-&gt;ptr = (<span class="hljs-type">void</span>*) value;<br>            <span class="hljs-keyword">return</span> o;<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-comment">/* 当字符串长度小于44字节时，将其从RAW编码转化为EMBSTR编码格式</span><br><span class="hljs-comment">     *</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">if</span> (len &lt;= OBJ_ENCODING_EMBSTR_SIZE_LIMIT) &#123;<br>        robj *emb;<br><br>        <span class="hljs-keyword">if</span> (o-&gt;encoding == OBJ_ENCODING_EMBSTR) <span class="hljs-keyword">return</span> o;<br>        emb = createEmbeddedStringObject(s,sdslen(s));<br>        decrRefCount(o);<br>        <span class="hljs-keyword">return</span> emb;<br>    &#125;<br><br>    <span class="hljs-comment">/* 释放 SDS 字符串末尾的冗余空闲空间，当未分配内容的</span><br><span class="hljs-comment">     * 空闲空间长度大于已分配空间的10%时释放空闲空间</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">if</span> (o-&gt;encoding == OBJ_ENCODING_RAW &amp;&amp;<br>        sdsavail(s) &gt; len/<span class="hljs-number">10</span>)<br>    &#123;<br>        o-&gt;ptr = sdsRemoveFreeSpace(o-&gt;ptr);<br>    &#125;<br><br>    <span class="hljs-comment">/* Return the original object. */</span><br>    <span class="hljs-keyword">return</span> o;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>然后单独介绍一个函数dbOverwrite:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> <span class="hljs-title function_">dbOverwrite</span><span class="hljs-params">(redisDb *db, robj *key, robj *val)</span> &#123;<br>    dictEntry *de = dictFind(db-&gt;dict,key-&gt;ptr);<br><br>    serverAssertWithInfo(<span class="hljs-literal">NULL</span>,key,de != <span class="hljs-literal">NULL</span>);<br>    dictReplace(db-&gt;dict, key-&gt;ptr, val);<br>&#125;<br><br><span class="hljs-type">static</span> dictEntry *<span class="hljs-title function_">dictFind</span><span class="hljs-params">(dict *ht, <span class="hljs-type">const</span> <span class="hljs-type">void</span> *key)</span> &#123;<br>    dictEntry *he;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> h;<br><br>    <span class="hljs-comment">/* 从这里可以看出，redis数据库的所有键值对通过redisDB维护，而</span><br><span class="hljs-comment">     * redisDB是通过数组+链表实现的</span><br><span class="hljs-comment">     */</span><br>    <span class="hljs-keyword">if</span> (ht-&gt;size == <span class="hljs-number">0</span>) <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;<br>    h = dictHashKey(ht, key) &amp; ht-&gt;sizemask;<br>    he = ht-&gt;table[h];<br>    <span class="hljs-keyword">while</span>(he) &#123;<br>        <span class="hljs-keyword">if</span> (dictCompareHashKeys(ht, key, he-&gt;key))<br>            <span class="hljs-keyword">return</span> he;<br>        he = he-&gt;next;<br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;<br>&#125;<br><br><span class="hljs-type">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">dictReplace</span><span class="hljs-params">(dict *ht, <span class="hljs-type">void</span> *key, <span class="hljs-type">void</span> *val)</span> &#123;<br>    dictEntry *entry, auxentry;<br><br>    <span class="hljs-keyword">if</span> (dictAdd(ht, key, val) == DICT_OK)<br>        <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;<br>    <span class="hljs-comment">/* It already exists, get the entry */</span><br>    entry = dictFind(ht, key);<br>    <br>    <span class="hljs-comment">/* 先写新值，再删除旧值，避免新旧redisObject对象相同的情况下</span><br><span class="hljs-comment">     * 先删除后引用计数为0，内存被释放，新值的指针变成野指针</span><br><span class="hljs-comment">     */</span><br>    auxentry = *entry;<br>    dictSetHashVal(ht, entry, val);<br>    dictFreeEntryVal(ht, &amp;auxentry);<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>每一个Redis数据库的所有键值对，都是通过redisDB来统一维护的:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">redisDb</span> &#123;</span><br>    dict *dict;                 <span class="hljs-comment">/* The keyspace for this DB */</span><br>    dict *expires;              <span class="hljs-comment">/* Timeout of keys with a timeout set */</span><br>    dict *blocking_keys;        <span class="hljs-comment">/* Keys with clients waiting for data (BLPOP) */</span><br>    dict *ready_keys;           <span class="hljs-comment">/* Blocked keys that received a PUSH */</span><br>    dict *watched_keys;         <span class="hljs-comment">/* WATCHED keys for MULTI/EXEC CAS */</span><br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">evictionPoolEntry</span> *<span class="hljs-title">eviction_pool</span>;</span>    <span class="hljs-comment">/* Eviction pool of keys */</span><br>    <span class="hljs-type">int</span> id;                     <span class="hljs-comment">/* Database ID */</span><br>    <span class="hljs-type">long</span> <span class="hljs-type">long</span> avg_ttl;          <span class="hljs-comment">/* Average TTL, just for stats */</span><br>&#125; redisDb;<br></code></pre></td></tr></table></figure>
+
+<h1 id="String底层数据结构"><a href="#String底层数据结构" class="headerlink" title="String底层数据结构"></a>String底层数据结构</h1><p>从之前的Set命令执行过程也可以看出来，字符串类型支持三种编码方式：</p>
+<ul>
+<li>整数：当字符串只包含数字时，可以直接存储整数优化存储</li>
+<li>embstr：当字符串长度小于44字节，采用embstr编码</li>
+<li>raw：不满足以上条件，采用raw编码</li>
+</ul>
+<p>先来看下redis中对象的通用结构<strong>redisObject</strong>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">redisObject</span> &#123;</span><br>    <span class="hljs-type">unsigned</span> type:<span class="hljs-number">4</span>;<br>    <span class="hljs-type">unsigned</span> encoding:<span class="hljs-number">4</span>;<br>    <span class="hljs-type">unsigned</span> lru:LRU_BITS; <span class="hljs-comment">/* lru time (relative to server.lruclock) */</span><br>    <span class="hljs-type">int</span> refcount;<br>    <span class="hljs-type">void</span> *ptr;<br>&#125; robj;<br></code></pre></td></tr></table></figure>
+
+<p>raw格式的string需要两次分配内存,redisObject的分配和对象ptr的分配：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// 分配1：redisObject 结构体</span><br>robj *o = <span class="hljs-built_in">malloc</span>(<span class="hljs-keyword">sizeof</span>(robj));<br><br><span class="hljs-comment">// 分配2：SDS 字符串（独立内存块）</span><br>sds s = sdsnew(<span class="hljs-string">&quot;hello world...&quot;</span>);<br>o-&gt;ptr = s;  <span class="hljs-comment">// 指向另一块内存</span><br></code></pre></td></tr></table></figure>
+<p>而embstr只需要分配一次：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// 一次性分配足够大的内存块：</span><br><span class="hljs-comment">// [ redisObject (16B) | sdshdr8 (3B) | 字符内容 (≤44B) | \0 ]</span><br><span class="hljs-type">void</span> *ptr = <span class="hljs-built_in">malloc</span>(<span class="hljs-keyword">sizeof</span>(robj) + <span class="hljs-keyword">sizeof</span>(sdshdr8) + <span class="hljs-number">45</span>);<br>robj *o = ptr;<br>sds s = (<span class="hljs-type">char</span>*)ptr + <span class="hljs-keyword">sizeof</span>(robj);<br></code></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th>编码类型</th>
+<th>全称</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>embstr</code></td>
+<td>Embedded String（嵌入式字符串）</td>
+<td>短字符串（长度 ≤ 44 字节）</td>
+</tr>
+<tr>
+<td><code>raw</code></td>
+<td>Raw String（原始字符串）</td>
+<td>长字符串（长度 &gt; 44 字节）或被修改过的短字符串</td>
+</tr>
+</tbody></table>
+<p>从分配策略可以总结一下raw和embstr的区别：</p>
+<ul>
+<li>raw：两次内存分配，并且redisObject和sds的内存不连续，局部性差，适合存储大字符串对象</li>
+<li>embstr：一次内存分配，redisObject和sds的内存连续，局部性好，适合小字符串对象存储</li>
+</ul>
+<p>Redis要在“内存效率”、“访问速度”和“可变性”之间取得最佳平衡——对短字符串用 embstr 做极致优化，对长&#x2F;可变字符串用 raw 保证灵活性。</p>
+<div class="note note-info">
+            <p><strong>为什么将44字节作为转化的阈值呢？</strong><br>这个和底层的编码有关，redisObject(type,encoding,lru,refcount)占用16个字节,sdshdr8(len,alloc,flags)占用3个字节，字符串内容末尾’\0’占用一个字节，而单次内存分配的最小chunk为64字节，64-16-3-1&#x3D;44字节</p> 
+          </div>
+
+<h1 id="SDS与C字符串的区别"><a href="#SDS与C字符串的区别" class="headerlink" title="SDS与C字符串的区别"></a>SDS与C字符串的区别</h1><h2 id="获取len的时间复杂度为O-1"><a href="#获取len的时间复杂度为O-1" class="headerlink" title="获取len的时间复杂度为O(1)"></a>获取len的时间复杂度为O(1)</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-meta">#<span class="hljs-keyword">define</span> SDS_TYPE_5  0</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> SDS_TYPE_8  1</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> SDS_TYPE_16 2</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> SDS_TYPE_32 3</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> SDS_TYPE_64 4</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> SDS_TYPE_MASK 7</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> SDS_TYPE_BITS 3</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> SDS_HDR_VAR(T,s) struct sdshdr##T *sh = (void*)((s)-(sizeof(struct sdshdr##T)));</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> SDS_HDR(T,s) ((struct sdshdr##T *)((s)-(sizeof(struct sdshdr##T)))) <span class="hljs-comment">// 回退指针</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> SDS_TYPE_5_LEN(f) ((f)&gt;&gt;SDS_TYPE_BITS)</span><br><br><span class="hljs-type">static</span> <span class="hljs-keyword">inline</span> <span class="hljs-type">size_t</span> <span class="hljs-title function_">sdslen</span><span class="hljs-params">(<span class="hljs-type">const</span> sds s)</span> &#123;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> flags = s[<span class="hljs-number">-1</span>];<br>    <span class="hljs-keyword">switch</span>(flags&amp;SDS_TYPE_MASK) &#123;<br>        <span class="hljs-keyword">case</span> SDS_TYPE_5:<br>            <span class="hljs-keyword">return</span> SDS_TYPE_5_LEN(flags);<br>        <span class="hljs-keyword">case</span> SDS_TYPE_8:<br>            <span class="hljs-keyword">return</span> SDS_HDR(<span class="hljs-number">8</span>,s)-&gt;len;<br>        <span class="hljs-keyword">case</span> SDS_TYPE_16:<br>            <span class="hljs-keyword">return</span> SDS_HDR(<span class="hljs-number">16</span>,s)-&gt;len;<br>        <span class="hljs-keyword">case</span> SDS_TYPE_32:<br>            <span class="hljs-keyword">return</span> SDS_HDR(<span class="hljs-number">32</span>,s)-&gt;len;<br>        <span class="hljs-keyword">case</span> SDS_TYPE_64:<br>            <span class="hljs-keyword">return</span> SDS_HDR(<span class="hljs-number">64</span>,s)-&gt;len;<br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>C 字符串并不记录自身的长度信息， 所以为了获取一个 C 字符串的长度， 程序必须遍历整个字符串,直到遇到’\0’。</p>
+<h2 id="杜绝缓冲区溢出风险"><a href="#杜绝缓冲区溢出风险" class="headerlink" title="杜绝缓冲区溢出风险"></a>杜绝缓冲区溢出风险</h2><p>C语言原生的strcat拼接函数需要开发者在拼接之前手动确认缓冲区是否足够，如果忘记确认，同时恰好剩余的缓冲区不够的话，拼接时就会发生缓冲区溢出。SDS提供了sdscat API，底层其实调用的是sdscatlen API，代码如下:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><code class="hljs c">sds <span class="hljs-title function_">sdscatlen</span><span class="hljs-params">(sds s, <span class="hljs-type">const</span> <span class="hljs-type">void</span> *t, <span class="hljs-type">size_t</span> len)</span> &#123;<br>    <span class="hljs-type">size_t</span> curlen = sdslen(s);<br><br>    s = sdsMakeRoomFor(s,len);<br>    <span class="hljs-keyword">if</span> (s == <span class="hljs-literal">NULL</span>) <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;<br>    <span class="hljs-built_in">memcpy</span>(s+curlen, t, len);<br>    sdssetlen(s, curlen+len);<br>    s[curlen+len] = <span class="hljs-string">&#x27;\0&#x27;</span>;<br>    <span class="hljs-keyword">return</span> s;<br>&#125;<br><br>sds <span class="hljs-title function_">sdsMakeRoomFor</span><span class="hljs-params">(sds s, <span class="hljs-type">size_t</span> addlen)</span> &#123;<br>    <span class="hljs-type">void</span> *sh, *newsh;<br>    <span class="hljs-comment">// 计算空闲空间:alloc-len</span><br>    <span class="hljs-type">size_t</span> avail = sdsavail(s);<br>    <span class="hljs-type">size_t</span> len, newlen;<br>    <span class="hljs-type">char</span> type, oldtype = s[<span class="hljs-number">-1</span>] &amp; SDS_TYPE_MASK;<br>    <span class="hljs-type">int</span> hdrlen;<br><br>    <span class="hljs-comment">/* 如果剩余空间足够，直接返回 */</span><br>    <span class="hljs-keyword">if</span> (avail &gt;= addlen) <span class="hljs-keyword">return</span> s;<br><br>    len = sdslen(s);<br>    sh = (<span class="hljs-type">char</span>*)s-sdsHdrSize(oldtype);<br>    newlen = (len+addlen);<br><br>    <span class="hljs-comment">// 预分配策略，避免内存的频繁分配回收</span><br>    <span class="hljs-keyword">if</span> (newlen &lt; SDS_MAX_PREALLOC)<br>        newlen *= <span class="hljs-number">2</span>;<br>    <span class="hljs-keyword">else</span><br>        newlen += SDS_MAX_PREALLOC;<br><br>    type = sdsReqType(newlen);<br><br>    <span class="hljs-comment">/* Don&#x27;t use type 5: the user is appending to the string and type 5 is</span><br><span class="hljs-comment">     * not able to remember empty space, so sdsMakeRoomFor() must be called</span><br><span class="hljs-comment">     * at every appending operation. */</span><br>    <span class="hljs-keyword">if</span> (type == SDS_TYPE_5) type = SDS_TYPE_8;<br><br>    hdrlen = sdsHdrSize(type);<br><br>    <span class="hljs-comment">// 如果前后type一致，尝试原地扩展内存</span><br>    <span class="hljs-keyword">if</span> (oldtype==type) &#123;<br>        newsh = s_realloc(sh, hdrlen+newlen+<span class="hljs-number">1</span>);<br>        <span class="hljs-keyword">if</span> (newsh == <span class="hljs-literal">NULL</span>) <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;<br>        s = (<span class="hljs-type">char</span>*)newsh+hdrlen;<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>        <span class="hljs-comment">/* Since the header size changes, need to move the string forward,</span><br><span class="hljs-comment">         * and can&#x27;t use realloc */</span><br>        newsh = s_malloc(hdrlen+newlen+<span class="hljs-number">1</span>);<br>        <span class="hljs-keyword">if</span> (newsh == <span class="hljs-literal">NULL</span>) <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;<br>        <span class="hljs-built_in">memcpy</span>((<span class="hljs-type">char</span>*)newsh+hdrlen, s, len+<span class="hljs-number">1</span>);<br>        s_free(sh);<br>        s = (<span class="hljs-type">char</span>*)newsh+hdrlen;<br>        s[<span class="hljs-number">-1</span>] = type;<br>        sdssetlen(s, len);<br>    &#125;<br>    sdssetalloc(s, newlen);<br>    <span class="hljs-keyword">return</span> s;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h2 id="空间预分配策略"><a href="#空间预分配策略" class="headerlink" title="空间预分配策略"></a>空间预分配策略</h2><p>从上述代码sdsMakeRoomFor方法中可以看到，在分配空间时并不是精准分配，而是会在所需空间上加上一部分空闲空间，以此避免内存频繁的分配回收。当需要free一部分空间时，并不立即释放，而是先将其记录下来，当内存紧张的时候再释放。</p>
+<h2 id="二进制安全"><a href="#二进制安全" class="headerlink" title="二进制安全"></a>二进制安全</h2><p>SDS通过len来判断一个字符串的结尾，而不是‘\0’，因此能保存更多的非结构化数据</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Redis/" class="category-chain-item">Redis</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Redis/" class="print-no-link">#Redis</a>
+      
+        <a href="/tags/%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/" class="print-no-link">#源码解读</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Redis SDS</div>
+      <div>http://xuxiusheng.github.io/2026/01/16/源码阅读-SDS/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Xuxiusheng</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年1月16日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/01/16/HelloAgents%E5%9F%BA%E7%A1%80/" title="Hello Agents笔记-智能体基础">
+                        <span class="hidden-mobile">Hello Agents笔记-智能体基础</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.5.1/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"2HT5rmC5XQuRugoXS6jx93oG-gzGzoHsz","appKey":"34FVPpMZGQcLXWdGF6FnOx9T","path":"window.location.pathname","placeholder":"说点什么吧","avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"","emojiCDN":null,"emojiMaps":null,"enableQQ":false,"appid":"2HT5rmC5XQuRugoXS6jx93oG-gzGzoHsz","appkey":"34FVPpMZGQcLXWdGF6FnOx9T","app_id":"2HT5rmC5XQuRugoXS6jx93oG-gzGzoHsz","app_key":"34FVPpMZGQcLXWdGF6FnOx9T"},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+
+</div>
+
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/card.js"></script>
+<script src="/js/encrypt_core.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

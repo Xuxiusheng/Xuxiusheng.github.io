@@ -30,7 +30,7 @@
 <meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/93.png">
 <meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/94.png">
 <meta property="article:published_time" content="2026-01-01T12:20:00.000Z">
-<meta property="article:modified_time" content="2026-01-14T18:35:14.677Z">
+<meta property="article:modified_time" content="2026-01-16T09:20:54.763Z">
 <meta property="article:author" content="Xuxiusheng">
 <meta property="article:tag" content="MySQL">
 <meta property="article:tag" content="数据库">
@@ -273,7 +273,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          8.8k 字
+          9.4k 字
         
       </span>
     
@@ -284,7 +284,7 @@
         
         
         
-          74 分钟
+          78 分钟
         
       </span>
     
@@ -848,6 +848,20 @@
 <div class="note note-warning">
             <p>自增锁（AUTO-INC Lock）及其不同模式是InnoDB特有的，因为只有InnoDB支持事务</p> 
           </div>
+
+<h1 id="OLTP"><a href="#OLTP" class="headerlink" title="OLTP"></a>OLTP</h1><p>MySQL的InnoDB存储引擎是目前最主流、功能最完善的事务型存储引擎，广泛用于OLTP场景</p>
+<div class="note note-info">
+            <p>OLTP(Online Transaction Processing，在线事务处理) 是一种面向事务型应用的数据库设计和处理模式。核心目标是<strong>高效、可靠、并发地处理大量短小的事务操作</strong>。</p> <table> <thead> <tr> <th>特性</th> <th>说明</th> </tr> </thead> <tbody><tr> <td>事务短小</td> <td>每个操作通常只涉及少量数据（如插入一条订单、更新用户余额）</td> </tr> <tr> <td>高并发</td> <td>系统需同时支持成千上万用户并发访问（如电商秒杀、银行转账）</td> </tr> <tr> <td>强一致性</td> <td>必须保证 ACID（原子性、一致性、隔离性、持久性）</td> </tr> <tr> <td>实时响应</td> <td>响应时间通常在毫秒级（&lt;100ms）</td> </tr> <tr> <td>读写混合</td> <td>既有查询（SELECT），也有频繁的 INSERT、UPDATE、DELETE</td> </tr> <tr> <td>数据量中等</td> <td>单表通常在 GB 到 TB 级别，但强调“热数据”快速访问</td> </tr> </tbody></table> <p>OLTP关注的核心是高效、可靠；而且InnoDB的高可靠是有代价的：锁+MVCC+各种配置协作才能实现高可靠</p> 
+          </div>
+
+<p>InnoDB虽然现在被广泛用于OLTP场景，但在某些场景下依然存在很大的限制：</p>
+<ul>
+<li>写入新能在高并发下的瓶颈(加锁、undo log膨胀、热点行问题)，QPS在达到一定上限后难以线性扩展</li>
+<li>不支持分布式横向扩展</li>
+<li>存储空间占用很高(各种持久化日志、B+树底层索引、按整页存储等机制)</li>
+<li>按行存储数据，OLAP场景效率很低</li>
+</ul>
+
                 
               </div>
             

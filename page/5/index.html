@@ -273,6 +273,128 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2026/01/01/Redis%E6%8C%81%E4%B9%85%E5%8C%96%E6%9C%BA%E5%88%B6/" target="_self">
+          Redis持久化机制
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/01/01/Redis%E6%8C%81%E4%B9%85%E5%8C%96%E6%9C%BA%E5%88%B6/" target="_self">
+        <div>
+          Redis虽然本身为内存数据库，但是作为高可用的基础，也支持数据持久化机制：RDB和AOF，两种持久化机制的使用场景不同，一般结合使用参考 https://www.cnblogs.com/kismetv/p/9137897.html RDB持久化RDB持久化通过创建快照来获得存储在内存里面的数据在某个时间点上的副本，因此副本不会包含该时间点之后的数据，RDB是默认的持久化方式。 配置redis.c
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-01-01 16:30" pubdate>
+              2026-01-01
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Redis/" class="category-chain-item">Redis</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Redis/">#Redis</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2026/01/01/Redis%E7%BA%BF%E7%A8%8B%E6%A8%A1%E5%9E%8B/" target="_self">
+          Redis线程模型
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/01/01/Redis%E7%BA%BF%E7%A8%8B%E6%A8%A1%E5%9E%8B/" target="_self">
+        <div>
+          Redis本身是一个单线程模型，不存在锁竞争和上下文切换开销，这里的单线程是狭义上的单线程，也就是处理客户端请求的线程只有一个，在Redis中其实支持多线程，下面来看看吧 异步删除Redis4.0增加了异步删除功能，UNLINK命令可以异步删除过期key，避免过多的过期key或过期大key阻塞主线程执行此外，redis如果开启了lazy free机制，会有一个独立线程定期删除过期KeyAOF重写b
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-01-01 16:30" pubdate>
+              2026-01-01
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Redis/" class="category-chain-item">Redis</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Redis/">#Redis</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2026/01/01/Redis%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%A8%A1%E5%9E%8B/" target="_self">
           Redis内存管理模型
         </a>
@@ -750,130 +872,6 @@
             <i class="iconfont icon-tags"></i>
             
               <a href="/tags/Redis/">#Redis</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2025/12/31/%E5%BC%82%E5%B8%B8%E6%8E%A5%E5%8D%95%E6%8E%A5%E5%8D%95%E9%80%BB%E8%BE%91%E4%BC%98%E5%8C%96/" target="_self">
-          异常订单接单逻辑优化
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2025/12/31/%E5%BC%82%E5%B8%B8%E6%8E%A5%E5%8D%95%E6%8E%A5%E5%8D%95%E9%80%BB%E8%BE%91%E4%BC%98%E5%8C%96/" target="_self">
-        <div>
-          这里的内容加密了，需要密码哦
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2025-12-31 20:20" pubdate>
-              2025-12-31
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E5%AE%9E%E4%B9%A0/" class="category-chain-item">实习</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E5%AE%9E%E4%B9%A0/">#实习</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2025/12/31/Fluid%E8%AE%BF%E9%97%AE%E9%87%8F%E8%B6%8B%E5%8A%BF%E5%9B%BE/" target="_self">
-          Fluid主题美化-访问量曲线图
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2025/12/31/Fluid%E8%AE%BF%E9%97%AE%E9%87%8F%E8%B6%8B%E5%8A%BF%E5%9B%BE/" target="_self">
-        <div>
-          我的Fluid博客是基于LeanCloud来统计访问量和访客的，但是LeanCloud的Counter记录的是pv和uv的总量，无法记录每一天的历史值，不方便展示曲线图。这个配置起来比较麻烦，本篇博客记录一下分享给大家。 具体展示效果参考统计数据。 我们需要记录每一天的值，而LeanCloud的Counter记录的是历史总值，所以需要开一个定时任务，在每天的23:59分上报当前的pv和uv。 创建
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2025-12-31 16:30" pubdate>
-              2025-12-31
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E5%89%8D%E7%AB%AF/" class="category-chain-item">前端</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E5%89%8D%E7%AB%AF/">#前端</a>
-            
-              <a href="/tags/Fluid/">#Fluid</a>
             
           </div>
         

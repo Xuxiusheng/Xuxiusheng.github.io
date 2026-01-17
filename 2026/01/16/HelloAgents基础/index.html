@@ -19,22 +19,27 @@
   <meta name="author" content="Xuxiusheng">
   <meta name="keywords" content="">
   
-    <meta name="description" content="MySQL的InnoDB存储引擎是目前最主流、功能最完善的事务型存储引擎，广泛用于OLTP场景              OLTP(Online Transaction Processing，在线事务处理) 是一种面向事务型应用的数据库设计和处理模式。核心目标是高效、可靠、并发地处理大量短小的事务操作。    特性 说明    事务短小 每个操作通常只涉及少量数据（如插入一条订单、更新用户余额）">
+    <meta name="description" content="心血来潮，想了解下最近大火的Agent，寻寻觅觅找到了datawhale开源的Agent教程，受益匪浅，本篇文章记录下自己的感悟。资源链接：Hello Agents 现在大火的LLM和Agent是两个不同的概念，LLM只会进行对话，相当于只有脑子没有手脚，不具备改造外部环境的能力，而Agent相当于为LLM这个大脑配备了手脚，赋予其操作工具的能力。              PT训练大脑，RL锻炼">
 <meta property="og:type" content="article">
-<meta property="og:title" content="数据库批判章">
-<meta property="og:url" content="http://xuxiusheng.github.io/2026/01/11/%E6%95%B0%E6%8D%AE%E5%BA%93/index.html">
+<meta property="og:title" content="Hello Agents笔记-智能体基础">
+<meta property="og:url" content="http://xuxiusheng.github.io/2026/01/16/HelloAgents%E5%9F%BA%E7%A1%80/index.html">
 <meta property="og:site_name" content="Xuxiusheng">
-<meta property="og:description" content="MySQL的InnoDB存储引擎是目前最主流、功能最完善的事务型存储引擎，广泛用于OLTP场景              OLTP(Online Transaction Processing，在线事务处理) 是一种面向事务型应用的数据库设计和处理模式。核心目标是高效、可靠、并发地处理大量短小的事务操作。    特性 说明    事务短小 每个操作通常只涉及少量数据（如插入一条订单、更新用户余额）">
+<meta property="og:description" content="心血来潮，想了解下最近大火的Agent，寻寻觅觅找到了datawhale开源的Agent教程，受益匪浅，本篇文章记录下自己的感悟。资源链接：Hello Agents 现在大火的LLM和Agent是两个不同的概念，LLM只会进行对话，相当于只有脑子没有手脚，不具备改造外部环境的能力，而Agent相当于为LLM这个大脑配备了手脚，赋予其操作工具的能力。              PT训练大脑，RL锻炼">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2026-01-11T09:00:00.000Z">
-<meta property="article:modified_time" content="2026-01-12T17:20:38.198Z">
+<meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/121.png">
+<meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/122.png">
+<meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/123.png">
+<meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/124.png">
+<meta property="article:published_time" content="2026-01-16T08:00:00.000Z">
+<meta property="article:modified_time" content="2026-01-17T06:10:58.624Z">
 <meta property="article:author" content="Xuxiusheng">
-<meta property="article:tag" content="数据库">
+<meta property="article:tag" content="Agent">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://xuxiusheng.github.io/img/article_img/121.png">
   
   
   
-  <title>数据库批判章 - Xuxiusheng</title>
+  <title>Hello Agents笔记-智能体基础 - Xuxiusheng</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -245,7 +250,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="数据库批判章"></span>
+            <span id="subtitle" data-typed-text="Hello Agents笔记-智能体基础"></span>
           
         </div>
 
@@ -256,8 +261,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2026-01-11 17:00" pubdate>
-          2026年1月11日 下午
+        <time datetime="2026-01-16 16:00" pubdate>
+          2026年1月16日 下午
         </time>
       </span>
     
@@ -268,7 +273,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          534 字
+          2.1k 字
         
       </span>
     
@@ -279,7 +284,7 @@
         
         
         
-          5 分钟
+          18 分钟
         
       </span>
     
@@ -325,22 +330,67 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">数据库批判章</h1>
+            <h1 id="seo-header">Hello Agents笔记-智能体基础</h1>
             
             
               <div class="markdown-body">
                 
-                <p>MySQL的InnoDB存储引擎是目前最主流、功能最完善的事务型存储引擎，广泛用于OLTP场景</p>
+                <p>心血来潮，想了解下最近大火的Agent，寻寻觅觅找到了datawhale开源的Agent教程，受益匪浅，本篇文章记录下自己的感悟。资源链接：<a target="_blank" rel="noopener" href="https://datawhalechina.github.io/hello-agents/#/">Hello Agents</a></p>
+<p>现在大火的LLM和Agent是两个不同的概念，LLM只会进行对话，相当于只有脑子没有手脚，不具备改造外部环境的能力，而Agent相当于为LLM这个大脑配备了手脚，赋予其操作工具的能力。</p>
 <div class="note note-info">
-            <p>OLTP(Online Transaction Processing，在线事务处理) 是一种面向事务型应用的数据库设计和处理模式。核心目标是<strong>高效、可靠、并发地处理大量短小的事务操作</strong>。</p> <table> <thead> <tr> <th>特性</th> <th>说明</th> </tr> </thead> <tbody><tr> <td>事务短小</td> <td>每个操作通常只涉及少量数据（如插入一条订单、更新用户余额）</td> </tr> <tr> <td>高并发</td> <td>系统需同时支持成千上万用户并发访问（如电商秒杀、银行转账）</td> </tr> <tr> <td>强一致性</td> <td>必须保证 ACID（原子性、一致性、隔离性、持久性）</td> </tr> <tr> <td>实时响应</td> <td>响应时间通常在毫秒级（&lt;100ms）</td> </tr> <tr> <td>读写混合</td> <td>既有查询（SELECT），也有频繁的 INSERT、UPDATE、DELETE</td> </tr> <tr> <td>数据量中等</td> <td>单表通常在 GB 到 TB 级别，但强调“热数据”快速访问</td> </tr> </tbody></table> <p>OLTP关注的核心是高效、可靠；而且InnoDB的高可靠是有代价的：锁+MVCC+各种配置协作才能实现高可靠</p> 
+            <p>PT训练大脑，RL锻炼模型使用工具的能力</p> 
           </div>
 
-<p>InnoDB虽然现在被广泛用于OLTP场景，但在某些场景下依然存在很大的限制：</p>
+<p>智能体(Agent)的定义是：任何能够通过传感器<strong>感知外部环境</strong>，并进行决策，使用执行器<strong>根据决策结果改变外部环境</strong>达成目标的实体。简单来说，智能体具备感知能力，并能够根据感知结果进行决策（自主性），进一步根据决策结果调用外部工具实现目标。</p>
+<p>智能体中智能的体现在于其“自主性”，在以往的智能体中，自主性的体现非常局限，感知和决策结果往往是呈现出固定的映射规则。</p>
+<div class="note note-info">
+            <p>打个比方，当室内温度高于25度，指示家居助手打开空调，家居助手的感知和决策结果是一一对应的，这种映射是由开发者预设的，自主性非常局限。</p> <table> <thead> <tr> <th align="center">传统Agent</th> </tr> </thead> <tbody><tr> <td align="center"><img src="/img/article_img/121.png" srcset="/img/config/loading.gif" lazyload></td> </tr> </tbody></table> 
+          </div>
+
+<p>以LLM的爆发时发展作为分水岭，智能体的发展大体分为两类：非学习型智能体和学习型智能体。</p>
 <ul>
-<li>写入新能在高并发下的瓶颈(加锁、undo log膨胀、热点行问题)，QPS在达到一定上限后难以线性扩展</li>
-<li>不支持分布式横向扩展</li>
-<li>存储空间占用很高(各种持久化日志、B+树底层索引、按整页存储等机制)</li>
-<li>按行存储数据，OLAP场景效率很低</li>
+<li>非学习型智能体：决策逻辑依赖于预设的先验知识，比如规则映射或模型函数</li>
+<li>学习型智能体：以LLM作为大脑驱动，不依赖预设的先验知识，能够在与环境的不断交互中<strong>自主学习</strong>决策逻辑，知识来源是非结构化不可解释的.最典型的学习型智能体就是现在的LLM驱动型智能体</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="center">传统智能体与LLM驱动智能体的区别</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><img src="/img/article_img/122.png" srcset="/img/config/loading.gif" lazyload></td>
+</tr>
+</tbody></table>
+<p>智能体之间的运作模式大不相同，通常使用PEAS模型描述智能体的运作模式或任务环境：</p>
+<ul>
+<li>P(Performance): 性能度量，智能体的目标</li>
+<li>E(Environment): 环境描述</li>
+<li>A(Actuators): 执行器，智能体可调用的外部工具</li>
+<li>S(Sensors): 解析执行器的结果或用户的文本提示</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th align="center">PEAS模型</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><img src="/img/article_img/123.png" srcset="/img/config/loading.gif" lazyload></td>
+</tr>
+</tbody></table>
+<div class="note note-warning">
+            <p>LLM驱动的智能体还有一点与传统智能体不同，传统智能体执行过程分为感知-决策-行动三步，行动表示流程的结束。而LLM驱动的智能体，行动的结果往往会作为下一次行动的新的环境输入，也就是<strong>上下文</strong>，形成一个持续的“感知-思考-行动-观察”的闭环。工程实践中，为了有效驱动这个循环逻辑，定义了一套结构化协议:</p> <figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs text">Thought: 用户想知道北京的天气。我需要调用天气查询工具。<br>Action: get_weather(&quot;北京&quot;)<br></code></pre></td></tr></table></figure> <p>通过类似的结构化定义，可以详细看到智能体在每一步的决策依据和执行结果，这个循环逻辑叫做<strong>智能体循环</strong>：</p> <table> <thead> <tr> <th align="center">智能体循环</th> </tr> </thead> <tbody><tr> <td align="center"><img src="/img/article_img/124.png" srcset="/img/config/loading.gif" lazyload></td> </tr> </tbody></table> 
+          </div>
+
+<p>自己也尝试了下搭建智能旅行助手，使用的模型是<a target="_blank" rel="noopener" href="https://bailian.console.aliyun.com/cn-beijing/?tab=api#/api">Qwen</a>，代码放在了<a target="_blank" rel="noopener" href="https://github.com/Xuxiusheng/Hello-Agents-code/blob/main/%E6%99%BA%E8%83%BD%E6%97%85%E8%A1%8C%E5%8A%A9%E6%89%8B.rar">智能旅行助手</a>,以下是测试的输出:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs text">用户输入: 你好，请帮我查询一下今天南京的天气，然后根据天气推荐一个合适的旅游景点。<br>========================================<br>--- 循环 1 ---<br><br>正在调用大语言模型...<br>大语言模型响应成功。<br>模型输出:<br>Thought: 首先需要查询南京今天的天气情况。<br>Action: get_weather(city=&quot;南京&quot;)<br><br>Observation: 南京当前天气:Mist，气温11摄氏度<br>========================================<br>--- 循环 2 ---<br><br>正在调用大语言模型...<br>大语言模型响应成功。<br>模型输出:<br>Thought: 现在已经知道了南京今天的天气是雾，气温11摄氏度。下一步应该根据这个天气状况来推荐一个适合的旅游景点。<br>Action: get_attraction(city=&quot;南京&quot;, weather=&quot;Mist&quot;)<br><br>Observation: In mist, Nanjing&#x27;s Xuanwu Lake Park and Zhongshan Ling are best. Both offer scenic views and historical significance.<br>========================================<br>--- 循环 3 ---<br><br>正在调用大语言模型...<br>大语言模型响应成功。<br>模型输出:<br>Thought: 根据南京今天的天气状况（雾），推荐的旅游景点为玄武湖公园和中山陵，这两个地方不仅风景优美还富有历史意义。现在可以向用户反馈最终建议了。<br>Action: Finish[考虑到今天南京有雾且气温较低的情况，我推荐您参观玄武湖公园或中山陵。这些地点即使在这样的天气条件下也能提供美丽的景色以及深刻的历史体验。]        <br><br>任务完成，最终答案: 考虑到今天南京有雾且气温较低的情况，我推荐您参观玄武湖公园或中山陵。这些地点即使在这样的天气条件下也能提供美丽的景色以及深刻的历史体验。 <br></code></pre></td></tr></table></figure>
+
+<p>工作流与智能体的区别在于：智能体具有<strong>自主性</strong>，而工作流是对一系列任务或步骤进行预先定义的、结构化的编排。而Agent能够基于实时信息进行动态推理和决策。</p>
+<p>当前智能体的两种应用范式：</p>
+<ul>
+<li>智能体交互模式：人为主体，Agent作为辅助</li>
+<li>高级协作者：能够独立完成高层级目标的“自主协作者”</li>
 </ul>
 
                 
@@ -360,7 +410,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="category-chain-item">数据库</a>
+  <a href="/categories/Agent/" class="category-chain-item">Agent</a>
   
   
 
@@ -375,7 +425,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="print-no-link">#数据库</a>
+        <a href="/tags/Agent/" class="print-no-link">#Agent</a>
       
     </div>
   
@@ -387,8 +437,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>数据库批判章</div>
-      <div>http://xuxiusheng.github.io/2026/01/11/数据库/</div>
+      <div>Hello Agents笔记-智能体基础</div>
+      <div>http://xuxiusheng.github.io/2026/01/16/HelloAgents基础/</div>
     </div>
     <div class="license-meta">
       
@@ -400,7 +450,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2026年1月11日</div>
+          <div>2026年1月16日</div>
         </div>
       
       
@@ -427,6 +477,29 @@
 
 
 
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/01/16/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB-SDS/" title="Redis SDS">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Redis SDS</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/01/06/%E8%AE%B0%E5%BD%95%E6%A0%A1%E6%8B%9B%E6%9C%9F%E9%97%B4%E9%9D%9E%E5%B8%B8%E6%9C%89%E6%84%8F%E6%80%9D%E7%9A%84%E4%B8%80%E4%B8%AA%E6%89%8B%E6%92%95%E9%A2%98/" title="记录校招期间非常有意思的一个手撕题">
+                        <span class="hidden-mobile">记录校招期间非常有意思的一个手撕题</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
               
             </div>
 
