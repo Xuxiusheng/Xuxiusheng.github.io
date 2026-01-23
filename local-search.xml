@@ -4,6 +4,33 @@
   
   
   <entry>
+    <title>Redis LinkedList</title>
+    <link href="/2026/01/18/Redis-LinkedList/"/>
+    <url>/2026/01/18/Redis-LinkedList/</url>
+    
+    <content type="html"><![CDATA[<h1 id="LinkedList底层结构"><a href="#LinkedList底层结构" class="headerlink" title="LinkedList底层结构"></a>LinkedList底层结构</h1><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// LinkedList</span><br><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">list</span> &#123;</span><br>    listNode *head;<br>    listNode *tail;<br>    <span class="hljs-type">void</span> *(*dup)(<span class="hljs-type">void</span> *ptr);<br>    <span class="hljs-type">void</span> (*<span class="hljs-built_in">free</span>)(<span class="hljs-type">void</span> *ptr);<br>    <span class="hljs-type">int</span> (*match)(<span class="hljs-type">void</span> *ptr, <span class="hljs-type">void</span> *key);<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> len;<br>&#125; <span class="hljs-built_in">list</span>;<br><br><span class="hljs-comment">// ListNode</span><br><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">listNode</span> &#123;</span><br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">listNode</span> *<span class="hljs-title">prev</span>;</span><br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">listNode</span> *<span class="hljs-title">next</span>;</span><br>    <span class="hljs-type">void</span> *value;<br>&#125; listNode;<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>Redis</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Redis</tag>
+      
+      <tag>源码解读</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>Redis SDS</title>
     <link href="/2026/01/16/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB-SDS/"/>
     <url>/2026/01/16/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB-SDS/</url>
