@@ -273,6 +273,191 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2026/01/30/Redis_ZipList/" target="_self">
+          Redis ZipList
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/01/30/Redis_ZipList/" target="_self">
+        <div>
+          ZipListLinkedList的内存浪费问题严重，除了保存数据外，还要使用前后指针记录前驱后继节点，64位系统下，每个节点至少16字节的内存被浪费。 ziplist（压缩列表）是 Redis 为节约内存设计的一种紧凑型双向链表。它彻底摒弃了传统链表中指针占用空间的缺点，将所有数据存储在一块连续内存中。 123456789101112传统链表：+---+     +---+     +---+|
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-01-30 22:10" pubdate>
+              2026-01-30
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Redis/" class="category-chain-item">Redis</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Redis/">#Redis</a>
+            
+              <a href="/tags/%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/">#源码解读</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2026/01/30/%E8%BF%B7%E5%AE%AB%E9%97%AE%E9%A2%98-%E5%B9%BF%E5%BA%A6%E4%BC%98%E5%85%88%E6%90%9C%E7%B4%A2/" target="_self">
+          迷宫问题-广度优先搜索
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/01/30/%E8%BF%B7%E5%AE%AB%E9%97%AE%E9%A2%98-%E5%B9%BF%E5%BA%A6%E4%BC%98%E5%85%88%E6%90%9C%E7%B4%A2/" target="_self">
+        <div>
+          迷宫表示 0 表示通路（可以走） 1 表示障碍（不能走）  BFS解法 使用队列（Queue）存储待探索的节点 从起点开始，每次探索相邻的四个方向 使用visited数组避免重复访问 首次到达终点时，路径一定是最短的（BFS特性）  以下代码包含最基础的BFS迷宫搜索和路径回溯迷宫搜索。 1234567891011121314151617181920212223242526272829303132
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-01-30 20:40" pubdate>
+              2026-01-30
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%89%8B%E6%92%95/" class="category-chain-item">手撕</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E8%BF%B7%E5%AE%AB%E9%97%AE%E9%A2%98/">#迷宫问题</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2026/01/30/CAS%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/" target="_self">
+          CAS底层原理
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/01/30/CAS%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/" target="_self">
+        <div>
+          CAS是一种无锁的原子操作，包含三个操作数：  内存位置(V) 期望值(E) 新值(N)  123456if (*V == E) &#123;    *V = N;    return true;&#125; else &#123;    return false;&#125; 不同的系统架构适配的汇编语言不同，所以有不同的实现，以x86为例: 123456789101112131415; x86
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-01-30 20:00" pubdate>
+              2026-01-30
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/" class="category-chain-item">计算机基础</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/CAS%E5%BA%95%E5%B1%82%E6%9C%BA%E5%88%B6/">#CAS底层机制</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2026/01/16/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB-SDS/" target="_self">
           Redis SDS
         </a>
@@ -693,195 +878,6 @@
               <a href="/tags/Kafka/">#Kafka</a>
             
               <a href="/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/">#消息队列</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2026/01/01/RocketMQ/" target="_self">
-          RocketMQ
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/01/01/RocketMQ/" target="_self">
-        <div>
-          核心架构   RocketMQ架构                    RocketMQ的整体架构和Kafka相似，只不过RMQ以NameServer作为注册中心。             NameServerRMQ的NameServer与Kafka中的ZooKeeper作用相同，负责路由注册、服务发现与心跳维护等功能。但是RMQ的NamerServer属于去中心化设计，NameServer之间
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-01-01 22:10" pubdate>
-              2026-01-01
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/RocketMQ/" class="category-chain-item">RocketMQ</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/">#消息队列</a>
-            
-              <a href="/tags/RocketMQ/">#RocketMQ</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2026/01/01/RocketMQ%E9%AB%98%E5%8F%AF%E7%94%A8%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%BA%E5%88%B6%E5%AE%9E%E7%8E%B0/" target="_self">
-          RocketMQ高可用 高性能机制实现
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/01/01/RocketMQ%E9%AB%98%E5%8F%AF%E7%94%A8%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%BA%E5%88%B6%E5%AE%9E%E7%8E%B0/" target="_self">
-        <div>
-          这里的内容加密了，需要密码哦
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-01-01 22:10" pubdate>
-              2026-01-01
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/RocketMQ/" class="category-chain-item">RocketMQ</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/">#消息队列</a>
-            
-              <a href="/tags/RocketMQ/">#RocketMQ</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2026/01/01/MySQL%E5%88%86%E5%BA%93%E5%88%86%E8%A1%A8/" target="_self">
-          MySQL分库分表
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/01/01/MySQL%E5%88%86%E5%BA%93%E5%88%86%E8%A1%A8/" target="_self">
-        <div>
-          概念MySQL主从集群支持读负载均衡，但是依然存在单点存储故障以及写不均衡压力，只有主节点负责写。分库分表是指对单表数据进行水平拆分后存储在多个库中，客户端访问时会根据路由策略定位存储指定数据的机器节点，然后去指定节点获取数据。    分库分表       分片策略 哈希分片：根据关键业务字段计算哈希值并对机器节点数量取余定位节点 范围分片：每隔节点负责一个连续的区间 一致性哈希分片：将哈希空间组
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-01-01 22:00" pubdate>
-              2026-01-01
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/MySQL/" class="category-chain-item">MySQL</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">#数据库</a>
-            
-              <a href="/tags/MySQL/">#MySQL</a>
             
           </div>
         

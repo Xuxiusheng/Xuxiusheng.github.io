@@ -19,23 +19,22 @@
   <meta name="author" content="Xuxiusheng">
   <meta name="keywords" content="">
   
-    <meta name="description" content="LinkedList底层结构12345678910111213141516&#x2F;&#x2F; LinkedListtypedef struct list &#123;    listNode *head;    listNode *tail;    void *(*dup)(void *ptr);    void (*free)(void *ptr);    int (*match)(void *ptr, vo">
+    <meta name="description" content="迷宫表示 0 表示通路（可以走） 1 表示障碍（不能走）  BFS解法 使用队列（Queue）存储待探索的节点 从起点开始，每次探索相邻的四个方向 使用visited数组避免重复访问 首次到达终点时，路径一定是最短的（BFS特性）  以下代码包含最基础的BFS迷宫搜索和路径回溯迷宫搜索。 1234567891011121314151617181920212223242526272829303132">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Redis LinkedList">
-<meta property="og:url" content="http://xuxiusheng.github.io/2026/01/18/Redis-LinkedList/index.html">
+<meta property="og:title" content="迷宫问题-广度优先搜索">
+<meta property="og:url" content="http://xuxiusheng.github.io/2026/01/30/%E8%BF%B7%E5%AE%AB%E9%97%AE%E9%A2%98-%E5%B9%BF%E5%BA%A6%E4%BC%98%E5%85%88%E6%90%9C%E7%B4%A2/index.html">
 <meta property="og:site_name" content="Xuxiusheng">
-<meta property="og:description" content="LinkedList底层结构12345678910111213141516&#x2F;&#x2F; LinkedListtypedef struct list &#123;    listNode *head;    listNode *tail;    void *(*dup)(void *ptr);    void (*free)(void *ptr);    int (*match)(void *ptr, vo">
+<meta property="og:description" content="迷宫表示 0 表示通路（可以走） 1 表示障碍（不能走）  BFS解法 使用队列（Queue）存储待探索的节点 从起点开始，每次探索相邻的四个方向 使用visited数组避免重复访问 首次到达终点时，路径一定是最短的（BFS特性）  以下代码包含最基础的BFS迷宫搜索和路径回溯迷宫搜索。 1234567891011121314151617181920212223242526272829303132">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2026-01-17T16:10:00.000Z">
-<meta property="article:modified_time" content="2026-01-30T02:16:13.497Z">
+<meta property="article:published_time" content="2026-01-30T12:40:00.000Z">
+<meta property="article:modified_time" content="2026-01-30T13:25:01.462Z">
 <meta property="article:author" content="Xuxiusheng">
-<meta property="article:tag" content="Redis">
-<meta property="article:tag" content="源码解读">
+<meta property="article:tag" content="迷宫问题">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>Redis LinkedList - Xuxiusheng</title>
+  <title>迷宫问题-广度优先搜索 - Xuxiusheng</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -240,13 +239,13 @@
   
 
 <div id="banner" class="banner" parallax=true
-     style="background: url('/img/config/content1.png') no-repeat center center; background-size: cover;">
+     style="background: url('/img/config/pikaqiu.png') no-repeat center center; background-size: cover;">
   <div class="full-bg-img">
     <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="Redis LinkedList"></span>
+            <span id="subtitle" data-typed-text="迷宫问题-广度优先搜索"></span>
           
         </div>
 
@@ -257,8 +256,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2026-01-18 00:10" pubdate>
-          2026年1月18日 凌晨
+        <time datetime="2026-01-30 20:40" pubdate>
+          2026年1月30日 晚上
         </time>
       </span>
     
@@ -269,7 +268,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          305 字
+          2.7k 字
         
       </span>
     
@@ -280,7 +279,7 @@
         
         
         
-          3 分钟
+          23 分钟
         
       </span>
     
@@ -326,12 +325,23 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">Redis LinkedList</h1>
+            <h1 id="seo-header">迷宫问题-广度优先搜索</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="LinkedList底层结构"><a href="#LinkedList底层结构" class="headerlink" title="LinkedList底层结构"></a>LinkedList底层结构</h1><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// LinkedList</span><br><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">list</span> &#123;</span><br>    listNode *head;<br>    listNode *tail;<br>    <span class="hljs-type">void</span> *(*dup)(<span class="hljs-type">void</span> *ptr);<br>    <span class="hljs-type">void</span> (*<span class="hljs-built_in">free</span>)(<span class="hljs-type">void</span> *ptr);<br>    <span class="hljs-type">int</span> (*match)(<span class="hljs-type">void</span> *ptr, <span class="hljs-type">void</span> *key);<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> len;<br>&#125; <span class="hljs-built_in">list</span>;<br><br><span class="hljs-comment">// ListNode</span><br><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">listNode</span> &#123;</span><br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">listNode</span> *<span class="hljs-title">prev</span>;</span><br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">listNode</span> *<span class="hljs-title">next</span>;</span><br>    <span class="hljs-type">void</span> *value;<br>&#125; listNode;<br></code></pre></td></tr></table></figure>
+                <h2 id="迷宫表示"><a href="#迷宫表示" class="headerlink" title="迷宫表示"></a>迷宫表示</h2><ul>
+<li>0 表示通路（可以走）</li>
+<li>1 表示障碍（不能走）</li>
+</ul>
+<h2 id="BFS解法"><a href="#BFS解法" class="headerlink" title="BFS解法"></a>BFS解法</h2><ul>
+<li>使用队列（Queue）存储待探索的节点</li>
+<li>从起点开始，每次探索相邻的四个方向</li>
+<li>使用visited数组避免重复访问</li>
+<li>首次到达终点时，路径一定是最短的（BFS特性）</li>
+</ul>
+<p>以下代码包含最基础的BFS迷宫搜索和路径回溯迷宫搜索。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">MazeBFS</span> &#123;<br>    <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Cell</span> &#123;<br>        <span class="hljs-type">int</span> row;<br>        <span class="hljs-type">int</span> col;<br>        <span class="hljs-type">int</span> distance;<br>        Cell parent;<br><br>        <span class="hljs-keyword">public</span> <span class="hljs-title function_">Cell</span><span class="hljs-params">(<span class="hljs-type">int</span> _row, <span class="hljs-type">int</span> _col, <span class="hljs-type">int</span> _distance)</span> &#123;<br>            row = _row;<br>            col = _col;<br>            distance = _distance;<br>        &#125;<br><br>        <span class="hljs-keyword">public</span> <span class="hljs-title function_">Cell</span><span class="hljs-params">(<span class="hljs-type">int</span> _row, <span class="hljs-type">int</span> _col, <span class="hljs-type">int</span> _distance, Cell _parent)</span> &#123;<br>            row = _row;<br>            col = _col;<br>            distance = _distance;<br>            parent = _parent;<br>        &#125;<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-type">int</span> <span class="hljs-title function_">bfsMaze</span><span class="hljs-params">(<span class="hljs-type">int</span>[][] maze, <span class="hljs-type">int</span>[] start, <span class="hljs-type">int</span>[] end)</span> &#123;<br>        <span class="hljs-type">int</span> <span class="hljs-variable">rows</span> <span class="hljs-operator">=</span> maze.length;<br>        <span class="hljs-type">int</span> <span class="hljs-variable">cols</span> <span class="hljs-operator">=</span> maze[<span class="hljs-number">0</span>].length;<br><br>        <span class="hljs-type">int</span>[][] directions = &#123;&#123;<span class="hljs-number">0</span>, -<span class="hljs-number">1</span>&#125;, &#123;<span class="hljs-number">0</span>, <span class="hljs-number">1</span>&#125;, &#123;-<span class="hljs-number">1</span>, <span class="hljs-number">0</span>&#125;, &#123;<span class="hljs-number">1</span>, <span class="hljs-number">0</span>&#125;&#125;;<br>        <span class="hljs-type">boolean</span>[][] visited = <span class="hljs-keyword">new</span> <span class="hljs-title class_">boolean</span>[rows][cols];<br><br>        Deque&lt;Cell&gt; queue = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayDeque</span>&lt;&gt;();<br>        queue.addLast(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Cell</span>(start[<span class="hljs-number">0</span>], start[<span class="hljs-number">1</span>], <span class="hljs-number">0</span>));<br>        visited[start[<span class="hljs-number">0</span>]][start[<span class="hljs-number">1</span>]] = <span class="hljs-literal">true</span>;<br><br>        <span class="hljs-keyword">while</span>(!queue.isEmpty()) &#123;<br>            <span class="hljs-type">Cell</span> <span class="hljs-variable">cell</span> <span class="hljs-operator">=</span> queue.removeFirst();<br><br>            <span class="hljs-keyword">if</span>(cell.row == end[<span class="hljs-number">0</span>] &amp;&amp; cell.col == end[<span class="hljs-number">1</span>]) &#123;<br>                <span class="hljs-keyword">return</span> cell.distance;<br>            &#125;<br><br>            <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span>[] d: directions) &#123;<br>                <span class="hljs-type">int</span> <span class="hljs-variable">newRow</span> <span class="hljs-operator">=</span> cell.row + d[<span class="hljs-number">0</span>];<br>                <span class="hljs-type">int</span> <span class="hljs-variable">newCol</span> <span class="hljs-operator">=</span> cell.col + d[<span class="hljs-number">1</span>];<br>                <span class="hljs-keyword">if</span>(newRow &gt;= <span class="hljs-number">0</span> &amp;&amp; newRow &lt; rows &amp;&amp;<br>                   newCol &gt;= <span class="hljs-number">0</span> &amp;&amp; newCol &lt; cols &amp;&amp;<br>                   maze[newRow][newCol] == <span class="hljs-number">0</span> &amp;&amp;<br>                   !visited[newRow][newCol]<br>                ) &#123;<br>                    visited[newRow][newCol] = <span class="hljs-literal">true</span>;<br>                    queue.addLast(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Cell</span>(newRow, newCol, cell.distance + <span class="hljs-number">1</span>));<br>                &#125;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> -<span class="hljs-number">1</span>;<br>    &#125;<br><br>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> String <span class="hljs-title function_">bfsMazeWithPath</span><span class="hljs-params">(<span class="hljs-type">int</span>[][] maze, <span class="hljs-type">int</span>[] start, <span class="hljs-type">int</span>[] end)</span> &#123;<br>        <span class="hljs-type">int</span> <span class="hljs-variable">rows</span> <span class="hljs-operator">=</span> maze.length;<br>        <span class="hljs-type">int</span> <span class="hljs-variable">cols</span> <span class="hljs-operator">=</span> maze[<span class="hljs-number">0</span>].length;<br><br>        <span class="hljs-type">int</span>[][] directions = &#123;&#123;<span class="hljs-number">0</span>, -<span class="hljs-number">1</span>&#125;, &#123;<span class="hljs-number">0</span>, <span class="hljs-number">1</span>&#125;, &#123;-<span class="hljs-number">1</span>, <span class="hljs-number">0</span>&#125;, &#123;<span class="hljs-number">1</span>, <span class="hljs-number">0</span>&#125;&#125;;<br>        <span class="hljs-type">boolean</span>[][] visited = <span class="hljs-keyword">new</span> <span class="hljs-title class_">boolean</span>[rows][cols];<br><br>        Deque&lt;Cell&gt; queue = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayDeque</span>&lt;&gt;();<br>        queue.addLast(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Cell</span>(start[<span class="hljs-number">0</span>], start[<span class="hljs-number">1</span>], <span class="hljs-number">0</span>, <span class="hljs-literal">null</span>));<br>        visited[start[<span class="hljs-number">0</span>]][start[<span class="hljs-number">1</span>]] = <span class="hljs-literal">true</span>;<br>        <span class="hljs-type">Cell</span> <span class="hljs-variable">endCell</span> <span class="hljs-operator">=</span> <span class="hljs-literal">null</span>;<br><br>        <span class="hljs-keyword">while</span>(!queue.isEmpty()) &#123;<br>            <span class="hljs-type">Cell</span> <span class="hljs-variable">cell</span> <span class="hljs-operator">=</span> queue.removeFirst();<br><br>            <span class="hljs-keyword">if</span>(cell.row == end[<span class="hljs-number">0</span>] &amp;&amp; cell.col == end[<span class="hljs-number">1</span>]) &#123;<br>                endCell = cell;<br>                <span class="hljs-keyword">break</span>;<br>            &#125;<br><br>            <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span>[] d: directions) &#123;<br>                <span class="hljs-type">int</span> <span class="hljs-variable">newRow</span> <span class="hljs-operator">=</span> cell.row + d[<span class="hljs-number">0</span>];<br>                <span class="hljs-type">int</span> <span class="hljs-variable">newCol</span> <span class="hljs-operator">=</span> cell.col + d[<span class="hljs-number">1</span>];<br>                <span class="hljs-keyword">if</span>(newRow &gt;= <span class="hljs-number">0</span> &amp;&amp; newRow &lt; rows &amp;&amp;<br>                        newCol &gt;= <span class="hljs-number">0</span> &amp;&amp; newCol &lt; cols &amp;&amp;<br>                        maze[newRow][newCol] == <span class="hljs-number">0</span> &amp;&amp;<br>                        !visited[newRow][newCol]<br>                ) &#123;<br>                    visited[newRow][newCol] = <span class="hljs-literal">true</span>;<br>                    queue.addLast(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Cell</span>(newRow, newCol, cell.distance + <span class="hljs-number">1</span>, cell));<br>                &#125;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">if</span>(endCell == <span class="hljs-literal">null</span>) <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;no path&quot;</span>;<br>        <span class="hljs-keyword">else</span> &#123;<br>            <span class="hljs-type">StringBuilder</span> <span class="hljs-variable">sb</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringBuilder</span>(<span class="hljs-string">&quot;&quot;</span>);<br>            <span class="hljs-type">Cell</span> <span class="hljs-variable">cell</span> <span class="hljs-operator">=</span> endCell;<br>            <span class="hljs-keyword">while</span>(cell.parent != <span class="hljs-literal">null</span>) &#123;<br>                sb.insert(<span class="hljs-number">0</span>, <span class="hljs-string">&quot; -&gt; [&quot;</span> + cell.row + <span class="hljs-string">&quot;, &quot;</span> + cell.col + <span class="hljs-string">&quot;]&quot;</span>);<br>                cell = cell.parent;<br>            &#125;<br><br>            sb.insert(<span class="hljs-number">0</span>, <span class="hljs-string">&quot;[&quot;</span> + cell.row + <span class="hljs-string">&quot;, &quot;</span> + cell.col + <span class="hljs-string">&quot;]&quot;</span>);<br>            <span class="hljs-keyword">return</span> sb.toString();<br>        &#125;<br>    &#125;<br>&#125;<br><br></code></pre></td></tr></table></figure>
                 
               </div>
             
@@ -349,7 +359,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/Redis/" class="category-chain-item">Redis</a>
+  <a href="/categories/%E6%89%8B%E6%92%95/" class="category-chain-item">手撕</a>
   
   
 
@@ -364,9 +374,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/Redis/" class="print-no-link">#Redis</a>
-      
-        <a href="/tags/%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/" class="print-no-link">#源码解读</a>
+        <a href="/tags/%E8%BF%B7%E5%AE%AB%E9%97%AE%E9%A2%98/" class="print-no-link">#迷宫问题</a>
       
     </div>
   
@@ -378,8 +386,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>Redis LinkedList</div>
-      <div>http://xuxiusheng.github.io/2026/01/18/Redis-LinkedList/</div>
+      <div>迷宫问题-广度优先搜索</div>
+      <div>http://xuxiusheng.github.io/2026/01/30/迷宫问题-广度优先搜索/</div>
     </div>
     <div class="license-meta">
       
@@ -391,7 +399,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2026年1月18日</div>
+          <div>2026年1月30日</div>
         </div>
       
       
@@ -418,6 +426,29 @@
 
 
 
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/01/30/Redis_ZipList/" title="Redis ZipList">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Redis ZipList</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/01/30/CAS%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/" title="CAS底层原理">
+                        <span class="hidden-mobile">CAS底层原理</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
               
             </div>
 
