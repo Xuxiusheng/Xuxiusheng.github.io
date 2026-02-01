@@ -466,7 +466,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2026/01/16/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB-SDS/" target="_self">
         <div>
-          SDS底层结构Redis为了尽可能地节省内存，根据字符串的长度设计了5种类型的字符串底层结构，在实际使用时，会根据字符串的长度选择合适的类型。 12345678910111213141516171819202122232425262728struct __attribute__ ((__packed__)) sdshdr5 &#123;    unsigned char flags; /* 3 l
+          导言本篇文章记录一下SDS源码的一些关键点，完整的源码解析请参考Redis。 SDS底层结构Redis为了尽可能地节省内存，根据字符串的长度设计了5种类型的字符串底层结构，在实际使用时，会根据字符串的长度选择合适的类型。 12345678910111213141516171819202122232425262728struct __attribute__ ((__packed__)) sdshdr
         </div>
       </a>
 
