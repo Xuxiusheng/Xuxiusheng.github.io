@@ -1,0 +1,16 @@
+/* 计时器容器整体样式 */
+#runtime_container {
+    font-size: 0.95rem;      /* 保持与下方文字字号接近 */
+    color: #3c4858;          /* 使用 Fluid 默认的深灰色，确保色调统一 */
+    margin-top: 0rem;      /* 增加与上方标题的间距 */
+    margin-bottom: 0rem;   /* 增加与下方链接的间距 */
+    opacity: 0.9;            /* 稍微降低透明度，使其更有层次感 */
+    line-height: 1.5;        /* 调整行高，避免拥挤 */
+}
+
+/* 针对数字的细微调整 */
+#runtime_container span {
+    font-family: inherit;    /* 继承全局字体，不要使用等宽字体 */
+    font-weight: 500;        /* 数字稍微加粗一点点，不要太突兀 */
+    margin: 0 1px;           /* 减小数字与汉字之间的间距 */
+}

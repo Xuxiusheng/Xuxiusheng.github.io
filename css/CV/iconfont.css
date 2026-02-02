@@ -1,6 +1,6 @@
 @font-face {
   font-family: "iconfont"; /* Project id  */
-  src: url('iconfont.ttf?t=1767105692945') format('truetype');
+  src: url('iconfont.ttf?t=1770007520771') format('truetype');
 }
 
 .iconfont {
@@ -11,7 +11,7 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-tongjijisuan:before {
-  content: "\e659";
+.icon-jianli:before {
+  content: "\e7b5";
 }
 

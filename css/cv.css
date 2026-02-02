@@ -1,0 +1,500 @@
+/* ============ 0) 基础变量 & Reset（iOS 细节） ============ */
+:root{
+  --brand-700:#0d7a4a; --brand-600:#12945a; --brand-500:#17a866; --brand-100:#e6f6ee;
+  --text-900:#1a1a1a; --text-700:#2f3a33; --muted-500:#6b7c73;
+  --border:#dfe8e3; --bg:#fff; --shadow:0 1px 2px rgba(0,0,0,.04), 0 6px 24px rgba(0,0,0,.06);
+  --maxw:780px; --radius:16px;
+}
+html,body{height:100%}
+html{
+  scroll-behavior:smooth;
+  -webkit-text-size-adjust:100%;          /* iOS 防止自动调字 */
+}
+body{
+  margin:0;  
+  background:var(--bg);
+  color:var(--text-900);
+  font-family:"Inter","Noto Sans SC",system-ui,-apple-system,Segoe UI,Roboto,Arial,"PingFang SC","Hiragino Sans GB","Microsoft Yahei",sans-serif;
+  line-height:1.65; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  word-wrap:break-word; overflow-wrap:break-word;
+  min-height:100vh; min-height:-webkit-fill-available;   /* iOS 视觉高度 */
+  -webkit-overflow-scrolling:touch;                       /* iOS 惯性滚动 */
+  -webkit-tap-highlight-color:transparent;                /* 去蓝灰点按高亮 */
+}
+
+html, body { touch-action: pan-x pan-y; }   /* 禁止浏览器把双指手势传给页面 */
+.actions a, .actions button, .lang-switch .track { touch-action: manipulation; }
+
+/* ============ 1) 顶部栏 & 容器（加 -webkit-backdrop-filter） ============ */
+.topbar{
+  position:sticky; top:0; z-index:10;
+  background:#fff; /* 回退色 */
+  background-color:rgba(255,255,255,.86); /* 让 blur 真正可见 */
+  border-bottom:1px solid var(--border);
+  backdrop-filter:saturate(180%) blur(6px);
+  -webkit-backdrop-filter:saturate(180%) blur(6px);
+  transform:translateZ(0);                 /* iOS 粘滞+模糊防抖 */
+}
+.topbar-inner{max-width:var(--maxw); margin:0 auto; display:flex; align-items:center; justify-content:space-between; padding:10px 16px;}
+.brand{display:flex; align-items:center; gap:10px; font-weight:700; color:var(--brand-700); letter-spacing:.3px;}
+.brand .dot{width:10px;height:10px;border-radius:50%;background:var(--brand-500);box-shadow:0 0 0 4px var(--brand-100);}
+.actions{display:flex; align-items:center; gap:8px;}
+.btn{
+  appearance:none; -webkit-appearance:none;              /* iOS */
+  cursor:pointer; border:1px solid var(--border); border-radius:999px;
+  background:#fff; color:var(--text-900); padding:8px 12px; font:600 14px/1 "Inter","Noto Sans SC",sans-serif;
+  transition:border-color .18s, color .18s, background .18s;
+}
+.btn:hover{border-color:var(--brand-500); color:var(--brand-700)}
+.btn.primary{border-color:transparent; background:var(--brand-600); color:#fff;}
+.btn.primary:hover{background:var(--brand-700)}
+.wrap{max-width:var(--maxw); margin:28px auto 60px; padding:0 16px;}
+
+/* ============ 2) 顶部名片 / 英雄区 ============ */
+.card{
+  background:#fff; border:1px solid var(--border); border-radius:var(--radius);
+  box-shadow:var(--shadow); padding:24px;
+  transition:transform .18s, box-shadow .18s, border-color .18s;
+  will-change:transform, box-shadow;
+}
+.card:hover{transform:translateY(-2px); box-shadow:0 10px 34px rgba(0,0,0,.10), 0 2px 10px rgba(0,0,0,.06);}
+.hero{display:grid; grid-template-columns:1fr; gap:12px; justify-items:center; align-items:start; text-align:center;}
+
+/* —— 头像容器 —— */
+/* 容器不做 transform，只改边框色 */
+.avatar{
+  width:121px; height:121px; border-radius:50%;
+  position:relative; overflow:hidden;
+  display:flex; align-items:center; justify-content:center;
+  border:3px solid var(--brand-100);
+  background:linear-gradient(135deg,#dff5ec,#f4fbf8);
+  transition: border-color .25s ease;
+}
+
+/* 图片从 0turn 到 1turn；移出回到 0turn（平滑） */
+.avatar img{
+  width:100%; height:100%; object-fit:cover; display:block;
+  transform: rotate(0turn) scale(1);
+  transition: transform .35s ease;
+  will-change: transform;
+  -webkit-backface-visibility:hidden; backface-visibility:hidden;
+}
+
+/* 桌面悬停也能转 */
+.avatar:hover{ border-color: var(--brand-700); }
+.avatar:hover img{ transform: rotate(1turn) scale(1.04); }
+
+/* JS 会在 .avatar 上加这个类，移动端/触屏用它触发旋转 */
+.avatar.rotating img{ transform: rotate(1turn) scale(1.04); }
+
+/* 高光扫过（可留可删） */
+.avatar::after{
+  content:""; position:absolute; inset:0; left:-150%;
+  background:linear-gradient(110deg,transparent 0,rgba(255,255,255,.35) 45%,transparent 55%);
+  transform:skewX(-20deg); transition: transform .6s ease;
+}
+.avatar:hover::after{ transform: translateX(220%) skewX(-20deg); }
+
+/* 触屏回退：按下期间也保持旋转（部分安卓无 pointerenter） */
+@media (hover:none){
+  .avatar:active img{ transform: rotate(1turn) scale(1.04); }
+}
+
+/* 可达性：键盘聚焦也可预览动效 */
+.avatar:focus-visible img{ transform: rotate(1turn) scale(1.04); }
+
+
+
+.title{display:flex; flex-direction:column; gap:6px; align-items:center; text-align:center;}
+.title h1{font-size:22px; line-height:1.25; margin:0; position:relative;}
+.title h1::after{content:""; position:absolute; left:50%; bottom:-6px; width:0; height:2px; border-radius:2px; background:linear-gradient(90deg,var(--brand-500),var(--brand-700)); transition:width .25s, left .25s;}
+.title h1:hover::after{width:70%; left:15%}
+.subtitle{color:var(--muted-500); font-weight:600; font-size:14px}
+.meta{display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; justify-content:center;}
+
+/* ============ 3) Chip / 微信公众号（hover 为主，触屏回退） ============ */
+.chip{
+  position:relative; display:inline-flex; align-items:center; gap:8px; overflow:hidden;
+  padding:6px 10px; border:1px solid var(--border); border-radius:999px;
+  font-size:13px; color:var(--text-700); background:#fff; transition:background .18s, color .18s, border-color .18s;
+  -webkit-user-select:none; user-select:none;             /* 触屏优化 */
+}
+.chip i{color:var(--brand-600)} .chip a{color:inherit; text-decoration:none;}
+.chip:hover,.chip:focus-visible{background:var(--brand-600); color:#fff; border-color:var(--brand-600)} .chip:hover i,.chip:focus-visible i{color:#fff}
+.chip:active{background:var(--brand-700); border-color:var(--brand-700)}
+/* 开放链接点击 */
+/* .chip::after{content:""; position:absolute; inset:-20%; border-radius:999px; opacity:0; background:radial-gradient(160px 160px at 50% 50%, rgba(23,168,102,.12), transparent 70%); transition:opacity .25s;} */
+/* .chip:hover::after,.chip:focus-visible::after{opacity:1} */
+
+.chip.wechat{overflow:visible; z-index:30}
+.chip.wechat .wx-name{white-space:nowrap}
+.chip.wechat .wx-qr{
+  position:absolute; left:50%; bottom:calc(100% + 10px);
+  transform:translateX(-50%) scale(.96) translateZ(0); /* iOS 抗抖 */
+  opacity:0; pointer-events:none; width:160px; color:var(--text-900);
+  background:#fff; border:1px solid var(--border); border-radius:12px; padding:8px; box-shadow:var(--shadow);
+  transition:opacity .18s, transform .18s; z-index:20; display:block;
+}
+.chip.wechat .wx-qr::after{content:""; position:absolute; top:100%; left:50%; transform:translateX(-50%); border:7px solid transparent; border-top-color:#fff; filter:drop-shadow(0 -1px 0 var(--border));}
+
+/* 桌面：仅 hover 弹出（保留你的原意） */
+.chip.wechat:hover .wx-qr{opacity:1; transform:translateX(-50%) scale(1) translateZ(0); pointer-events:auto;}
+/* 触屏（iOS/Android）：允许点按/聚焦作为回退，仅在无 hover 设备生效 */
+@media (hover:none), (pointer:coarse){
+  .chip.wechat:active .wx-qr,
+  .chip.wechat:focus-within .wx-qr{
+    opacity:1; transform:translateX(-50%) scale(1) translateZ(0); pointer-events:auto;
+  }
+}
+
+/* ============ 4) Section / Block ============ */
+section{margin-top:22px}
+.sec-h{display:flex; align-items:center; gap:10px; margin:0 0 8px; color:var(--brand-700)}
+.sec-h .bar{width:6px; height:18px; border-radius:6px; background:var(--brand-500); transition:width .18s, background .18s;}
+.sec-h h2{margin:0; font-size:18px}
+.block{
+  position:relative; overflow:hidden; background:#fff; color:var(--text-900);
+  border:1px solid var(--border); border-radius:12px; padding:18px;
+  transition:transform .18s, box-shadow .18s, border-color .18s, background .18s, color .18s;
+  will-change:transform, box-shadow;
+}
+.block::before{content:""; position:absolute; inset:0 auto 0 0; width:4px; background:linear-gradient(180deg,var(--brand-500),var(--brand-700)); transform:scaleY(0); transform-origin:top; transition:transform .2s, width .2s;}
+.block:hover,.block:focus-within{transform:translateY(-2px); box-shadow:0 8px 28px rgba(0,0,0,.08), 0 2px 8px rgba(0,0,0,.06); border-color:var(--brand-500)}
+.block:hover::before,.block:focus-within::before{transform:scaleY(1); width:6px}
+section:hover .sec-h .bar{width:12px; background:linear-gradient(90deg,var(--brand-500),var(--brand-700));}
+
+/* ============ 5) 基础列表 & 链接 ============ */
+.item{padding:10px 0; border-top:1px dashed var(--border)} .item:first-child{border-top:none}
+.item h3{margin:.1em 0 .2em; font-size:16px} .muted{color:var(--muted-500); font-size:13px}
+ol.list{margin:6px 0 0; padding-left:0; list-style:none; counter-reset:custom;}
+ol.list li{counter-increment:custom; position:relative; padding-left:2.5em; margin:.4em 0;}
+ol.list li::before{content:'[' counter(custom) ']'; position:absolute; left:0; width:2.5em; text-align:right; color:var(--text-900); font-size:.9em;}
+.block a{
+  color:var(--brand-700); text-decoration:none; transition:color .18s;
+  word-break:normal; overflow-wrap:anywhere; hyphens:auto; -webkit-hyphens:auto; /* iOS 断词 */
+}
+.block a:hover,.block a:focus-visible{color:var(--brand-600); text-decoration:none}
+
+/* ============ 6) 教育经历时间线 ============ */
+.sec--edu .block{position:relative; padding-left:28px}
+.sec--edu .block::before{content:""; position:absolute; left:12px; top:14px; bottom:14px; width:2px; background:linear-gradient(180deg,var(--brand-500),var(--brand-700)); border-radius:2px;}
+.sec--edu .block .item{position:relative; padding-left:10px; margin:10px 0}
+.sec--edu .block .item::before{
+  content:""; position:absolute; left:-22px; top:10px; width:12px; height:12px; border-radius:50%;
+  background:#fff; border:2px solid var(--brand-600); box-shadow:0 0 0 5px var(--brand-100);
+  transition:transform .18s, box-shadow .18s, border-color .18s;
+}
+.sec--edu .block .item:hover::before{transform:scale(1.08); border-color:var(--brand-700); box-shadow:0 0 0 6px rgba(23,168,102,.22)}
+
+/* ============ 7) 项目：卡片化（无箭头） ============ */
+.sec--projects .block .item{
+  position:relative; margin:8px 0; padding:12px; border-radius:12px; border:1px solid transparent;
+  transition:transform .18s, box-shadow .18s, background .18s, border-color .18s;
+}
+.sec--projects .block .item::before{
+  content:""; position:absolute; left:0; top:10px; bottom:10px; width:4px; border-radius:4px;
+  background:linear-gradient(180deg,var(--brand-500),var(--brand-700)); transform:scaleY(0); transform-origin:top; transition:transform .2s, width .2s;
+}
+.sec--projects .block .item:hover,
+.sec--projects .block .item:focus-within{transform:translateY(-2px); background:var(--brand-100); box-shadow:0 10px 28px rgba(0,0,0,.08); border-color:var(--brand-100);}
+.sec--projects .block .item:hover::before,
+.sec--projects .block .item:focus-within::before{transform:scaleY(1); width:6px}
+.sec--projects .block .item ul.list li{transition:transform .18s}
+.sec--projects .block .item:hover ul.list li,
+.sec--projects .block .item:focus-within ul.list li{transform:translateX(2px)}
+
+/* ============ 8) Publications：论文/专利（左上角角标） ============ */
+.block .pub-list{counter-reset:pub; list-style:none; margin:8px 0 0; padding:0;}
+.block .pub-list li{
+  counter-increment:pub; position:relative; display:block;
+  margin:12px 0; padding:16px; border:1px solid var(--border); border-radius:14px; background:#fff;
+  transition:transform .16s, box-shadow .16s, border-color .16s, background .16s;
+}
+.block .pub-list li::before{
+  content:counter(pub); position:absolute; top:0; left:0; transform:translate(-10px,-10px);
+  width:30px; height:30px; display:grid; place-items:center; font:700 13px/1 "Inter","Noto Sans SC",sans-serif;
+  border-radius:10px; box-shadow:0 6px 14px rgba(0,0,0,.10); z-index:1;
+}
+.block .pub-list.papers li::before{color:#fff; background:linear-gradient(135deg,var(--brand-600),var(--brand-700)); border:1px solid rgba(255,255,255,.6);}
+.block .pub-list.patents li::before{color:var(--brand-700); background:#fff; border:2px solid var(--brand-500); box-shadow:0 6px 14px rgba(23,168,102,.18);}
+.block .pub-list li:hover{transform:translateY(-2px); border-color:var(--brand-500); box-shadow:0 10px 24px rgba(0,0,0,.08);}
+.block .pub-list li:hover::before{transform:translate(-11px,-12px) scale(1.04);}
+.block .pub-list li > a{
+  display:block; color:var(--text-900); text-decoration:none; line-height:1.6;
+  white-space:normal; word-break:normal; overflow-wrap:anywhere; hyphens:auto; -webkit-hyphens:auto;
+  transition:color .16s;
+}
+.block .pub-list.papers li > a:hover{color:var(--brand-600)}
+.block .pub-list.papers li > a em{font-style:normal; color:var(--muted-500); transition:color .16s}
+.block .pub-list.papers li:hover > a em{color:var(--brand-700)}
+.block .pub-list.patents li{border-style:dashed}
+
+/* 彻底屏蔽旧规则（若仍有残留） */
+.block .item:first-child > ol.list li > a,
+:is(#lang-zh,#lang-en) section:nth-of-type(4) .block .item:nth-of-type(2) > ol.list li > a{
+  border:none !important; background:transparent !important; padding:0 !important; box-shadow:none !important; transform:none !important;
+}
+
+/* ============ 9) 技能：小气泡 ============ */
+.tags{display:flex; flex-wrap:wrap; gap:8px; margin-top:6px}
+.tag{
+  position:relative; font-size:12px; padding:8px 12px; border-radius:999px;
+  background:var(--brand-100); color:var(--brand-700); border:1px solid rgba(23,168,102,.18);
+  box-shadow:0 1px 0 rgba(23,168,102,.05), inset 0 -1px 0 rgba(255,255,255,.7);
+  transition:transform .16s, box-shadow .16s, border-color .16s, background .16s;
+}
+.tag::after{content:""; position:absolute; inset:-20%; border-radius:999px; opacity:0; pointer-events:none; background:radial-gradient(120px 120px at 50% 50%, rgba(23,168,102,.22), transparent 70%); transition:opacity .2s;}
+.tag:hover{transform:translateY(-1px) scale(1.06); border-color:rgba(23,168,102,.35); box-shadow:0 8px 18px rgba(0,0,0,.08)}
+.tag:hover::after{opacity:1}
+/* 触屏点按反馈 */
+@media (hover:none){
+  .tag:active{transform:scale(.98)}
+  .btn:active{transform:translateY(1px)}
+}
+
+/* ============ 10) 页脚 ============ */
+.site-footer{max-width:var(--maxw); margin:48px auto 20px; padding:0 16px}
+.site-footer .ft-inner{
+  padding:14px 16px; background:#fff; border:1px solid var(--border); border-radius:14px; box-shadow:var(--shadow);
+  display:flex; align-items:center; justify-content:space-between; gap:12px; position:relative; overflow:hidden;
+  transition:transform .18s, box-shadow .18s, border-color .18s;
+  will-change:transform, box-shadow;
+}
+.site-footer .ft-inner::before{content:""; position:absolute; left:0; right:0; top:0; height:3px; background:linear-gradient(90deg,var(--brand-500),var(--brand-700)); opacity:.85;}
+.site-footer .ft-inner:hover{transform:translateY(-2px); box-shadow:0 12px 36px rgba(0,0,0,.10), 0 3px 10px rgba(0,0,0,.06); border-color:var(--brand-500);}
+.ft-brand{display:flex; align-items:center; gap:8px; font-weight:700; color:var(--brand-700)}
+.ft-links{display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:center}
+.ft-links a{display:inline-block; padding:6px 10px; border:1px solid var(--border); border-radius:999px; color:var(--text-700); text-decoration:none; transition:background .18s, color .18s, border-color .18s, transform .18s;}
+.ft-links a:hover{background:var(--brand-600); color:#fff; border-color:var(--brand-600); transform:translateY(-1px)}
+.ft-top{display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:999px; border:1px solid var(--border); color:var(--brand-700); text-decoration:none; transition:transform .18s, background .18s, border-color .18s;}
+.ft-top:hover{transform:translateY(-2px); background:var(--brand-100); border-color:var(--brand-500)}
+@media (max-width:560px){ .site-footer .ft-inner{flex-direction:column; align-items:stretch} .ft-links{justify-content:flex-start} }
+
+/* ============ 11) 打印 & 无障碍 ============ */
+@media print{
+  .topbar,.btn-print{display:none !important}
+  .wrap{margin:0; padding:0} .card,.block{box-shadow:none}
+  a{text-decoration:none; color:#000} body{background:#fff}
+  section,.item{break-inside:avoid} .site-footer{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .chip::after,.card,.block,.block::before{transition:none}
+  .sec--projects .block .item:hover,.pub-list li:hover,.tag:hover{transform:none}
+}
+
+/* ============ 12) 语言面板淡入（iOS 过渡稳定） ============ */
+/* === Language panels（iOS 稳定 + 焦点安全）=== */
+/* 语言面板：无过渡，直接显示/隐藏 */
+/* === Language panels（无动画，强制隐藏/显示）=== */
+/* ========== Language panels（无动画，彻底避免白屏） ========== */
+/* ===== 语言面板：基础 & 宿主 ===== */
+/* ---------- 语言面板：基础 ---------- */
+.wrap{ position:relative; }
+.lang-panel{ display:block; }
+.lang-panel[hidden]{ display:none !important; }
+
+/* 切换时把两个面板叠放一层，避免布局抖动 */
+.lang-panel.__anim-layer{
+  position:absolute; left:0; top:0; width:100%;
+  will-change: transform, opacity;
+  -webkit-transform: translateZ(0);
+}
+
+/* 宿主容器高度过渡，防止切换瞬间跳动 */
+.lang-host-anim{ transition: height .28s cubic-bezier(.2,.8,.2,1); }
+
+/* ---------- 动画类（CSS 过渡，不是淡入淡出） ---------- */
+/* 进入：从下方轻滑上来，略微放大到 100% */
+.lang-anim-enter{
+  transform: translateY(10px) scale(0.985);
+  opacity:.98;          /* 轻微透明，只为柔和，不是明显淡入 */
+}
+.lang-anim-enter-active{
+  transform: translateY(0) scale(1);
+  opacity:1;
+  transition:
+    transform .28s cubic-bezier(.2,.8,.2,1),
+    opacity   .28s cubic-bezier(.2,.8,.2,1);
+}
+
+/* 离开：向上轻滑并轻微缩小 */
+.lang-anim-leave{
+  transform: translateY(0) scale(1);
+  opacity:1;
+}
+.lang-anim-leave-active{
+  transform: translateY(-10px) scale(0.985);
+  opacity:.98;
+  transition:
+    transform .28s cubic-bezier(.2,.8,.2,1),
+    opacity   .28s cubic-bezier(.2,.8,.2,1);
+}
+
+/* 低动画偏好：直接切，无过渡 */
+@media (prefers-reduced-motion: reduce){
+  .lang-host-anim{ transition:none !important; }
+  .lang-anim-enter,.lang-anim-enter-active,
+  .lang-anim-leave,.lang-anim-leave-active{
+    transition:none !important; transform:none !important; opacity:1 !important;
+  }
+}
+
+/* ---------- 苹果风开关：保留，隐藏旧按钮 ---------- */
+#btn-en,#btn-zh{ display:none !important; }
+.lang-switch{
+  --h:28px; --w:54px;
+  position:relative; display:inline-flex; align-items:center; gap:8px;
+  font:600 14px/1 "Inter","Noto Sans SC",system-ui,-apple-system;
+  -webkit-tap-highlight-color:transparent; touch-action:manipulation;
+}
+.lang-switch .label{ min-width:36px; text-align:right; color:var(--text-700); }
+/* .lang-switch[data-lang="en"] .label::after{ content:"English"; }
+.lang-switch[data-lang="zh"] .label::after{ content:"中文"; } */
+.lang-switch .track{
+  position:relative; width:var(--w); height:var(--h);
+  border-radius:999px; cursor:pointer; isolation:isolate;
+  background:#e6f6ee; border:1px solid var(--border);
+  transition:background .2s ease, border-color .2s ease;
+}
+.lang-switch .thumb{
+  position:absolute; top:2px; left:2px;
+  width:calc(var(--h) - 4px); height:calc(var(--h) - 4px);
+  border-radius:999px; background:#fff; box-shadow:0 1px 2px rgba(0,0,0,.22);
+  transition:transform .2s ease; will-change:transform;
+}
+.lang-switch[aria-checked="true"] .track{
+  background:linear-gradient(90deg, var(--brand-500), var(--brand-700));
+  border-color:transparent;
+}
+.lang-switch[aria-checked="true"] .thumb{ transform:translateX(calc(var(--w) - var(--h))); }
+.lang-switch:focus-visible .track{ outline:2px solid rgba(23,168,102,.35); outline-offset:2px; }
+
+/* inert 回退（旧浏览器） */
+/* inert 回退（只作用于语言面板本身，避免误伤内部链接） */
+/* .lang-panel[inert],
+.lang-panel[aria-hidden="true"],
+.lang-panel[data-inert-shim],
+.lang-panel[inert] *,
+.lang-panel[data-inert-shim] *{
+  pointer-events: none !important;
+} */
+
+.lang-panel:not([hidden]) a { pointer-events:auto !important; }
+
+/* ========== Tap = Hover（移动端点击模拟悬浮） ========== */
+/* 交互元素：去蓝灰高亮、减少300ms延迟 */
+.card,.chip,.sec--projects .block .item,.block .pub-list li,.tag,.site-footer .ft-inner{
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* 头像 */
+/* .avatar.is-active{ border-color: var(--brand-700); }
+.avatar.is-active img{ transform: rotate(360deg) scale(1.04); }
+.avatar.is-active::after{ transform: translateX(220%) skewX(-20deg); } */
+
+/* 顶部名片卡片 */
+.card.is-active{
+  transform: translateY(-2px);
+  box-shadow: 0 10px 34px rgba(0,0,0,.10), 0 2px 10px rgba(0,0,0,.06);
+}
+
+/* 通用区块 */
+.block.is-active{
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0,0,0,.08), 0 2px 8px rgba(0,0,0,.06);
+  border-color: var(--brand-500);
+}
+.block.is-active::before{ transform: scaleY(1); width: 6px; }
+
+/* Chip（含普通 chip） */
+.chip.is-active{ background: var(--brand-600); color:#fff; border-color:var(--brand-600); }
+.chip.is-active i{ color:#fff; }
+.chip.is-active::after{ opacity:1; }
+
+/* 微信公众号：点按也弹出（桌面仍然 hover） */
+.chip.wechat.is-active .wx-qr{
+  opacity:1; transform: translateX(-50%) scale(1); pointer-events:auto;
+}
+
+/* 项目卡片 */
+.sec--projects .block .item.is-active{
+  transform: translateY(-2px);
+  background: var(--brand-100);
+  box-shadow: 0 10px 28px rgba(0,0,0,.08);
+  border-color: var(--brand-100);
+}
+.sec--projects .block .item.is-active::before{ transform: scaleY(1); width: 6px; }
+.sec--projects .block .item.is-active ul.list li{ transform: translateX(2px); }
+
+/* Publications：论文/专利 */
+.block .pub-list li.is-active{
+  transform: translateY(-2px);
+  border-color: var(--brand-500);
+  box-shadow: 0 10px 24px rgba(0,0,0,.08);
+}
+.block .pub-list li.is-active::before{ transform: translate(-11px,-12px) scale(1.04); }
+
+/* 论文：点按后文字也变绿、期刊名提亮（与 :hover 一致） */
+.block .pub-list.papers li.is-active{
+  background: linear-gradient(0deg, rgba(23,168,102,.04), rgba(23,168,102,0));
+}
+.block .pub-list.papers li.is-active > a{ color: var(--brand-600); }
+.block .pub-list.papers li.is-active > a em{ color: var(--brand-700); }
+
+/* 技能气泡 */
+.tag.is-active{
+  transform: translateY(-1px) scale(1.06);
+  border-color: rgba(23,168,102,.35);
+  box-shadow: 0 8px 18px rgba(0,0,0,.08);
+}
+.tag.is-active::after{ opacity:1; }
+
+/* 页脚卡片 */
+.site-footer .ft-inner.is-active{
+  transform: translateY(-2px);
+  box-shadow: 0 12px 36px rgba(0,0,0,.10), 0 3px 10px rgba(0,0,0,.06);
+  border-color: var(--brand-500);
+}
+
+@media (hover:hover) {
+  a, button,
+  .chip, .avatar,
+  .pub-list li > a,
+  .site-footer .ft-inner a
+  { cursor: pointer; }
+}
+
+/* 添加更多纹理 */
+/* —— 全站几何纹理：给 body 加类名即可 —— */
+.geo-hex, body.geo-hex{
+  background-image:
+    radial-gradient(circle at 0    50%, rgba(var(--hex-ink), var(--hex-alpha)) 1.2px, transparent 1.3px),
+    radial-gradient(circle at 50%   0  , rgba(var(--hex-ink), var(--hex-alpha)) 1.2px, transparent 1.3px),
+    radial-gradient(circle at 100% 50%, rgba(var(--hex-ink), var(--hex-alpha)) 1.2px, transparent 1.3px),
+    radial-gradient(circle at 50% 100%, rgba(var(--hex-ink), var(--hex-alpha)) 1.2px, transparent 1.3px),
+    radial-gradient(circle at 0     0  , rgba(var(--hex-ink), var(--hex-alpha)) 1.2px, transparent 1.3px),
+    radial-gradient(circle at 100%  0  , rgba(var(--hex-ink), var(--hex-alpha)) 1.2px, transparent 1.3px),
+    /* ✅ 正确写法：.012 */
+    linear-gradient(0deg, rgba(0,0,0,.012) 0 0);
+  background-size:
+    var(--hex-size) var(--hex-size), var(--hex-size) var(--hex-size),
+    var(--hex-size) var(--hex-size), var(--hex-size) var(--hex-size),
+    var(--hex-size) var(--hex-size), var(--hex-size) var(--hex-size),
+    auto;
+  background-position:
+    0 0, calc(var(--hex-size)/2) 0, var(--hex-size) 0,
+    0 calc(var(--hex-size)/2), calc(var(--hex-size)/2) calc(var(--hex-size)/2), var(--hex-size) calc(var(--hex-size)/2),
+    0 0;
+  background-attachment: fixed;
+}
+
+/* 如果想只给面板加纹理（不改整页），可选： */
+.card, .block, .card--profile.geot {
+  /* 任选一款，示例为三角网格 */
+  background-image:
+    linear-gradient(30deg,  rgba(23,168,102,.05) 1px, transparent 1px),
+    linear-gradient(150deg, rgba(23,168,102,.05) 1px, transparent 1px);
+  background-size: 28px 28px;
+  background-blend-mode: multiply; /* 更柔和，可去掉 */
+}
