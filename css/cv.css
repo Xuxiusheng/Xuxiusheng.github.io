@@ -498,3 +498,8 @@ ol.list li::before{content:'[' counter(custom) ']'; position:absolute; left:0; w
   background-size: 28px 28px;
   background-blend-mode: multiply; /* 更柔和，可去掉 */
 }
+
+.no-indent {
+  padding-left: 0;
+  margin-left: 1em; /* 可选：微调对齐 */
+}
