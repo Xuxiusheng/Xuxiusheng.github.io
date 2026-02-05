@@ -28,7 +28,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/125.svg">
 <meta property="article:published_time" content="2026-01-30T14:10:00.000Z">
-<meta property="article:modified_time" content="2026-02-05T13:16:56.140Z">
+<meta property="article:modified_time" content="2026-02-05T16:30:23.909Z">
 <meta property="article:author" content="Xuxiusheng">
 <meta property="article:tag" content="Redis">
 <meta property="article:tag" content="源码解读">
@@ -278,7 +278,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          6.4k 字
+          7.8k 字
         
       </span>
     
@@ -289,7 +289,7 @@
         
         
         
-          54 分钟
+          65 分钟
         
       </span>
     
@@ -397,6 +397,28 @@
 <p>insert和delete有很多相似之处，把逻辑理清楚就可以。</p>
 <h2 id="ziplistCascadeUpdate"><a href="#ziplistCascadeUpdate" class="headerlink" title="ziplistCascadeUpdate"></a>ziplistCascadeUpdate</h2><p>ziplist进行插入&#x2F;删除操作时，存在级联更新的风险，<a href="https://xuxiusheng.github.io/2026/01/01/Redis%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B/#%E7%BA%A7%E8%81%94%E6%9B%B4%E6%96%B0%E9%97%AE%E9%A2%98">ziplist级联更新</a>, 级联更新的函数如下:</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> *__ziplistCascadeUpdate(<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> *zl, <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> *p) &#123;<br>    <span class="hljs-type">size_t</span> curlen = intrev32ifbe(ZIPLIST_BYTES(zl)), rawlen, rawlensize;<br>    <span class="hljs-type">size_t</span> offset, noffset, extra;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> *np;<br>    zlentry cur, next;<br><br>    <span class="hljs-keyword">while</span> (p[<span class="hljs-number">0</span>] != ZIP_END) &#123;<br>        zipEntry(p, &amp;cur);<br>        rawlen = cur.headersize + cur.len;<br>        rawlensize = zipPrevEncodeLength(<span class="hljs-literal">NULL</span>,rawlen);<br><br>        <span class="hljs-comment">/* Abort if there is no next entry. */</span><br>        <span class="hljs-keyword">if</span> (p[rawlen] == ZIP_END) <span class="hljs-keyword">break</span>;<br>        zipEntry(p+rawlen, &amp;next);<br><br>        <span class="hljs-comment">/* Abort when &quot;prevlen&quot; has not changed. */</span><br>        <span class="hljs-keyword">if</span> (next.prevrawlen == rawlen) <span class="hljs-keyword">break</span>;<br><br>        <span class="hljs-keyword">if</span> (next.prevrawlensize &lt; rawlensize) &#123;<br>            <span class="hljs-comment">/* The &quot;prevlen&quot; field of &quot;next&quot; needs more bytes to hold</span><br><span class="hljs-comment">             * the raw length of &quot;cur&quot;. */</span><br>            offset = p-zl;<br>            extra = rawlensize-next.prevrawlensize;<br>            zl = ziplistResize(zl,curlen+extra);<br>            p = zl+offset;<br><br>            <span class="hljs-comment">/* Current pointer and offset for next element. */</span><br>            np = p+rawlen;<br>            noffset = np-zl;<br><br>            <span class="hljs-comment">/* Update tail offset when next element is not the tail element. */</span><br>            <span class="hljs-keyword">if</span> ((zl+intrev32ifbe(ZIPLIST_TAIL_OFFSET(zl))) != np) &#123;<br>                ZIPLIST_TAIL_OFFSET(zl) =<br>                    intrev32ifbe(intrev32ifbe(ZIPLIST_TAIL_OFFSET(zl))+extra);<br>            &#125;<br><br>            <span class="hljs-comment">/* Move the tail to the back. */</span><br>            memmove(np+rawlensize,<br>                np+next.prevrawlensize,<br>                curlen-noffset-next.prevrawlensize<span class="hljs-number">-1</span>);<br>            zipPrevEncodeLength(np,rawlen);<br><br>            <span class="hljs-comment">/* Advance the cursor */</span><br>            p += rawlen;<br>            curlen += extra;<br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>            <span class="hljs-keyword">if</span> (next.prevrawlensize &gt; rawlensize) &#123;<br>                <span class="hljs-comment">/* This would result in shrinking, which we want to avoid.</span><br><span class="hljs-comment">                 * So, set &quot;rawlen&quot; in the available bytes. */</span><br>                zipPrevEncodeLengthForceLarge(p+rawlen,rawlen);<br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                zipPrevEncodeLength(p+rawlen,rawlen);<br>            &#125;<br><br>            <span class="hljs-comment">/* Stop here, as the raw length of &quot;next&quot; has not changed. */</span><br>            <span class="hljs-keyword">break</span>;<br>        &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span> zl;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h1 id="listpack"><a href="#listpack" class="headerlink" title="listpack"></a>listpack</h1><p>ziplist和listpack都是紧凑存储少量数据的结构，让 Redis 在存储少量数据时既节省内存又保持快速访问。</p>
+<p>listpack 是 ziplist 的“升级版”，它保留了紧凑存储的核心思想，但改进了设计以解决 ziplist 的问题。现代redis的quicklistNode底层完全基于listpack，而不是ziplist。</p>
+<p>ziplist级联更新的根源在于：<strong>entry之间具有依赖关系</strong>，每一个entry通过prevlen保存了前一个entry的长度，所以当前一个entry的长度发生变化时，需要更新自己的prevlen字段，这个更新会导致自身长度发生变化，又会触发后继的entry更新。</p>
+<p>listpack整体结构如下:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs text">[总字节数 lpbytes] [元素个数 lplen] [entry] [entry][...][lp_eof]<br></code></pre></td></tr></table></figure>
+
+<p>ListPack 的核心创新在于：彻底移除条目之间的依赖，让每个条目成为完全自包含的独立单元。每个entry结构如下:</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs text">[编码类型 encoding] [实际数据 entry-data] [元素总长度 element-total-len]<br></code></pre></td></tr></table></figure>
+<p>相比 Ziplist 的最大变化：</p>
+<ul>
+<li>删除了 prevlen 字段：条目不再存储前一个条目的任何信息。</li>
+<li>在末尾增加了 element-total-len 字段：这个字段存储本条目的总字节数（即 encoding + entry-data + element-total-len 自身的长度）</li>
+</ul>
+<p>那如何实现正向遍历和逆向遍历呢?</p>
+<ul>
+<li>逆向遍历: 从 ListPack 尾部开始解析：ListPack 的头部存储了整个 ListPack 的总字节数lpbytes。要找到最后一个条目，可以用 lpbytes - 末尾的 element-total-len，得到上一个条目的起始位置。一旦定位到一个条目，读取其末尾的 element-total-len，就能立即知道这个条目占据了多少字节，从而轻松跳到前一个条目。</li>
+<li>正向遍历: 从entry的encoding字段可以计算encoding+entry_data的长度，再通过这个长度计算element-entry-len的字节数，知道了这三者的长度可以顺利定位到下一个entry。</li>
+</ul>
+<div class="note note-warning">
+            <p>quicklist一定程度上解决了ziplist连锁更新的问题，但是依然需要合理设计每个quicklistNode的fill，来权衡内存成本和访问效率，属于治标不治本。所以看上去是不是listpack结局了连锁更新的问题后，quicklist就完全不需要了？<br><strong>并不是</strong>，listpack为内存紧凑型结构，头部插入&#x2F;删除效率低，因为需要移动整个listpack结构，而每个quicklistNode的lp元素非常少，头部插入&#x2F;删除只影响头结点的listpack，而不是整个listpack，效率就很高了。</p> <p>此外，redis为list提供了LZF压缩机制，listpack的话如果压缩就必须全局压缩，但是头尾节点访问时需要频繁的压缩和解压缩，CPU成本很高。而quicklist允许对list的中间quicklistNode节点进行局部压缩，而保持头尾节点处于非压缩状态，在一些头尾节点高频访问的场景中，可以同时保证内存存储效率和CPU效率。</p> 
+          </div>
 
 
 
