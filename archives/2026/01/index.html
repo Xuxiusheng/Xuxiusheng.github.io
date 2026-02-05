@@ -65,6 +65,7 @@
 <link rel="stylesheet" href="/css/partial_encrypt.css">
 <link rel="stylesheet" href="/css/runtime.css">
 <link rel="stylesheet" href="/css/cv.css">
+<link rel="stylesheet" href="/css/articles/iconfont.css">
 
 
 
@@ -139,35 +140,39 @@
           
           
           
-            <li class="nav-item">
-              <a class="nav-link" href="/archives/" target="_self">
-                <i class="iconfont icon-archive-fill"></i>
-                <span>归档</span>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" target="_self" href="javascript:;" role="button"
+                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="icon iconfont icon-wenzhangshezhi"></i>
+                <span>文章</span>
               </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/categories/" target="_self">
-                <i class="iconfont icon-category-fill"></i>
-                <span>分类</span>
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/tags/" target="_self">
-                <i class="iconfont icon-tags-fill"></i>
-                <span>标签</span>
-              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/archives/" target="_self">
+                    <i class="iconfont icon-archive-fill"></i>
+                    <span>归档</span>
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/categories/" target="_self">
+                    <i class="iconfont icon-category-fill"></i>
+                    <span>分类</span>
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/tags/" target="_self">
+                    <i class="iconfont icon-tags-fill"></i>
+                    <span>标签</span>
+                  </a>
+                
+              </div>
             </li>
           
         
@@ -230,7 +235,7 @@
   
 
 <div id="banner" class="banner" parallax=true
-     style="background: url('/img/config/pikaqiu.png') no-repeat center center; background-size: cover;">
+     style="background: url('/img/config/main_3.png') no-repeat center center; background-size: cover;">
   <div class="full-bg-img">
     <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
       <div class="banner-text text-center fade-in-up">
@@ -264,7 +269,7 @@
                 
 
 <div class="list-group">
-  <p class="h4">共计 59 篇文章</p>
+  <p class="h4">共计 60 篇文章</p>
   <hr>
   
   
@@ -274,7 +279,7 @@
     
     <a href="/2026/01/30/Redis_ZipList/" class="list-group-item list-group-item-action">
       <time>01-30</time>
-      <div class="list-group-item-title">Redis ZipList</div>
+      <div class="list-group-item-title">源码系列-Redis ZipList</div>
     </a>
   
     
@@ -292,7 +297,7 @@
     
     <a href="/2026/01/16/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB-SDS/" class="list-group-item list-group-item-action">
       <time>01-16</time>
-      <div class="list-group-item-title">Redis SDS</div>
+      <div class="list-group-item-title">源码系列-Redis SDS</div>
     </a>
   
     

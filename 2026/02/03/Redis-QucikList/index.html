@@ -1,0 +1,811 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/config/fluid.png">
+  <link rel="icon" href="/img/config/personal.jpg">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="Xuxiusheng">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="QucikListziplist（压缩列表）是 Redis 为节约内存设计的一种紧凑型双向链表，前序和逆序访问的效率都很高，适合少量小字符串的存储。但是ziplist在删除和插入元素时，会触发连锁扩容，当元素数量很大时，连锁更新的效率很低。可以参考ziplist连锁更新。现在list类型完全摒弃了linkedlist和ziplist，完全被quicklist取代。 结构设计QuickList是Li">
+<meta property="og:type" content="article">
+<meta property="og:title" content="源码系列-Redis QucikList">
+<meta property="og:url" content="http://xuxiusheng.github.io/2026/02/03/Redis-QucikList/index.html">
+<meta property="og:site_name" content="Xuxiusheng">
+<meta property="og:description" content="QucikListziplist（压缩列表）是 Redis 为节约内存设计的一种紧凑型双向链表，前序和逆序访问的效率都很高，适合少量小字符串的存储。但是ziplist在删除和插入元素时，会触发连锁扩容，当元素数量很大时，连锁更新的效率很低。可以参考ziplist连锁更新。现在list类型完全摒弃了linkedlist和ziplist，完全被quicklist取代。 结构设计QuickList是Li">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/126.svg">
+<meta property="article:published_time" content="2026-02-03T10:15:00.000Z">
+<meta property="article:modified_time" content="2026-02-04T18:40:14.099Z">
+<meta property="article:author" content="Xuxiusheng">
+<meta property="article:tag" content="Redis">
+<meta property="article:tag" content="源码解读">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://xuxiusheng.github.io/img/article_img/126.svg">
+  
+  
+  
+  <title>源码系列-Redis QucikList - Xuxiusheng</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/cnblogs/iconfont.css">
+<link rel="stylesheet" href="/css/email/iconfont.css">
+<link rel="stylesheet" href="/css/card.css">
+<link rel="stylesheet" href="/css/CV/iconfont.css">
+<link rel="stylesheet" href="/css/partial_encrypt.css">
+<link rel="stylesheet" href="/css/runtime.css">
+<link rel="stylesheet" href="/css/cv.css">
+<link rel="stylesheet" href="/css/articles/iconfont.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"xuxiusheng.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/config/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"2HT5rmC5XQuRugoXS6jx93oG-gzGzoHsz","app_key":"34FVPpMZGQcLXWdGF6FnOx9T","server_url":"https://2ht5rmc5.lc-cn-n1-shared.com","path":"window.location.pathname","ignore_local":true},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>XuxiushengのBlog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" target="_self" href="javascript:;" role="button"
+                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="icon iconfont icon-wenzhangshezhi"></i>
+                <span>文章</span>
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/archives/" target="_self">
+                    <i class="iconfont icon-archive-fill"></i>
+                    <span>归档</span>
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/categories/" target="_self">
+                    <i class="iconfont icon-category-fill"></i>
+                    <span>分类</span>
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/tags/" target="_self">
+                    <i class="iconfont icon-tags-fill"></i>
+                    <span>标签</span>
+                  </a>
+                
+              </div>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/CV/" target="_self">
+                <i class="icon iconfont icon-jianli"></i>
+                <span>CV</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/config/main_3.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="源码系列-Redis QucikList"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-02-03 18:15" pubdate>
+          2026年2月3日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.9k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          33 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">源码系列-Redis QucikList</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="QucikList"><a href="#QucikList" class="headerlink" title="QucikList"></a>QucikList</h1><p>ziplist（压缩列表）是 Redis 为节约内存设计的一种紧凑型双向链表，前序和逆序访问的效率都很高，适合少量小字符串的存储。但是ziplist在删除和插入元素时，会触发连锁扩容，当元素数量很大时，连锁更新的效率很低。可以参考<a href="https://xuxiusheng.github.io/2026/01/01/Redis%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B/#%E7%BA%A7%E8%81%94%E6%9B%B4%E6%96%B0%E9%97%AE%E9%A2%98">ziplist连锁更新</a>。现在list类型完全摒弃了linkedlist和ziplist，完全被quicklist取代。</p>
+<h1 id="结构设计"><a href="#结构设计" class="headerlink" title="结构设计"></a>结构设计</h1><p>QuickList是<strong>LinkedList + ZipList</strong>的混合体。宏观上看，它是一个双向链表。 微观上看，链表中的每个节点 (Node) 都是一个 ZipList。QuickList的设计核心在于平衡<strong>内存</strong>与<strong>CPU</strong>。</p>
+<ul>
+<li>linkedlist平均每个节点浪费16字节的内存，空间成本很高</li>
+<li>ziplist在极端情况（每个字符串的长度都大于等于2^14字节）下，每个节点平均浪费10字节内存，平均情况下，每个节点浪费2字节内存。所以空间成本不高，但是在插入&#x2F;删除时要执行连锁更新，在大数据量下对CPU不友好</li>
+</ul>
+<p>quicklist的结构如下:<br><img src="/img/article_img/126.svg" srcset="/img/config/loading.gif" lazyload></p>
+<p>Redis通过list-max-ziplist-size 参数来控制每个 ZipList 节点的大小。</p>
+<ul>
+<li>如果一个节点存太多元素：它就退化成了一个大 ZipList，虽然极省内存，但更新性能差（连锁更新）。</li>
+<li>如果一个节点存太少元素：它就退化成了标准 LinkedList，内存开销大。</li>
+</ul>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">quicklist</span> &#123;</span><br>    quicklistNode *head;<br>    quicklistNode *tail;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> count;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> len;<br>    <span class="hljs-comment">/*</span><br><span class="hljs-comment">        fill &gt; 0: ziplist的最大entry数量</span><br><span class="hljs-comment">        fill &lt; 0: 表示直接限制内存大小: -1表示最大4KB, -5表示最大64KB</span><br><span class="hljs-comment">    */</span><br>    <span class="hljs-type">int</span> fill : <span class="hljs-number">16</span>;<br>    <span class="hljs-comment">/*</span><br><span class="hljs-comment">        压缩深度compress=n: list的前n个和最后n个不压缩,中间的quicklistNode压缩存储</span><br><span class="hljs-comment">        CPU资源充足，内存资源受限的条件下建议开启</span><br><span class="hljs-comment">    */</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> compress : <span class="hljs-number">16</span>;<br>&#125; quicklist;<br><br><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">quicklistNode</span> &#123;</span><br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">quicklistNode</span> *<span class="hljs-title">prev</span>;</span><br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">quicklistNode</span> *<span class="hljs-title">next</span>;</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> *zl;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> sz;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> count : <span class="hljs-number">16</span>;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> encoding : <span class="hljs-number">2</span>;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> container : <span class="hljs-number">2</span>;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> recompress : <span class="hljs-number">1</span>;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> attempted_compress : <span class="hljs-number">1</span>;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">int</span> extra : <span class="hljs-number">10</span>;<br>&#125; quicklistNode;<br></code></pre></td></tr></table></figure>
+
+<p>quicklist结构的两个参数需要特别注意一下:</p>
+<ul>
+<li>fill: 表示对单个quicklistNode的限制，可以从entry的数量进行限制，也可以从内存大小进行限制。<ul>
+<li>fill &gt; 0时表示每个node的ziplist最多存储fill个entry</li>
+<li>fill &lt; 0时表示每个node的内存大小有限制(-1的限制最强:4KB, -5的限制最小:64KB)</li>
+</ul>
+</li>
+<li>compress: 压缩深度，compress&#x3D;n表示前n个quicklistNode和最后的n个quicklistNode不执行压缩，中间的quicklistNode压缩存储，以节省内存<ul>
+<li>CPU资源充足，内存资源敏感或者高并发、低延迟的情况下建议开启</li>
+<li>内存资源充足的情况下不建议开启</li>
+</ul>
+</li>
+</ul>
+<h1 id="核心API"><a href="#核心API" class="headerlink" title="核心API"></a>核心API</h1><h2 id="压缩机制"><a href="#压缩机制" class="headerlink" title="压缩机制"></a>压缩机制</h2><p>quicklist允许对中间的quicklistNode的zl使用LZF压缩算法进行压缩，进一步节省内存空间，但是在CPU敏感，内存充足的场景下不建议开启，因为字节数组的压缩和解压缩都需要消耗CPU。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs c">REDIS_STATIC <span class="hljs-type">int</span> __quicklistCompressNode(quicklistNode *node) &#123;<br><span class="hljs-meta">#<span class="hljs-keyword">ifdef</span> REDIS_TEST</span><br>    node-&gt;attempted_compress = <span class="hljs-number">1</span>;<br><span class="hljs-meta">#<span class="hljs-keyword">endif</span></span><br><br>    <span class="hljs-comment">/* 如果node本身的内存字节占用较小，不进行压缩 */</span><br>    <span class="hljs-keyword">if</span> (node-&gt;sz &lt; MIN_COMPRESS_BYTES)<br>        <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br><br>	<span class="hljs-comment">/*</span><br><span class="hljs-comment">		压缩前不能确定压缩后的大小，并且压缩算法不能保证压缩后</span><br><span class="hljs-comment">        数据一定比原始数据小，所以预留node-&gt;size的空间</span><br><span class="hljs-comment">	*/</span><br>    quicklistLZF *lzf = zmalloc(<span class="hljs-keyword">sizeof</span>(*lzf) + node-&gt;sz);<br><br>    <span class="hljs-comment">/* Cancel if compression fails or doesn&#x27;t compress small enough */</span><br>    <span class="hljs-keyword">if</span> (((lzf-&gt;sz = lzf_compress(node-&gt;zl, node-&gt;sz, lzf-&gt;compressed,<br>                                 node-&gt;sz)) == <span class="hljs-number">0</span>) ||<br>        lzf-&gt;sz + MIN_COMPRESS_IMPROVE &gt;= node-&gt;sz) &#123;<br>        <span class="hljs-comment">/* lzf_compress aborts/rejects compression if value not compressable. */</span><br>        zfree(lzf);<br>        <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>    &#125;<br>    lzf = zrealloc(lzf, <span class="hljs-keyword">sizeof</span>(*lzf) + lzf-&gt;sz);<br>    zfree(node-&gt;zl);<br>    node-&gt;zl = (<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> *)lzf;<br>    node-&gt;encoding = QUICKLIST_NODE_ENCODING_LZF;<br>    node-&gt;recompress = <span class="hljs-number">0</span>;<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<div class="note note-info">
+            <p>LZF是一种轻量级压缩算法，压缩和解压缩速度极快，不追求极致的压缩率，适合小数据块压缩，被用于quicklist的节点压缩。</p> 
+          </div>
+
+<h2 id="头插-尾插"><a href="#头插-尾插" class="headerlink" title="头插 &amp; 尾插"></a>头插 &amp; 尾插</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// 头插法</span><br><span class="hljs-type">int</span> <span class="hljs-title function_">quicklistPushHead</span><span class="hljs-params">(quicklist *quicklist, <span class="hljs-type">void</span> *value, <span class="hljs-type">size_t</span> sz)</span> &#123;<br>    quicklistNode *orig_head = quicklist-&gt;head;<br>    <span class="hljs-comment">/* </span><br><span class="hljs-comment">        先判断是否能直接在当前的头节点进行插入</span><br><span class="hljs-comment">        如果当前节点被压缩或者fill以达到上限，则创建新的头节点</span><br><span class="hljs-comment">    */</span><br>    <span class="hljs-keyword">if</span> (likely(<br>            _quicklistNodeAllowInsert(quicklist-&gt;head, quicklist-&gt;fill, sz))) &#123;<br>        quicklist-&gt;head-&gt;zl =<br>            ziplistPush(quicklist-&gt;head-&gt;zl, value, sz, ZIPLIST_HEAD);<br>        quicklistNodeUpdateSz(quicklist-&gt;head);<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>        quicklistNode *node = quicklistCreateNode();<br>        node-&gt;zl = ziplistPush(ziplistNew(), value, sz, ZIPLIST_HEAD);<br><br>        quicklistNodeUpdateSz(node);<br>        _quicklistInsertNodeBefore(quicklist, quicklist-&gt;head, node);<br>    &#125;<br>    quicklist-&gt;count++;<br>    quicklist-&gt;head-&gt;count++;<br>    <span class="hljs-keyword">return</span> (orig_head != quicklist-&gt;head);<br>&#125;<br><br><span class="hljs-comment">// 尾插法</span><br><span class="hljs-type">int</span> <span class="hljs-title function_">quicklistPushTail</span><span class="hljs-params">(quicklist *quicklist, <span class="hljs-type">void</span> *value, <span class="hljs-type">size_t</span> sz)</span> &#123;<br>    quicklistNode *orig_tail = quicklist-&gt;tail;<br>    <span class="hljs-keyword">if</span> (likely(<br>            _quicklistNodeAllowInsert(quicklist-&gt;tail, quicklist-&gt;fill, sz))) &#123;<br>        quicklist-&gt;tail-&gt;zl =<br>            ziplistPush(quicklist-&gt;tail-&gt;zl, value, sz, ZIPLIST_TAIL);<br>        quicklistNodeUpdateSz(quicklist-&gt;tail);<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>        quicklistNode *node = quicklistCreateNode();<br>        node-&gt;zl = ziplistPush(ziplistNew(), value, sz, ZIPLIST_TAIL);<br><br>        quicklistNodeUpdateSz(node);<br>        _quicklistInsertNodeAfter(quicklist, quicklist-&gt;tail, node);<br>    &#125;<br>    quicklist-&gt;count++;<br>    quicklist-&gt;tail-&gt;count++;<br>    <span class="hljs-keyword">return</span> (orig_tail != quicklist-&gt;tail);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Redis/" class="category-chain-item">Redis</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Redis/" class="print-no-link">#Redis</a>
+      
+        <a href="/tags/%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/" class="print-no-link">#源码解读</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>源码系列-Redis QucikList</div>
+      <div>http://xuxiusheng.github.io/2026/02/03/Redis-QucikList/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Xuxiusheng</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年2月3日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/01/30/Redis_ZipList/" title="源码系列-Redis ZipList">
+                        <span class="hidden-mobile">源码系列-Redis ZipList</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.5.1/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"2HT5rmC5XQuRugoXS6jx93oG-gzGzoHsz","appKey":"34FVPpMZGQcLXWdGF6FnOx9T","path":"window.location.pathname","placeholder":"说点什么吧","avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"","emojiCDN":null,"emojiMaps":null,"enableQQ":false,"appid":"2HT5rmC5XQuRugoXS6jx93oG-gzGzoHsz","appkey":"34FVPpMZGQcLXWdGF6FnOx9T","app_id":"2HT5rmC5XQuRugoXS6jx93oG-gzGzoHsz","app_key":"34FVPpMZGQcLXWdGF6FnOx9T"},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://xuxiusheng.github.io/" target="_blank" rel="nofollow noopener"><strong>XuxiushengのBlog</strong><span></span></a> <div id="runtime_container"> 已经在星海中遨游了：<span id="runtime_days">0</span> 天 <span id="runtime_hours">0</span> 小时 <span id="runtime_mins">0</span> 分 <span id="runtime_secs">0</span> 秒 </div> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>由<strong>Hexo</strong>强力驱动</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>主题：<strong>Fluid</strong></span></a><br> <span>We are stupid but strong</span> 
+    </div>
+  
+  
+  
+    <!-- 备案信息 ICP for China -->
+    <div class="beian">
+  <span>
+    <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
+      京ICP证123456号
+    </a>
+  </span>
+  
+    
+      <span>
+        <a
+          href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=12345678"
+          rel="nofollow noopener"
+          class="beian-police"
+          target="_blank"
+        >
+          
+            <span style="visibility: hidden; width: 0">|</span>
+            <img src="/img/config/police_beian.png" srcset="/img/config/loading.gif" lazyload alt="police-icon"/>
+          
+          <span>京公网安备12345678号</span>
+        </a>
+      </span>
+    
+  
+</div>
+
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/card.js"></script>
+<script src="/js/encrypt_core.js"></script>
+<script src="/js/runtime.js"></script>
+<script src="/js/cv.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

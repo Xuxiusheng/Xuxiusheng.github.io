@@ -65,6 +65,7 @@
 <link rel="stylesheet" href="/css/partial_encrypt.css">
 <link rel="stylesheet" href="/css/runtime.css">
 <link rel="stylesheet" href="/css/cv.css">
+<link rel="stylesheet" href="/css/articles/iconfont.css">
 
 
 
@@ -139,35 +140,39 @@
           
           
           
-            <li class="nav-item">
-              <a class="nav-link" href="/archives/" target="_self">
-                <i class="iconfont icon-archive-fill"></i>
-                <span>归档</span>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" target="_self" href="javascript:;" role="button"
+                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="icon iconfont icon-wenzhangshezhi"></i>
+                <span>文章</span>
               </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/categories/" target="_self">
-                <i class="iconfont icon-category-fill"></i>
-                <span>分类</span>
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/tags/" target="_self">
-                <i class="iconfont icon-tags-fill"></i>
-                <span>标签</span>
-              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/archives/" target="_self">
+                    <i class="iconfont icon-archive-fill"></i>
+                    <span>归档</span>
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/categories/" target="_self">
+                    <i class="iconfont icon-category-fill"></i>
+                    <span>分类</span>
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/tags/" target="_self">
+                    <i class="iconfont icon-tags-fill"></i>
+                    <span>标签</span>
+                  </a>
+                
+              </div>
             </li>
           
         
@@ -230,7 +235,7 @@
   
 
 <div id="banner" class="banner" parallax=true
-     style="background: url('/img/config/main_1.png') no-repeat center center; background-size: cover;">
+     style="background: url('/img/config/main_2.jpg') no-repeat center center; background-size: cover;">
   <div class="full-bg-img">
     <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
       <div class="banner-text text-center fade-in-up">
@@ -268,6 +273,67 @@
                 
 
 <h1 style="display: none">Xuxiusheng</h1>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2026/01/01/ConcurrentHashMap/" target="_self">
+          源码系列-ConcurrentHashMap
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/01/01/ConcurrentHashMap/" target="_self">
+        <div>
+          ConcurrentHashMap是线程安全的Map类型，本篇文章来解读以下ConcurrentHashMap源码，看下它是怎么做到线程安全的。 ConcurrentHashMap初始化构造函数 12345678910public ConcurrentHashMap(int initialCapacity) &#123;    if (initialCapacity &lt; 0)
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-01-01 20:20" pubdate>
+              2026-01-01
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Java/" class="category-chain-item">Java</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/">#源码解读</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
 
   <div class="row mx-auto index-card">
     
@@ -782,67 +848,6 @@
       <a class="index-excerpt index-excerpt__noimg" href="/2026/01/01/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" target="_self">
         <div>
           虚拟内存在介绍虚拟地址之前先介绍下物理地址，物理地址指的就是内存条上的直接地址，如果应用程序直接使用物理地址，有两大缺陷：  缺少内存保护，不同程序间内存访问容易出现内存越界，非法访问 应用程序只能访问局部空间，可用内存减少  虚拟内存的作用是通过硬件和操作系统的配合（局部性+换页），为进程提供一个完整的虚拟空间，使得在进程看来独占整个内存，并提供内存保护机制，避免出现非法访问。  应用程序使用的
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-01-01 19:30" pubdate>
-              2026-01-01
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/" class="category-chain-item">计算机基础</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2026/01/01/%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86/" target="_self">
-          进程管理
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/01/01/%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86/" target="_self">
-        <div>
-          进程编写的代码被编译为二进制可执行文件存储在硬盘，此时只是一个静态文件，当我们执行程序，操作系统将其加载到内存运行，这个运行起来的程序叫做进程，是一个动态的概念。 进程状态   进程状态切换       除了上述五种状态外，还有一种挂起状态，当阻塞的进程很多，会占用大量的物理内存，OS会将其暂时交换到硬盘交换空间，这种状态叫做挂起态，分为阻塞挂起和就绪挂起。 上下文切换当前的操作系统大都使用分时轮
         </div>
       </a>
 

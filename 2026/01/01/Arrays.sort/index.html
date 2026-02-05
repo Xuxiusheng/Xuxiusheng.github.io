@@ -21,20 +21,20 @@
   
     <meta name="description" content="简介Arrays.sort底层并不是基于简单的快速排序算法，而是根据工程实践进行了优化，针对不同的数据类型，选择不同的排序算法：  基本数据类型：双轴快速排序算法 引用数据类型：TimSort算法  双轴快速排序 DualPivotQuicksort对于基本数据类型的排序，JDK进行了优化，使用双轴快速排序，每次选择两个轴，相比于单轴快速排序，比较次数和树高都更少，效率更高。但是和快排一样，是一个">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Arrays.sort">
+<meta property="og:title" content="源码系列-Arrays.sort">
 <meta property="og:url" content="http://xuxiusheng.github.io/2026/01/01/Arrays.sort/index.html">
 <meta property="og:site_name" content="Xuxiusheng">
 <meta property="og:description" content="简介Arrays.sort底层并不是基于简单的快速排序算法，而是根据工程实践进行了优化，针对不同的数据类型，选择不同的排序算法：  基本数据类型：双轴快速排序算法 引用数据类型：TimSort算法  双轴快速排序 DualPivotQuicksort对于基本数据类型的排序，JDK进行了优化，使用双轴快速排序，每次选择两个轴，相比于单轴快速排序，比较次数和树高都更少，效率更高。但是和快排一样，是一个">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-01-01T13:50:00.000Z">
-<meta property="article:modified_time" content="2026-01-01T13:51:52.648Z">
+<meta property="article:modified_time" content="2026-02-03T10:14:15.574Z">
 <meta property="article:author" content="Xuxiusheng">
 <meta property="article:tag" content="源码解读">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>Arrays.sort - Xuxiusheng</title>
+  <title>源码系列-Arrays.sort - Xuxiusheng</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -76,6 +76,7 @@
 <link rel="stylesheet" href="/css/partial_encrypt.css">
 <link rel="stylesheet" href="/css/runtime.css">
 <link rel="stylesheet" href="/css/cv.css">
+<link rel="stylesheet" href="/css/articles/iconfont.css">
 
 
 
@@ -150,35 +151,39 @@
           
           
           
-            <li class="nav-item">
-              <a class="nav-link" href="/archives/" target="_self">
-                <i class="iconfont icon-archive-fill"></i>
-                <span>归档</span>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" target="_self" href="javascript:;" role="button"
+                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="icon iconfont icon-wenzhangshezhi"></i>
+                <span>文章</span>
               </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/categories/" target="_self">
-                <i class="iconfont icon-category-fill"></i>
-                <span>分类</span>
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/tags/" target="_self">
-                <i class="iconfont icon-tags-fill"></i>
-                <span>标签</span>
-              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/archives/" target="_self">
+                    <i class="iconfont icon-archive-fill"></i>
+                    <span>归档</span>
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/categories/" target="_self">
+                    <i class="iconfont icon-category-fill"></i>
+                    <span>分类</span>
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/tags/" target="_self">
+                    <i class="iconfont icon-tags-fill"></i>
+                    <span>标签</span>
+                  </a>
+                
+              </div>
             </li>
           
         
@@ -241,13 +246,13 @@
   
 
 <div id="banner" class="banner" parallax=true
-     style="background: url('/img/config/pikaqiu.png') no-repeat center center; background-size: cover;">
+     style="background: url('/img/config/main_3.png') no-repeat center center; background-size: cover;">
   <div class="full-bg-img">
     <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="Arrays.sort"></span>
+            <span id="subtitle" data-typed-text="源码系列-Arrays.sort"></span>
           
         </div>
 
@@ -327,7 +332,7 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">Arrays.sort</h1>
+            <h1 id="seo-header">源码系列-Arrays.sort</h1>
             
             
               <div class="markdown-body">
@@ -435,7 +440,7 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>Arrays.sort</div>
+      <div>源码系列-Arrays.sort</div>
       <div>http://xuxiusheng.github.io/2026/01/01/Arrays.sort/</div>
     </div>
     <div class="license-meta">

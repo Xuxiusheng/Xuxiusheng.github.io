@@ -65,6 +65,7 @@
 <link rel="stylesheet" href="/css/partial_encrypt.css">
 <link rel="stylesheet" href="/css/runtime.css">
 <link rel="stylesheet" href="/css/cv.css">
+<link rel="stylesheet" href="/css/articles/iconfont.css">
 
 
 
@@ -139,35 +140,39 @@
           
           
           
-            <li class="nav-item">
-              <a class="nav-link" href="/archives/" target="_self">
-                <i class="iconfont icon-archive-fill"></i>
-                <span>归档</span>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" target="_self" href="javascript:;" role="button"
+                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="icon iconfont icon-wenzhangshezhi"></i>
+                <span>文章</span>
               </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/categories/" target="_self">
-                <i class="iconfont icon-category-fill"></i>
-                <span>分类</span>
-              </a>
-            </li>
-          
-        
-          
-          
-          
-          
-            <li class="nav-item">
-              <a class="nav-link" href="/tags/" target="_self">
-                <i class="iconfont icon-tags-fill"></i>
-                <span>标签</span>
-              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/archives/" target="_self">
+                    <i class="iconfont icon-archive-fill"></i>
+                    <span>归档</span>
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/categories/" target="_self">
+                    <i class="iconfont icon-category-fill"></i>
+                    <span>分类</span>
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/tags/" target="_self">
+                    <i class="iconfont icon-tags-fill"></i>
+                    <span>标签</span>
+                  </a>
+                
+              </div>
             </li>
           
         
@@ -230,7 +235,7 @@
   
 
 <div id="banner" class="banner" parallax=true
-     style="background: url('/img/config/main_1.png') no-repeat center center; background-size: cover;">
+     style="background: url('/img/config/main_2.jpg') no-repeat center center; background-size: cover;">
   <div class="full-bg-img">
     <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
       <div class="banner-text text-center fade-in-up">
@@ -275,8 +280,71 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2026/02/03/Redis-QucikList/" target="_self">
+          源码系列-Redis QucikList
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/02/03/Redis-QucikList/" target="_self">
+        <div>
+          QucikListziplist（压缩列表）是 Redis 为节约内存设计的一种紧凑型双向链表，前序和逆序访问的效率都很高，适合少量小字符串的存储。但是ziplist在删除和插入元素时，会触发连锁扩容，当元素数量很大时，连锁更新的效率很低。可以参考ziplist连锁更新。现在list类型完全摒弃了linkedlist和ziplist，完全被quicklist取代。 结构设计QuickList是Li
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-02-03 18:15" pubdate>
+              2026-02-03
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Redis/" class="category-chain-item">Redis</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Redis/">#Redis</a>
+            
+              <a href="/tags/%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/">#源码解读</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2026/01/30/Redis_ZipList/" target="_self">
-          Redis ZipList
+          源码系列-Redis ZipList
         </a>
       </h2>
 
@@ -461,7 +529,7 @@
       <h2 class="index-header">
         
         <a href="/2026/01/16/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB-SDS/" target="_self">
-          Redis SDS
+          源码系列-Redis SDS
         </a>
       </h2>
 
@@ -774,69 +842,6 @@
 
       
       <a class="index-excerpt index-excerpt__noimg" href="/2026/01/01/Kafka%E9%AB%98%E5%8F%AF%E7%94%A8%E9%AB%98%E6%80%A7%E8%83%BD%E6%9C%BA%E5%88%B6%E5%AE%9E%E7%8E%B0/" target="_self">
-        <div>
-          这里的内容加密了，需要密码哦
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-01-01 22:20" pubdate>
-              2026-01-01
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/Kafka/" class="category-chain-item">Kafka</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/Kafka/">#Kafka</a>
-            
-              <a href="/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/">#消息队列</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2026/01/01/Kafka%E4%BA%8B%E5%8A%A1/" target="_self">
-          Kafka事务
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/01/01/Kafka%E4%BA%8B%E5%8A%A1/" target="_self">
         <div>
           这里的内容加密了，需要密码哦
         </div>
