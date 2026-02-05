@@ -10,20 +10,23 @@
   clear: both;
 }
 
-/* --- Grid 布局：强制三列等宽 --- */
+/* --- Grid 布局：改为四列等宽 --- */
 .recom-container {
   display: grid !important;
-  grid-template-columns: repeat(3, 1fr) !important;
-  gap: 20px !important;
+  /* 【修改点】改为 repeat(4, 1fr) */
+  grid-template-columns: repeat(4, 1fr) !important;
+  /* 【修改点】4列布局间距建议稍微调小一点，这里改为 15px */
+  gap: 15px !important; 
   width: 100% !important;
   overflow: hidden;
   transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
 }
 
-/* --- 核心修改：高度设为 380px 左右只显示第一行 --- */
+/* --- 核心修改：4列时单行高度变低，折叠高度需同步调小 --- */
 .recom-container.collapsed {
-  max-height: 380px !important; 
+  /* 【修改点】因为4列单行高度通常在 220px-260px 左右，这里设为 260px */
+  max-height: 260px !important; 
 }
 
 /* 折叠时的渐变遮罩 */
@@ -33,7 +36,8 @@
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 80px;
+  /* 【修改点】遮罩高度同步缩减，避免挡住第一行文字 */
+  height: 60px;
   background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 1));
   pointer-events: none;
   z-index: 5;
@@ -48,7 +52,7 @@
 .recom-card {
   width: 100% !important;
   background-color: #ffffff;
-  border-radius: 12px;
+  border-radius: 10px; /* 【修改点】圆角稍微调小，配合更小的卡片 */
   overflow: hidden;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
   transition: transform 0.3s, box-shadow 0.3s;
@@ -65,66 +69,69 @@
 
 .recom-img {
   width: 100% !important;
-  aspect-ratio: 16 / 10 !important;
+  /* 【修改点】4列布局建议 16/9 比例，视觉更轻盈 */
+  aspect-ratio: 16 / 9 !important;
   object-fit: cover !important;
   display: block;
 }
 
 .recom-info {
-  padding: 12px !important;
+  /* 【修改点】减小内边距，让卡片看起来不拥挤 */
+  padding: 8px 10px !important;
   flex-grow: 1;
 }
 
 .recom-title {
   color: #3c4858;
-  font-size: 1rem;
+  /* 【修改点】文字稍微调小 */
+  font-size: 0.9rem;
   font-weight: bold;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   display: block;
+  /* 增加：防止长标题换行撑破高度 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .recom-tags {
   color: #727272;
-  font-size: 0.8rem;
+  /* 【修改点】标签文字调小 */
+  font-size: 0.75rem;
 }
 
-/* --- 展开按钮：浅蓝色风格 --- */
+/* --- 展开按钮 --- */
 .recom-toggle-btn {
   display: block !important;
-  width: 140px !important;
-  margin: 25px auto 0 !important;
-  padding: 8px 0 !important;
+  width: 130px !important;
+  margin: 20px auto 0 !important;
+  padding: 6px 0 !important;
   background: transparent;
-  color: #70c1ff; /* 浅蓝色文字 */
-  border: 1.5px solid #70c1ff; /* 浅蓝色边框 */
+  color: #70c1ff;
+  border: 1.5px solid #70c1ff;
   border-radius: 20px;
   text-align: center;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: bold;
   transition: all 0.3s;
 }
 
-.recom-toggle-btn:hover {
-  background: #70c1ff;
-  color: #ffffff;
-  box-shadow: 0 4px 12px rgba(112, 193, 255, 0.4);
+/* --- 响应式适配：阶梯式回退 --- */
+@media (max-width: 1200px) {
+  /* 屏幕稍小时回到 3 列 */
+  .recom-container { grid-template-columns: repeat(3, 1fr) !important; }
+  .recom-container.collapsed { max-height: 320px !important; }
 }
 
-/* --- 暗黑模式适配 --- */
-[data-user-color-scheme='dark'] .recom-card {
-  background-color: #252d3d;
-  border-color: rgba(255, 255, 255, 0.1);
-}
-[data-user-color-scheme='dark'] .recom-title { color: #70c1ff; }
-
-/* --- 响应式适配 --- */
-@media (max-width: 992px) {
+@media (max-width: 868px) {
+  /* 平板显示 2 列 */
   .recom-container { grid-template-columns: repeat(2, 1fr) !important; }
-  .recom-container.collapsed { max-height: 420px !important; } /* 平板模式高度微调 */
+  .recom-container.collapsed { max-height: 350px !important; }
 }
 
 @media (max-width: 576px) {
+  /* 手机显示 1 列 */
   .recom-container { grid-template-columns: 1fr !important; }
-  .recom-container.collapsed { max-height: 400px !important; } /* 手机模式只显一个 */
+  .recom-container.collapsed { max-height: 380px !important; }
 }

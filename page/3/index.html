@@ -280,15 +280,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2026/01/01/ConcurrentHashMap/" target="_self">
-          源码系列-ConcurrentHashMap
+        <a href="/2026/01/01/%E5%B9%B6%E5%8F%91/" target="_self">
+          并发
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/01/01/ConcurrentHashMap/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/01/01/%E5%B9%B6%E5%8F%91/" target="_self">
         <div>
-          ConcurrentHashMap是线程安全的Map类型，本篇文章来解读以下ConcurrentHashMap源码，看下它是怎么做到线程安全的。 ConcurrentHashMap初始化构造函数 12345678910public ConcurrentHashMap(int initialCapacity) &#123;    if (initialCapacity &lt; 0)
+          锁Java中的锁分为悲观锁和乐观锁：  悲观锁：线程在获取悲观锁时，如果获取不到，阻塞线程，对CPU比较友好，但是需要进行上下文切换 乐观锁：线程在获取锁时，如果获取不到，会循环重试获取，不存在上下文切换，但是会造成CPU空转  乐观锁的典型实现就是CAS+失败重试，CAS存在两个问题：  ABA问题：通过版本号机制解决 频繁失败浪费CPU资源：通过分散热点提高并发效率  悲观锁适合多写场景，乐观
         </div>
       </a>
 
@@ -326,6 +326,69 @@
         
           <div class="post-meta">
             <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Java/">#Java</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2026/01/01/ConcurrentHashMap/" target="_self">
+          源码系列-ConcurrentHashMap
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/01/01/ConcurrentHashMap/" target="_self">
+        <div>
+          ConcurrentHashMap是线程安全的Map类型，本篇文章来解读以下ConcurrentHashMap源码，看下它是怎么做到线程安全的。 ConcurrentHashMap初始化构造函数 12345678910public ConcurrentHashMap(int initialCapacity) &#123;    if (initialCapacity &lt; 0)
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-01-01 20:20" pubdate>
+              2026-01-01
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/" class="category-chain-item">源码解读</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Java/">#Java</a>
             
               <a href="/tags/%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/">#源码解读</a>
             
@@ -833,72 +896,11 @@
     </article>
   </div>
 
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2026/01/01/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" target="_self">
-          内存管理
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/01/01/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/" target="_self">
-        <div>
-          虚拟内存在介绍虚拟地址之前先介绍下物理地址，物理地址指的就是内存条上的直接地址，如果应用程序直接使用物理地址，有两大缺陷：  缺少内存保护，不同程序间内存访问容易出现内存越界，非法访问 应用程序只能访问局部空间，可用内存减少  虚拟内存的作用是通过硬件和操作系统的配合（局部性+换页），为进程提供一个完整的虚拟空间，使得在进程看来独占整个内存，并提供内存保护机制，避免出现非法访问。  应用程序使用的
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-01-01 19:30" pubdate>
-              2026-01-01
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/" class="category-chain-item">计算机基础</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/">#操作系统</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
 
 
   <nav aria-label="navigation">
     <span class="pagination" id="pagination">
-      <a class="extend prev" rel="prev" href="/page/2/#board"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/#board">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/#board">4</a><a class="page-number" href="/page/5/#board">5</a><a class="page-number" href="/page/6/#board">6</a><a class="extend next" rel="next" href="/page/4/#board"><i class="iconfont icon-arrowright"></i></a>
+      <a class="extend prev" rel="prev" href="/page/2/#board"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/#board">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/#board">4</a><a class="page-number" href="/page/5/#board">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/#board">7</a><a class="extend next" rel="next" href="/page/4/#board"><i class="iconfont icon-arrowright"></i></a>
     </span>
   </nav>
 
