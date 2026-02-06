@@ -4,31 +4,6 @@
   
   
   <entry>
-    <title>Redis总结篇</title>
-    <link href="/2026/02/06/Redis%E6%80%BB%E7%BB%93%E7%AF%87/"/>
-    <url>/2026/02/06/Redis%E6%80%BB%E7%BB%93%E7%AF%87/</url>
-    
-    <content type="html"><![CDATA[<p>本篇文章对Redis的一些设计做个总结:</p><ul><li>ziplist -&gt; quicklist -&gt; listpack: listpack消除entry之间的依赖避免连锁更新的设计自我感觉很惊艳</li><li>ziplist和listpack本身的紧凑型结构</li><li>sds的空间预分配设计和整体的结构设计</li></ul>]]></content>
-    
-    
-    <categories>
-      
-      <category>Redis</category>
-      
-    </categories>
-    
-    
-    <tags>
-      
-      <tag>Redis</tag>
-      
-    </tags>
-    
-  </entry>
-  
-  
-  
-  <entry>
     <title>LZF压缩算法</title>
     <link href="/2026/02/05/LZF/"/>
     <url>/2026/02/05/LZF/</url>
