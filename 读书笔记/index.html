@@ -20,16 +20,18 @@
   <meta name="keywords" content="">
   
     <meta property="og:type" content="website">
-<meta property="og:title" content="标签 - Agent">
-<meta property="og:url" content="http://xuxiusheng.github.io/tags/Agent/index.html">
+<meta property="og:title" content="读书笔记">
+<meta property="og:url" content="http://xuxiusheng.github.io/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/index.html">
 <meta property="og:site_name" content="Xuxiusheng">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-02-09T16:08:19.000Z">
+<meta property="article:modified_time" content="2026-02-09T16:56:50.473Z">
 <meta property="article:author" content="Xuxiusheng">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>标签 - Agent - Xuxiusheng</title>
+  <title>读书笔记 - Xuxiusheng</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -66,6 +68,7 @@
 <link rel="stylesheet" href="/css/runtime.css">
 <link rel="stylesheet" href="/css/cv.css">
 <link rel="stylesheet" href="/css/articles/iconfont.css">
+<link rel="stylesheet" href="/css/reading/iconfont.css">
 
 
 
@@ -107,7 +110,7 @@
   <header>
     
 
-<div class="header-inner" style="height: 80vh;">
+<div class="header-inner" style="height: 100vh;">
   <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
   <div class="container">
     <a class="navbar-brand" href="/">
@@ -181,6 +184,18 @@
           
           
             <li class="nav-item">
+              <a class="nav-link" href="/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" target="_self">
+                <i class="icon iconfont icon-yuedu"></i>
+                <span>读书笔记</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
               <a class="nav-link" href="/about/" target="_self">
                 <i class="iconfont icon-user-fill"></i>
                 <span>关于</span>
@@ -241,7 +256,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="标签 - Agent"></span>
+            <span id="subtitle" data-typed-text="读书笔记"></span>
           
         </div>
 
@@ -265,33 +280,111 @@
     
       <div class="container nopadding-x-md">
         <div id="board"
-          >
+          style="margin-top: 0">
           
           <div class="container">
             <div class="row">
               <div class="col-12 col-md-10 m-auto">
-                
+                <style>
+  /* 1. 物理屏蔽重复首图 */
+  .markdown-body img:first-child,
+  .post-content img:first-child {
+    display: none !important;
+  }
 
-<div class="list-group">
-  <p class="h4">共计 1 篇文章</p>
-  <hr>
-  
-  
+  /* 2. 宽度回归正常 */
+  .markdown-body {
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    max-width: none !important;
+  }
+
+  /* 3. 修复摘要截断与间距问题 */
+  .index-excerpt {
+    color: #666;
+    line-height: 1.5rem !important; 
+    /* 核心修改：使用 max-height 代替 height，防止文字少时撑开空白 */
+    max-height: 4.5rem !important; 
     
+    /* 调整底部外边距，控制摘要与日期行之间的距离 */
+    margin: 0.5rem 0 1rem 0 !important; 
+    
+    display: -webkit-box !important;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden !important;
+    text-overflow: ellipsis;
+  }
+
+  /* 4. 图标与元数据样式 */
+  .post-metas {
+    color: #999;
+    font-size: 0.9rem;
+    display: block !important;
+  }
+
+  .post-meta {
+    margin-right: 25px !important; 
+    display: inline-flex !important; 
+    align-items: center !important; 
+  }
+
+  .post-meta i {
+    display: inline-block !important;
+    padding-right: 8px !important; /* 调整图标与文字的左右间距 */
+    font-size: 1rem;
+    position: relative !important;
+    top: 1px !important; /* 微调图标上下位置 */
+  }
+
+  /* 5. 整体布局与分割线 */
+  .custom-post-item {
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+  }
+
+  .custom-post-title {
+    font-weight: bold;
+    color: #3c4858 !important;
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .custom-books-page .col-12 {
+    height: auto !important;
+  }
+</style>
+
+<div class="custom-books-list">
+  
+    <div class="custom-post-item">
+      <a href="/2026/01/16/HelloAgents%E5%9F%BA%E7%A1%80/">
+        <p class="custom-post-title">Hello Agents笔记-智能体基础</p>
+      </a>
       
-      <p class="h5">2026</p>
-    
-    <a href="/2026/01/16/HelloAgents%E5%9F%BA%E7%A1%80/" class="list-group-item list-group-item-action">
-      <time>01-16</time>
-      <div class="list-group-item-title">Hello Agents笔记-智能体基础</div>
-    </a>
+      <div class="index-excerpt" style="margin: 1rem 0; color: #666;">
+        心血来潮，想了解下最近大火的Agent，寻寻觅觅找到了datawhale开源的Agent教程，受益匪浅，本篇文章记录下自己的感悟。资源链接：Hello Agents
+现在大火的LLM和Agent是两个不同的概念，LLM只会进行对话，相当于只有脑子没有手脚，不具备改造外部环境的能力，而Agent相当于为LLM这个大脑配备了手脚，赋予其操作工具的能力。
+
+            PT训练大脑，RL锻炼...
+      </div>
+
+      <div class="post-metas" style="color: #999; font-size: 0.9rem;">
+        <i class="iconfont icon-date-fill"></i>
+        2026-01-16
+        
+        
+          <span style="margin-left: 15px;">
+            <i class="iconfont icon-tag-fill"></i>
+            #读书笔记 #Hello Agents
+          </span>
+        
+      </div>
+    </div>
   
 </div>
-
-
-
-
-
               </div>
             </div>
           </div>
