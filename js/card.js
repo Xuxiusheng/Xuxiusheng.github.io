@@ -1,9 +1,16 @@
 document.addEventListener("DOMContentLoaded", function() {
-  const btn = document.getElementById('toggleBtn');
-  const container = document.getElementById('recomGrid');
+  // 1. 改为获取所有带有相应类名的按钮
+  const buttons = document.querySelectorAll('.recom-toggle-btn');
   
-  if (btn && container) {
+  buttons.forEach(btn => {
     btn.addEventListener('click', function() {
+      // 2. 关键：通过 this (当前点击的按钮) 找到它同层级的容器
+      // 向上找 wrapper，再从 wrapper 向下找 container
+      const wrapper = this.closest('.recom-wrapper');
+      const container = wrapper.querySelector('.recom-container');
+      
+      if (!container) return;
+
       const isCollapsed = container.classList.contains('collapsed');
       
       if (isCollapsed) {
@@ -11,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const fullHeight = container.scrollHeight + "px";
         container.style.maxHeight = fullHeight;
         container.classList.remove('collapsed');
-        btn.textContent = "收起内容";
+        this.textContent = "收起内容";
         
         setTimeout(() => {
           if(!container.classList.contains('collapsed')) {
@@ -19,16 +26,21 @@ document.addEventListener("DOMContentLoaded", function() {
           }
         }, 600);
       } else {
-        // 收起（回到 380px）
+        // 收起
         container.style.maxHeight = container.scrollHeight + "px";
+        
+        // 强制触发重绘，确保动画丝滑
+        container.offsetHeight; 
+
         setTimeout(() => {
           container.style.maxHeight = "380px";
           container.classList.add('collapsed');
-          btn.textContent = "展开全部";
+          this.textContent = "展开全部";
         }, 10);
         
-        container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        // 滚动到当前这个 wrapper 的位置
+        wrapper.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
     });
-  }
+  });
 });
