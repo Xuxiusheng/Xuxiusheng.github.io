@@ -16,14 +16,14 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
   <meta name="theme-color" content="#2f4154">
-  <meta name="author" content="Xuxiusheng">
+  <meta name="author" content="xxs不是小学生">
   <meta name="keywords" content="">
   
     <meta name="description" content="大家都知道，Redis的ZSET底层基于跳表，但是为什么基于跳表呢，为什么不是红黑树或者AVL数呢？本篇文章来探讨一下。 Redis的设计初衷是内存数据库，首先要保证访问快速，其次，内存效率要高。那跳表是如何脱颖而出的呢？ AVL树 AVL树的存取时间复杂度为O(logn)，其属于绝对平衡树，需要通过旋转来维护平衡，相对于跳表，缺陷如下：  操作复杂度高，需要通过左旋右旋维护绝对平衡，消耗时间和资">
 <meta property="og:type" content="article">
 <meta property="og:title" content="ZSet底层数据结构">
 <meta property="og:url" content="http://xuxiusheng.github.io/2026/01/01/ZSet%E5%BA%95%E5%B1%82%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/index.html">
-<meta property="og:site_name" content="Xuxiusheng">
+<meta property="og:site_name" content="xxs不是小学生">
 <meta property="og:description" content="大家都知道，Redis的ZSET底层基于跳表，但是为什么基于跳表呢，为什么不是红黑树或者AVL数呢？本篇文章来探讨一下。 Redis的设计初衷是内存数据库，首先要保证访问快速，其次，内存效率要高。那跳表是如何脱颖而出的呢？ AVL树 AVL树的存取时间复杂度为O(logn)，其属于绝对平衡树，需要通过旋转来维护平衡，相对于跳表，缺陷如下：  操作复杂度高，需要通过左旋右旋维护绝对平衡，消耗时间和资">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/25.png">
@@ -31,14 +31,14 @@
 <meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/27.png">
 <meta property="article:published_time" content="2026-01-01T08:30:00.000Z">
 <meta property="article:modified_time" content="2026-01-01T08:31:29.962Z">
-<meta property="article:author" content="Xuxiusheng">
+<meta property="article:author" content="xxs不是小学生">
 <meta property="article:tag" content="Redis">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="http://xuxiusheng.github.io/img/article_img/25.png">
   
   
   
-  <title>ZSet底层数据结构 - Xuxiusheng</title>
+  <title>ZSet底层数据结构 - xxs不是小学生</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -127,7 +127,7 @@
   <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
   <div class="container">
     <a class="navbar-brand" href="/">
-      <strong>XuxiushengのBlog</strong>
+      <strong>xxs不是小学生のBlog</strong>
     </a>
 
     <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
@@ -423,7 +423,7 @@
       
         <div class="license-meta-item">
           <div>作者</div>
-          <div>Xuxiusheng</div>
+          <div>xxs不是小学生</div>
         </div>
       
       
@@ -606,7 +606,7 @@
     <div class="footer-inner">
   
     <div class="footer-content">
-       <a href="https://xuxiusheng.github.io/" target="_blank" rel="nofollow noopener"><strong>XuxiushengのBlog</strong><span></span></a> <div id="runtime_container"> 已经在星海中遨游了：<span id="runtime_days">0</span> 天 <span id="runtime_hours">0</span> 小时 <span id="runtime_mins">0</span> 分 <span id="runtime_secs">0</span> 秒 </div> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>由<strong>Hexo</strong>强力驱动</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>主题：<strong>Fluid</strong></span></a><br> <span>We are stupid but strong</span> 
+       <a href="https://xuxiusheng.github.io/" target="_blank" rel="nofollow noopener"><strong>xxs不是小学生のBlog</strong><span></span></a> <div id="runtime_container"> 已经在星海中遨游了：<span id="runtime_days">0</span> 天 <span id="runtime_hours">0</span> 小时 <span id="runtime_mins">0</span> 分 <span id="runtime_secs">0</span> 秒 </div> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>由<strong>Hexo</strong>强力驱动</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>主题：<strong>Fluid</strong></span></a><br> <span>We are stupid but strong</span> 
     </div>
   
   

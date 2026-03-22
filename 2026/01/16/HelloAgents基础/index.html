@@ -16,24 +16,25 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
   <meta name="theme-color" content="#2f4154">
-  <meta name="author" content="Xuxiusheng">
+  <meta name="author" content="xxs不是小学生">
   <meta name="keywords" content="">
   
     <meta name="description" content="心血来潮，想了解下最近大火的Agent，寻寻觅觅找到了datawhale开源的Agent教程，受益匪浅，本篇文章记录下自己的感悟。资源链接：Hello Agents 现在大火的LLM和Agent是两个不同的概念，LLM只会进行对话，相当于只有脑子没有手脚，不具备改造外部环境的能力，而Agent相当于为LLM这个大脑配备了手脚，赋予其操作工具的能力。              PT训练大脑，RL锻炼">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Hello Agents-智能体基础">
 <meta property="og:url" content="http://xuxiusheng.github.io/2026/01/16/HelloAgents%E5%9F%BA%E7%A1%80/index.html">
-<meta property="og:site_name" content="Xuxiusheng">
+<meta property="og:site_name" content="xxs不是小学生">
 <meta property="og:description" content="心血来潮，想了解下最近大火的Agent，寻寻觅觅找到了datawhale开源的Agent教程，受益匪浅，本篇文章记录下自己的感悟。资源链接：Hello Agents 现在大火的LLM和Agent是两个不同的概念，LLM只会进行对话，相当于只有脑子没有手脚，不具备改造外部环境的能力，而Agent相当于为LLM这个大脑配备了手脚，赋予其操作工具的能力。              PT训练大脑，RL锻炼">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/121.png">
 <meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/122.png">
 <meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/123.png">
 <meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/124.png">
-<meta property="og:image" content="https://raw.githubusercontent.com/datawhalechina/Hello-Agents/main/docs/images/2-figures/1757246501849-0.png">
+<meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/126.png">
+<meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/127.png">
 <meta property="article:published_time" content="2026-01-16T08:00:00.000Z">
-<meta property="article:modified_time" content="2026-02-12T10:44:38.472Z">
-<meta property="article:author" content="Xuxiusheng">
+<meta property="article:modified_time" content="2026-02-13T10:18:53.608Z">
+<meta property="article:author" content="xxs不是小学生">
 <meta property="article:tag" content="Hello Agents">
 <meta property="article:tag" content="读书笔记">
 <meta name="twitter:card" content="summary_large_image">
@@ -41,7 +42,7 @@
   
   
   
-  <title>Hello Agents-智能体基础 - Xuxiusheng</title>
+  <title>Hello Agents-智能体基础 - xxs不是小学生</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -130,7 +131,7 @@
   <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
   <div class="container">
     <a class="navbar-brand" href="/">
-      <strong>XuxiushengのBlog</strong>
+      <strong>xxs不是小学生のBlog</strong>
     </a>
 
     <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
@@ -295,7 +296,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          2.3k 字
+          3.1k 字
         
       </span>
     
@@ -306,7 +307,7 @@
         
         
         
-          20 分钟
+          27 分钟
         
       </span>
     
@@ -418,20 +419,41 @@
 <table>
 <thead>
 <tr>
-<th align="center">学习范式</th>
-<th align="center">假设</th>
-<th align="center">图示</th>
-<th align="center">应用</th>
+<th align="center">维度</th>
+<th align="center">符号主义</th>
+<th align="center">联结主义</th>
 </tr>
 </thead>
 <tbody><tr>
-<td align="center">符号主义</td>
+<td align="center">假设</td>
 <td align="center">受数理逻辑影响，符号主义认为:人类的智能，尤其是逻辑推理能力，能够由形式化的符号表达，简单来说，一个推理系统由一组可被区分的符号和一系列对这些符号进行操作的过程组成，<strong>智能的本质，就是符号的计算与处理</strong></td>
-<td align="center"><img src="https://raw.githubusercontent.com/datawhalechina/Hello-Agents/main/docs/images/2-figures/1757246501849-0.png" srcset="/img/config/loading.gif" lazyload></td>
+<td align="center">来源于对生物大脑神经网络结构的模仿,知识以权重的形式存储在神经元中，系统通过接触大量样本，根据特定的学习算法迭代神经元权重以获取智能，<strong>智能的本质，是能够像人类一样，从数据中进行学习</strong></td>
+</tr>
+<tr>
+<td align="center">图示</td>
+<td align="center"><img src="/img/article_img/126.png" srcset="/img/config/loading.gif" lazyload></td>
+<td align="center"><img src="/img/article_img/127.png" srcset="/img/config/loading.gif" lazyload></td>
+</tr>
+<tr>
+<td align="center">应用</td>
 <td align="center">专家系统</td>
+<td align="center">当前主流的智能体</td>
+</tr>
+<tr>
+<td align="center">贡献</td>
+<td align="center">符号系统将人类思考这一模糊行为具象化为符号推理过程</td>
+<td align="center">联结主义创造出能够像人类一样学习知识的机器，其能够直接从原始数据中理解世界</td>
+</tr>
+<tr>
+<td align="center">局限</td>
+<td align="center">符号系统的核心是知识库和推理机，知识库知识的获取非常高昂，需要由人类专家和知识工程师通过繁琐的访谈、提炼和编码过程来构建；人类的大量知识是直觉性的，无法被显式编码（水是湿的）；系统泛化性差，过度拟合现有知识</td>
+<td align="center">联结主义局限于感知，而智能体的主要任务是决策</td>
 </tr>
 </tbody></table>
-
+<p>行为主义：强调智能体通过与环境的互动和试错来学习最优策略，其现代化身为强化学习，这也是当前最主要的学习范式。联结主义赋予智能体感知世界的能力，而强化学习使其学会在与环境的交互中进行最优决策</p>
+<div class="note note-info">
+            <p>监督学习与强化学习是两类主流的学习范式，两者在数据标注、学习目标以及反馈机制上有很大的不同：</p> <table> <thead> <tr> <th align="center">维度</th> <th align="center">监督学习</th> <th align="center">强化学习</th> </tr> </thead> <tbody><tr> <td align="center">数据标注</td> <td align="center">带有正确答案的标注数据(数据+标签)</td> <td align="center">没有明确答案，靠<strong>奖励&#x2F;惩罚</strong>来学习</td> </tr> <tr> <td align="center">学习目标</td> <td align="center">学习数据到标签之间的映射函数</td> <td align="center">学习一个策略，能够在与环境的交互中最大化长期累积奖励</td> </tr> <tr> <td align="center">反馈机制</td> <td align="center">有明确的反馈，能够根据真实标签和预测标签调整学习方向</td> <td align="center">只告诉模型当前的结果好不好，而不告诉模型当前什么是最好的</td> </tr> </tbody></table> <p>监督学习像是有一个老师手把手教，而强化学习属于在不断的试错中自学。强化学习基于马尔可夫决策过程，在时间维度上做一系列相互依赖的决策以优化长期回报，天然支持多步、动态、因果依赖的决策链，每一步决策都会影响后续状态和可能获得的奖励。</p> <p>而监督学习是最小化当前误差，保证每一步最优，容易陷入局部最优状态，而强化学习是最大化长期累积奖励，允许当前决策非最优。</p> <p>在当前大语言模型的训练范式中，强化学习主要起到<strong>对齐</strong>的作用，比如RLHF，并不是用于训练模型的基础语言能力，而是用于引导模型生成更符合人类偏好、更有用、更安全、更诚实的输出。</p> 
+          </div>
                 
               </div>
             
@@ -485,7 +507,7 @@
       
         <div class="license-meta-item">
           <div>作者</div>
-          <div>Xuxiusheng</div>
+          <div>xxs不是小学生</div>
         </div>
       
       
@@ -668,7 +690,7 @@
     <div class="footer-inner">
   
     <div class="footer-content">
-       <a href="https://xuxiusheng.github.io/" target="_blank" rel="nofollow noopener"><strong>XuxiushengのBlog</strong><span></span></a> <div id="runtime_container"> 已经在星海中遨游了：<span id="runtime_days">0</span> 天 <span id="runtime_hours">0</span> 小时 <span id="runtime_mins">0</span> 分 <span id="runtime_secs">0</span> 秒 </div> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>由<strong>Hexo</strong>强力驱动</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>主题：<strong>Fluid</strong></span></a><br> <span>We are stupid but strong</span> 
+       <a href="https://xuxiusheng.github.io/" target="_blank" rel="nofollow noopener"><strong>xxs不是小学生のBlog</strong><span></span></a> <div id="runtime_container"> 已经在星海中遨游了：<span id="runtime_days">0</span> 天 <span id="runtime_hours">0</span> 小时 <span id="runtime_mins">0</span> 分 <span id="runtime_secs">0</span> 秒 </div> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>由<strong>Hexo</strong>强力驱动</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>主题：<strong>Fluid</strong></span></a><br> <span>We are stupid but strong</span> 
     </div>
   
   

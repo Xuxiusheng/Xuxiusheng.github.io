@@ -16,27 +16,27 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
   <meta name="theme-color" content="#2f4154">
-  <meta name="author" content="Xuxiusheng">
+  <meta name="author" content="xxs不是小学生">
   <meta name="keywords" content="">
   
     <meta name="description" content="Redis本身是一个单线程模型，不存在锁竞争和上下文切换开销，这里的单线程是狭义上的单线程，也就是处理客户端请求的线程只有一个，在Redis中其实支持多线程，下面来看看吧 异步删除Redis4.0增加了异步删除功能，UNLINK命令可以异步删除过期key，避免过多的过期key或过期大key阻塞主线程执行此外，redis如果开启了lazy free机制，会有一个独立线程定期删除过期KeyAOF重写b">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Redis线程模型">
 <meta property="og:url" content="http://xuxiusheng.github.io/2026/01/01/Redis%E7%BA%BF%E7%A8%8B%E6%A8%A1%E5%9E%8B/index.html">
-<meta property="og:site_name" content="Xuxiusheng">
+<meta property="og:site_name" content="xxs不是小学生">
 <meta property="og:description" content="Redis本身是一个单线程模型，不存在锁竞争和上下文切换开销，这里的单线程是狭义上的单线程，也就是处理客户端请求的线程只有一个，在Redis中其实支持多线程，下面来看看吧 异步删除Redis4.0增加了异步删除功能，UNLINK命令可以异步删除过期key，避免过多的过期key或过期大key阻塞主线程执行此外，redis如果开启了lazy free机制，会有一个独立线程定期删除过期KeyAOF重写b">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/29.png">
 <meta property="article:published_time" content="2026-01-01T08:30:00.000Z">
 <meta property="article:modified_time" content="2026-01-01T08:44:50.617Z">
-<meta property="article:author" content="Xuxiusheng">
+<meta property="article:author" content="xxs不是小学生">
 <meta property="article:tag" content="Redis">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="http://xuxiusheng.github.io/img/article_img/29.png">
   
   
   
-  <title>Redis线程模型 - Xuxiusheng</title>
+  <title>Redis线程模型 - xxs不是小学生</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -125,7 +125,7 @@
   <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
   <div class="container">
     <a class="navbar-brand" href="/">
-      <strong>XuxiushengのBlog</strong>
+      <strong>xxs不是小学生のBlog</strong>
     </a>
 
     <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
@@ -415,7 +415,7 @@
       
         <div class="license-meta-item">
           <div>作者</div>
-          <div>Xuxiusheng</div>
+          <div>xxs不是小学生</div>
         </div>
       
       
@@ -598,7 +598,7 @@
     <div class="footer-inner">
   
     <div class="footer-content">
-       <a href="https://xuxiusheng.github.io/" target="_blank" rel="nofollow noopener"><strong>XuxiushengのBlog</strong><span></span></a> <div id="runtime_container"> 已经在星海中遨游了：<span id="runtime_days">0</span> 天 <span id="runtime_hours">0</span> 小时 <span id="runtime_mins">0</span> 分 <span id="runtime_secs">0</span> 秒 </div> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>由<strong>Hexo</strong>强力驱动</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>主题：<strong>Fluid</strong></span></a><br> <span>We are stupid but strong</span> 
+       <a href="https://xuxiusheng.github.io/" target="_blank" rel="nofollow noopener"><strong>xxs不是小学生のBlog</strong><span></span></a> <div id="runtime_container"> 已经在星海中遨游了：<span id="runtime_days">0</span> 天 <span id="runtime_hours">0</span> 小时 <span id="runtime_mins">0</span> 分 <span id="runtime_secs">0</span> 秒 </div> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>由<strong>Hexo</strong>强力驱动</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>主题：<strong>Fluid</strong></span></a><br> <span>We are stupid but strong</span> 
     </div>
   
   

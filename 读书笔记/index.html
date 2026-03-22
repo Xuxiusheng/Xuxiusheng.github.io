@@ -16,22 +16,22 @@
   <meta http-equiv="x-ua-compatible" content="ie=edge">
   
   <meta name="theme-color" content="#2f4154">
-  <meta name="author" content="Xuxiusheng">
+  <meta name="author" content="xxs不是小学生">
   <meta name="keywords" content="">
   
     <meta property="og:type" content="website">
 <meta property="og:title" content="读书笔记">
 <meta property="og:url" content="http://xuxiusheng.github.io/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/index.html">
-<meta property="og:site_name" content="Xuxiusheng">
+<meta property="og:site_name" content="xxs不是小学生">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2026-02-09T16:08:19.000Z">
 <meta property="article:modified_time" content="2026-02-09T16:56:50.473Z">
-<meta property="article:author" content="Xuxiusheng">
+<meta property="article:author" content="xxs不是小学生">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>读书笔记 - Xuxiusheng</title>
+  <title>读书笔记 - xxs不是小学生</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -114,7 +114,7 @@
   <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
   <div class="container">
     <a class="navbar-brand" href="/">
-      <strong>XuxiushengのBlog</strong>
+      <strong>xxs不是小学生のBlog</strong>
     </a>
 
     <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
@@ -360,22 +360,95 @@
 <div class="custom-books-list">
   
     <div class="custom-post-item">
-      <a href="/2026/02/11/Base-LLM-%E7%90%86%E8%AE%BA%E7%AF%87/">
-        <p class="custom-post-title">Base LLM-理论篇</p>
+      <a href="/2026/03/22/%E8%AE%B0%E5%BF%86%E4%B8%8E%E6%A3%80%E7%B4%A2/">
+        <p class="custom-post-title">Hello Agents-记忆与检索</p>
       </a>
       
       <div class="index-excerpt" style="margin: 1rem 0; color: #666;">
-        ...
+        基于LLM的智能体有两大局限：
+
+对话遗忘：LLM本身是无状态设计，每一次用户请求都是一次独立的、无关联的计算。模型本身不会自动“记住”上一次对话的内容
+知识局限性：模型知识往往截止到训练之前，是静态且有限的，无法获取最新信息，并且通用知识对于垂直领域的深度可能不足
+
+...
       </div>
 
       <div class="post-metas" style="color: #999; font-size: 0.9rem;">
         <i class="iconfont icon-date-fill"></i>
-        2026-02-11
+        2026-03-22
         
         
           <span style="margin-left: 15px;">
             <i class="iconfont icon-tag-fill"></i>
-            #读书笔记 #Base LLM
+            #读书笔记 #Hello Agents
+          </span>
+        
+      </div>
+    </div>
+  
+    <div class="custom-post-item">
+      <a href="/2026/02/15/HelloAgents-%E6%99%BA%E8%83%BD%E4%BD%93%E8%8C%83%E5%BC%8F/">
+        <p class="custom-post-title">Hello Agents-智能体范式</p>
+      </a>
+      
+      <div class="index-excerpt" style="margin: 1rem 0; color: #666;">
+        ReAct在ReAct诞生之前，关于LLM的两大核心能力：推理能力(Reasoning)和行动能力(Acting)是被割裂研究的。推理能力，即模型推导出答案的思考过程；行动能力是模型调用外部工具解决问题的能力。在ReAct出现之前：
+
+“推理”（Reasoning，如思维链 CoT）和“行动”（Acting，如与环境交互、调用工具）通常是分开研究的。
+单纯的推理容易陷入“黑盒”，导致幻觉（Hall...
+      </div>
+
+      <div class="post-metas" style="color: #999; font-size: 0.9rem;">
+        <i class="iconfont icon-date-fill"></i>
+        2026-02-15
+        
+        
+          <span style="margin-left: 15px;">
+            <i class="iconfont icon-tag-fill"></i>
+            #读书笔记 #Hello Agents
+          </span>
+        
+      </div>
+    </div>
+  
+    <div class="custom-post-item">
+      <a href="/2026/02/13/Hello-Agents-%E6%99%BA%E8%83%BD%E4%BD%93%E5%9F%BA%E7%A1%80/">
+        <p class="custom-post-title">Hello Agents-大语言模型基础</p>
+      </a>
+      
+      <div class="index-excerpt" style="margin: 1rem 0; color: #666;">
+        现代智能体基于LLM进行工作，这篇文章总结下LLM的关键原理和工作机制。语言模型的演进如下图所示:
+
+
+
+模型
+原理
+劣势
+
+
+
+N-gram
+N-gram
+泛化性差，完全基于统计思想，模型无法理解语义概念
+
+
+神经网络模型
+将文本转化为高维向量，通过下一个词预测训练模型，在训练过程中会隐式学习语义之间的关联
+本质上依然基于N-gram，上下文窗口有限
+
+
+RNN
+引入了一个隐藏状态向量作为当前记...
+      </div>
+
+      <div class="post-metas" style="color: #999; font-size: 0.9rem;">
+        <i class="iconfont icon-date-fill"></i>
+        2026-02-13
+        
+        
+          <span style="margin-left: 15px;">
+            <i class="iconfont icon-tag-fill"></i>
+            #读书笔记 #Hello Agents
           </span>
         
       </div>
@@ -451,7 +524,7 @@
     <div class="footer-inner">
   
     <div class="footer-content">
-       <a href="https://xuxiusheng.github.io/" target="_blank" rel="nofollow noopener"><strong>XuxiushengのBlog</strong><span></span></a> <div id="runtime_container"> 已经在星海中遨游了：<span id="runtime_days">0</span> 天 <span id="runtime_hours">0</span> 小时 <span id="runtime_mins">0</span> 分 <span id="runtime_secs">0</span> 秒 </div> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>由<strong>Hexo</strong>强力驱动</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>主题：<strong>Fluid</strong></span></a><br> <span>We are stupid but strong</span> 
+       <a href="https://xuxiusheng.github.io/" target="_blank" rel="nofollow noopener"><strong>xxs不是小学生のBlog</strong><span></span></a> <div id="runtime_container"> 已经在星海中遨游了：<span id="runtime_days">0</span> 天 <span id="runtime_hours">0</span> 小时 <span id="runtime_mins">0</span> 分 <span id="runtime_secs">0</span> 秒 </div> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>由<strong>Hexo</strong>强力驱动</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>主题：<strong>Fluid</strong></span></a><br> <span>We are stupid but strong</span> 
     </div>
   
   
