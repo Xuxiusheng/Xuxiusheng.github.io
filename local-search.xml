@@ -4,33 +4,6 @@
   
   
   <entry>
-    <title>Hello Agents-记忆与检索</title>
-    <link href="/2026/03/22/%E8%AE%B0%E5%BF%86%E4%B8%8E%E6%A3%80%E7%B4%A2/"/>
-    <url>/2026/03/22/%E8%AE%B0%E5%BF%86%E4%B8%8E%E6%A3%80%E7%B4%A2/</url>
-    
-    <content type="html"><![CDATA[<p>基于LLM的智能体有两大局限：</p><ul><li>对话遗忘：LLM本身是无状态设计，每一次用户请求都是一次独立的、无关联的计算。模型本身不会自动“记住”上一次对话的内容</li><li>知识局限性：模型知识往往截止到训练之前，是静态且有限的，无法获取最新信息，并且通用知识对于垂直领域的深度可能不足</li></ul>]]></content>
-    
-    
-    <categories>
-      
-      <category>智能体</category>
-      
-    </categories>
-    
-    
-    <tags>
-      
-      <tag>读书笔记</tag>
-      
-      <tag>Hello Agents</tag>
-      
-    </tags>
-    
-  </entry>
-  
-  
-  
-  <entry>
     <title>Hello Agents-智能体范式</title>
     <link href="/2026/02/15/HelloAgents-%E6%99%BA%E8%83%BD%E4%BD%93%E8%8C%83%E5%BC%8F/"/>
     <url>/2026/02/15/HelloAgents-%E6%99%BA%E8%83%BD%E4%BD%93%E8%8C%83%E5%BC%8F/</url>
