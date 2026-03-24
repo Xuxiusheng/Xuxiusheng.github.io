@@ -23,7 +23,7 @@ body{
 }
 
 html, body { touch-action: pan-x pan-y; }   /* 禁止浏览器把双指手势传给页面 */
-.actions a, .actions button, .lang-switch .track { touch-action: manipulation; }
+.actions a, .actions button { touch-action: manipulation; }
 
 /* ============ 1) 顶部栏 & 容器（加 -webkit-backdrop-filter） ============ */
 .topbar{
@@ -230,8 +230,7 @@ ol.list li::before{content:'[' counter(custom) ']'; position:absolute; left:0; w
 .block .pub-list.patents li{border-style:dashed}
 
 /* 彻底屏蔽旧规则（若仍有残留） */
-.block .item:first-child > ol.list li > a,
-:is(#lang-zh,#lang-en) section:nth-of-type(4) .block .item:nth-of-type(2) > ol.list li > a{
+.block .item:first-child > ol.list li > a{
   border:none !important; background:transparent !important; padding:0 !important; box-shadow:none !important; transform:none !important;
 }
 
@@ -282,104 +281,8 @@ ol.list li::before{content:'[' counter(custom) ']'; position:absolute; left:0; w
   .sec--projects .block .item:hover,.pub-list li:hover,.tag:hover{transform:none}
 }
 
-/* ============ 12) 语言面板淡入（iOS 过渡稳定） ============ */
-/* === Language panels（iOS 稳定 + 焦点安全）=== */
-/* 语言面板：无过渡，直接显示/隐藏 */
-/* === Language panels（无动画，强制隐藏/显示）=== */
-/* ========== Language panels（无动画，彻底避免白屏） ========== */
-/* ===== 语言面板：基础 & 宿主 ===== */
-/* ---------- 语言面板：基础 ---------- */
-.wrap{ position:relative; }
-.lang-panel{ display:block; }
-.lang-panel[hidden]{ display:none !important; }
-
-/* 切换时把两个面板叠放一层，避免布局抖动 */
-.lang-panel.__anim-layer{
-  position:absolute; left:0; top:0; width:100%;
-  will-change: transform, opacity;
-  -webkit-transform: translateZ(0);
-}
-
-/* 宿主容器高度过渡，防止切换瞬间跳动 */
-.lang-host-anim{ transition: height .28s cubic-bezier(.2,.8,.2,1); }
-
-/* ---------- 动画类（CSS 过渡，不是淡入淡出） ---------- */
-/* 进入：从下方轻滑上来，略微放大到 100% */
-.lang-anim-enter{
-  transform: translateY(10px) scale(0.985);
-  opacity:.98;          /* 轻微透明，只为柔和，不是明显淡入 */
-}
-.lang-anim-enter-active{
-  transform: translateY(0) scale(1);
-  opacity:1;
-  transition:
-    transform .28s cubic-bezier(.2,.8,.2,1),
-    opacity   .28s cubic-bezier(.2,.8,.2,1);
-}
-
-/* 离开：向上轻滑并轻微缩小 */
-.lang-anim-leave{
-  transform: translateY(0) scale(1);
-  opacity:1;
-}
-.lang-anim-leave-active{
-  transform: translateY(-10px) scale(0.985);
-  opacity:.98;
-  transition:
-    transform .28s cubic-bezier(.2,.8,.2,1),
-    opacity   .28s cubic-bezier(.2,.8,.2,1);
-}
-
-/* 低动画偏好：直接切，无过渡 */
-@media (prefers-reduced-motion: reduce){
-  .lang-host-anim{ transition:none !important; }
-  .lang-anim-enter,.lang-anim-enter-active,
-  .lang-anim-leave,.lang-anim-leave-active{
-    transition:none !important; transform:none !important; opacity:1 !important;
-  }
-}
-
-/* ---------- 苹果风开关：保留，隐藏旧按钮 ---------- */
-#btn-en,#btn-zh{ display:none !important; }
-.lang-switch{
-  --h:28px; --w:54px;
-  position:relative; display:inline-flex; align-items:center; gap:8px;
-  font:600 14px/1 "Inter","Noto Sans SC",system-ui,-apple-system;
-  -webkit-tap-highlight-color:transparent; touch-action:manipulation;
-}
-.lang-switch .label{ min-width:36px; text-align:right; color:var(--text-700); }
-/* .lang-switch[data-lang="en"] .label::after{ content:"English"; }
-.lang-switch[data-lang="zh"] .label::after{ content:"中文"; } */
-.lang-switch .track{
-  position:relative; width:var(--w); height:var(--h);
-  border-radius:999px; cursor:pointer; isolation:isolate;
-  background:#e6f6ee; border:1px solid var(--border);
-  transition:background .2s ease, border-color .2s ease;
-}
-.lang-switch .thumb{
-  position:absolute; top:2px; left:2px;
-  width:calc(var(--h) - 4px); height:calc(var(--h) - 4px);
-  border-radius:999px; background:#fff; box-shadow:0 1px 2px rgba(0,0,0,.22);
-  transition:transform .2s ease; will-change:transform;
-}
-.lang-switch[aria-checked="true"] .track{
-  background:linear-gradient(90deg, var(--brand-500), var(--brand-700));
-  border-color:transparent;
-}
-.lang-switch[aria-checked="true"] .thumb{ transform:translateX(calc(var(--w) - var(--h))); }
-.lang-switch:focus-visible .track{ outline:2px solid rgba(23,168,102,.35); outline-offset:2px; }
-
-/* inert 回退（旧浏览器） */
-/* inert 回退（只作用于语言面板本身，避免误伤内部链接） */
-/* .lang-panel[inert],
-.lang-panel[aria-hidden="true"],
-.lang-panel[data-inert-shim],
-.lang-panel[inert] *,
-.lang-panel[data-inert-shim] *{
-  pointer-events: none !important;
-} */
-
-.lang-panel:not([hidden]) a { pointer-events:auto !important; }
+/* ============ 12) 单页容器 ============ */
+.cv-panel{display:block;}
 
 /* ========== Tap = Hover（移动端点击模拟悬浮） ========== */
 /* 交互元素：去蓝灰高亮、减少300ms延迟 */
