@@ -293,313 +293,6 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2026/01/01/Redis%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%A8%A1%E5%9E%8B/" target="_self">
-          Redis内存管理模型
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/01/01/Redis%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86%E6%A8%A1%E5%9E%8B/" target="_self">
-        <div>
-          内存资源有限且珍贵，Redis作为高性能内存数据库，充分有效利用内存是充分且必要的，下面简单来看下Redis的内存管理模型。 过期机制内存是有限的，所以需要将不被使用或者偶尔被使用的数据移出内存，以提升内存的有效利用率。Redis提供了过期机制来实现这个功能，即在创建key的时候可以指定过期时间，如果key已存在可以通过expire命令设置过期时间。  如果不指定过期时间，则永不过期   那Red
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-01-01 16:30" pubdate>
-              2026-01-01
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/Redis/" class="category-chain-item">Redis</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/Redis/">#Redis</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2026/01/01/Redis%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B/" target="_self">
-          Redis基本数据类型
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/01/01/Redis%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B/" target="_self">
-        <div>
-          Redis 共有 5 种基本数据类型：String（字符串）、List（列表）、Set（集合）、Hash（散列）、Zset（有序集合），底层结构如下所示：    String List Hash Set Zset    SDS LinkedList &#x2F; ZipList &#x2F; QuickList Dict &#x2F; ZipList Dict &#x2F; Intset ZipL
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-01-01 16:20" pubdate>
-              2026-01-01
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/Redis/" class="category-chain-item">Redis</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/Redis/">#Redis</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2026/01/01/%E7%BC%93%E5%AD%98%E4%B8%80%E8%87%B4%E6%80%A7%E7%AD%96%E7%95%A5/" target="_self">
-          缓存一致性策略
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/01/01/%E7%BC%93%E5%AD%98%E4%B8%80%E8%87%B4%E6%80%A7%E7%AD%96%E7%95%A5/" target="_self">
-        <div>
-          概念业务中通常使用MySQL作为持久化数据库，并使用缓存来提升系统性能，同时使用缓存和数据库会存在数据一致性问题，而缓存一致性策略，或者也可以叫做缓存读写策略，是指在写数据或读数据时，数据库与缓存之间如何去维护数据一致性的方案。 换一个视角，从CAP理论视角来看，缓存属于AP系统，即保证分区容错和高可用，一致性采用最终一致性策略，所以，对于追求绝对一致性的场景，不适合引入缓存。
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-01-01 16:00" pubdate>
-              2026-01-01
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/Redis/" class="category-chain-item">Redis</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E7%BC%93%E5%AD%98/">#缓存</a>
-            
-              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/">#数据库</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2026/01/01/TCP%E7%B2%98%E5%8C%85%E9%97%AE%E9%A2%98/" target="_self">
-          TCP粘包问题
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/01/01/TCP%E7%B2%98%E5%8C%85%E9%97%AE%E9%A2%98/" target="_self">
-        <div>
-          概念TCP三大特性：面向连接、可靠传输和基于字节流，第三个特性面向字节流是指TCP协议属于流式协议，内容与内容之间没有明确的分界符号，需要人为去给消息协议定义边界规则，来区分不同的消息。举一个例子  发送端发送了两份数据，在传输层被划分为7个数据包，两份数据各占3.5个数据包，由于是字节流，两份数据的0.5个数据包之间没有边界 接收端接收到数据后，需要通过边界规则将0.5个数据包正确拼接到其他数据
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-01-01 16:00" pubdate>
-              2026-01-01
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/" class="category-chain-item">计算机基础</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/">#计算机网络</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2026/01/01/%E6%8B%BC%E5%A5%BD%E9%A5%AD%E7%BB%93%E6%9E%84%E5%8C%96%E5%A4%87%E6%B3%A8/" target="_self">
-          拼好饭结构化备注
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/01/01/%E6%8B%BC%E5%A5%BD%E9%A5%AD%E7%BB%93%E6%9E%84%E5%8C%96%E5%A4%87%E6%B3%A8/" target="_self">
-        <div>
-          这里的内容加密了，需要密码哦
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-01-01 02:00" pubdate>
-              2026-01-01
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E5%AE%9E%E4%B9%A0/" class="category-chain-item">实习</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E5%AE%9E%E4%B9%A0/">#实习</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
         <a href="/2026/01/01/Java%E5%9F%BA%E7%A1%80(%E4%B8%8B)/" target="_self">
           Java基础(下)
         </a>
@@ -901,11 +594,257 @@
     </article>
   </div>
 
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2025/12/31/Fluid%E5%A2%9E%E5%8A%A0%E5%8D%A1%E7%89%87/" target="_self">
+          Fluid主题美化-增加卡片式链接
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/12/31/Fluid%E5%A2%9E%E5%8A%A0%E5%8D%A1%E7%89%87/" target="_self">
+        <div>
+          Fluid主题不支持卡片式链接展示，本人也是个前端白痴，经过Gemini3 Pro点拨，实现了一个比较简单的链接卡片。  具体的展示效果可参见About。这里把代码和配置分享出来，把以下代码包装成一个自定义js文件，并在fluid的配置中引入这个js文件，具体配置参照自定义 JS &#x2F; CSS &#x2F; HTML 123456789101112131415161718192021222
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-12-31 16:00" pubdate>
+              2025-12-31
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E5%89%8D%E7%AB%AF/" class="category-chain-item">前端</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E5%89%8D%E7%AB%AF/">#前端</a>
+            
+              <a href="/tags/Fluid/">#Fluid</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2025/12/30/%E5%86%85%E5%AD%98%E6%B3%84%E9%9C%B2/" target="_self">
+          内存泄露
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/12/30/%E5%86%85%E5%AD%98%E6%B3%84%E9%9C%B2/" target="_self">
+        <div>
+          基本概念参考：https://www.cnblogs.com/0201zcr/p/4805920.html 内存泄露 vs 内存溢出 内存溢出(OOM)：程序申请内存时，没有足够的空间供其使用 内存泄露：程序申请内存成功，使用完后，这部分空间无法被GC回收，导致可用内存减少，一次内存泄露危害可以忽略，但内存泄露堆积会导致内存溢出  内存泄露本质垃圾回收机制需要通过可达性分析标记垃圾对象，没有被标记
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-12-30 19:00" pubdate>
+              2025-12-30
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/" class="category-chain-item">计算机基础</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/">#计算机基础</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2025/12/29/Java%E5%9F%BA%E7%A1%80(%E4%B8%AD)/" target="_self">
+          Java基础(中)
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/12/29/Java%E5%9F%BA%E7%A1%80(%E4%B8%AD)/" target="_self">
+        <div>
+          本文主要参考：Javaguide ，在其基础上做了部分扩展 面向对象面向对象 vs 面向过程 面向过程（POP）：将解决问题的过程拆解为若干方法，通过方法的组合执行解决问题 面向对象（OOP）：先抽象出一个对象，然后对象调用方法解决问题  对于简单的程序逻辑，优先使用POP；对于复杂的系统优先使用OOP，原因如下：  OOP的封装性更好，安全性更高 OOP的可维护性更好，各个模块之间解耦，系统迭代
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-12-29 10:00" pubdate>
+              2025-12-29
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Java/" class="category-chain-item">Java</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Java/">#Java</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2025/12/28/Java%E5%9F%BA%E7%A1%80(%E4%B8%8A)/" target="_self">
+          Java基础(上)
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2025/12/28/Java%E5%9F%BA%E7%A1%80(%E4%B8%8A)/" target="_self">
+        <div>
+          本文主要参考：https://javaguide.cn/java/basis/java-basic-questions-01.html ，在其基础上做了部分扩展 基础概念Java vs. C++ C++需要手动管理内存，Java有自动内存回收机制  C++支持多继承，Java只支持单继承，但支持多实现  C++支持运算符重载，Java不支持  C++跨平台需要重新编译，Java一次编译可以处处运行
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2025-12-28 10:00" pubdate>
+              2025-12-28
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Java/" class="category-chain-item">Java</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Java/">#Java</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
 
 
   <nav aria-label="navigation">
     <span class="pagination" id="pagination">
-      <a class="extend prev" rel="prev" href="/page/5/#board"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/#board">4</a><a class="page-number" href="/page/5/#board">5</a><span class="page-number current">6</span><a class="page-number" href="/page/7/#board">7</a><a class="extend next" rel="next" href="/page/7/#board"><i class="iconfont icon-arrowright"></i></a>
+      <a class="extend prev" rel="prev" href="/page/5/#board"><i class="iconfont icon-arrowleft"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/4/#board">4</a><a class="page-number" href="/page/5/#board">5</a><span class="page-number current">6</span>
     </span>
   </nav>
 

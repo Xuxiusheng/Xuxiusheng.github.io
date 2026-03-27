@@ -293,15 +293,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2026/03/24/%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%97-Redis-Set/" target="_self">
-          源码系列-Redis Set
+        <a href="/2026/03/26/Redis-SDS-%E6%BA%90%E7%A0%81/" target="_self">
+          Redis底层揭秘：SDS
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/03/24/%E6%BA%90%E7%A0%81%E7%B3%BB%E5%88%97-Redis-Set/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/03/26/Redis-SDS-%E6%BA%90%E7%A0%81/" target="_self">
         <div>
-          底层结构Redis Set底层存在两种编码方式：intset与hashtable，当元素数量未超过设定阈值（默认512）并且均为整数，使用intset，否则使用hashtable。 12345678910111213141516// intsettypedef struct intset &#123;    uint32_t encoding;    uint32_t length;    int
+          编码格式在Redis中，字符串是用户最常接触的数据类型。无论是键值对的 Key 与 Value，还是底层通信协议的缓冲，字符串无处不在。Redis 并没有直接使用 C语言原生的字符串，而是自研了一套名为 SDS（Simple Dynamic String，简单动态字符串） 的抽象结构，解决 C 字符串在性能、安全性和功能上的诸多缺陷，为 Redis 的高性能奠定了坚实基础。 在C语言的内存模型中，
         </div>
       </a>
 
@@ -309,8 +309,8 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2026-03-24 12:15" pubdate>
-              2026-03-24
+            <time datetime="2026-03-26 23:00" pubdate>
+              2026-03-26
             </time>
           </div>
         
@@ -325,7 +325,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/" class="category-chain-item">源码解读</a>
+  <a href="/categories/Redis/" class="category-chain-item">Redis</a>
   
   
 
@@ -342,7 +342,70 @@
             
               <a href="/tags/Redis/">#Redis</a>
             
-              <a href="/tags/%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/">#源码解读</a>
+              <a href="/tags/%E6%BA%90%E7%A0%81/">#源码</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2026/03/25/Redis%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B-%E6%BA%90%E7%A0%81/" target="_self">
+          Redis底层揭秘：内存分配与回收篇
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/03/25/Redis%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B-%E6%BA%90%E7%A0%81/" target="_self">
+        <div>
+          内存泄漏？碎片率飙升？本文带你彻底搞懂 Redis 的内存分配与回收逻辑。从自定义分配器的设计初衷，到后台清理策略的实战影响，一文讲透如何驾驭 Redis内存。 Redis作为内存数据库，内存是其最宝贵的资源。在 Redis的源码世界里，你很难直接看到裸奔的 malloc&#x2F;realloc&#x2F;calloc&#x2F;free。取而代之的，是一套严密的内存分配包装器。这是为了解决一个
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-03-25 20:00" pubdate>
+              2026-03-25
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Redis/" class="category-chain-item">Redis</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Redis/">#Redis</a>
+            
+              <a href="/tags/%E6%BA%90%E7%A0%81/">#源码</a>
             
           </div>
         
@@ -543,132 +606,6 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2026/02/03/Redis-QucikList/" target="_self">
-          源码系列-Redis QucikList
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/02/03/Redis-QucikList/" target="_self">
-        <div>
-          QucikListziplist（压缩列表）是 Redis 为节约内存设计的一种紧凑型双向链表，前序和逆序访问的效率都很高，适合少量小字符串的存储。但是ziplist在删除和插入元素时，会触发连锁扩容，当元素数量很大时，连锁更新的效率很低。可以参考ziplist连锁更新。现在list类型完全摒弃了linkedlist和ziplist，完全被quicklist取代。 结构设计QuickList是Li
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-02-03 18:15" pubdate>
-              2026-02-03
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/" class="category-chain-item">源码解读</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/Redis/">#Redis</a>
-            
-              <a href="/tags/%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/">#源码解读</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2026/01/30/Redis_ZipList/" target="_self">
-          源码系列-Redis ZipList
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/01/30/Redis_ZipList/" target="_self">
-        <div>
-          ZipListLinkedList的内存浪费问题严重，除了保存数据外，还要使用前后指针记录前驱后继节点，64位系统下，每个节点至少16字节的内存被浪费。 ziplist（压缩列表）是 Redis 为节约内存设计的一种紧凑型双向链表。它彻底摒弃了传统链表中指针占用空间的缺点，将所有数据存储在一块连续内存中。 123456789101112传统链表：+---+     +---+     +---+|
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-01-30 22:10" pubdate>
-              2026-01-30
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/" class="category-chain-item">源码解读</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/Redis/">#Redis</a>
-            
-              <a href="/tags/%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/">#源码解读</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
         <a href="/2026/01/30/%E8%BF%B7%E5%AE%AB%E9%97%AE%E9%A2%98-%E5%B9%BF%E5%BA%A6%E4%BC%98%E5%85%88%E6%90%9C%E7%B4%A2/" target="_self">
           迷宫问题-广度优先搜索
         </a>
@@ -791,69 +728,6 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2026/01/16/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB-SDS/" target="_self">
-          源码系列-Redis SDS
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/01/16/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB-SDS/" target="_self">
-        <div>
-          导言本篇文章记录一下SDS源码的一些关键点，完整的源码解析请参考Redis。 SDS底层结构Redis为了尽可能地节省内存，根据字符串的长度设计了5种类型的字符串底层结构，在实际使用时，会根据字符串的长度选择合适的类型。 12345678910111213141516171819202122232425262728struct __attribute__ ((__packed__)) sdshdr
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-01-16 20:10" pubdate>
-              2026-01-16
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/" class="category-chain-item">源码解读</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/Redis/">#Redis</a>
-            
-              <a href="/tags/%E6%BA%90%E7%A0%81%E8%A7%A3%E8%AF%BB/">#源码解读</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
         <a href="/2026/01/16/HelloAgents%E5%9F%BA%E7%A1%80/" target="_self">
           Hello Agents-智能体基础
         </a>
@@ -911,11 +785,133 @@
     </article>
   </div>
 
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2026/01/06/%E8%AE%B0%E5%BD%95%E6%A0%A1%E6%8B%9B%E6%9C%9F%E9%97%B4%E9%9D%9E%E5%B8%B8%E6%9C%89%E6%84%8F%E6%80%9D%E7%9A%84%E4%B8%80%E4%B8%AA%E6%89%8B%E6%92%95%E9%A2%98/" target="_self">
+          记录校招期间非常有意思的一个手撕题
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/01/06/%E8%AE%B0%E5%BD%95%E6%A0%A1%E6%8B%9B%E6%9C%9F%E9%97%B4%E9%9D%9E%E5%B8%B8%E6%9C%89%E6%84%8F%E6%80%9D%E7%9A%84%E4%B8%80%E4%B8%AA%E6%89%8B%E6%92%95%E9%A2%98/" target="_self">
+        <div>
+          今天面试了四维纵横，这里夸一夸面试官，非常有耐心，属于我遇到的为数不多的引导型面试官，面试体验真的超棒，而且出的题也相当有意思，非力扣题，和I&#x2F;O优化相关。              题目：向文件中写入10000000个数，数据范围不限，可以通过随机生成。再从文件中读出这些数，计算耗时              12345678910111213141516171819202122232
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-01-06 17:00" pubdate>
+              2026-01-06
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Java/" class="category-chain-item">Java</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Java/">#Java</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2026/01/02/Spring%E5%B0%8F%E8%AE%B0/" target="_self">
+          Spring小记
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/01/02/Spring%E5%B0%8F%E8%AE%B0/" target="_self">
+        <div>
+          这篇文章记录一下校招面试期间问到的一些Spring相关的问题,问的不是很多，但我基本不会[苦笑][苦笑]              Spring如何定义Bean的加载顺序?(比如，A依赖B，强制B先加载，再加载A)Spring 会自动解析 Bean 之间的依赖关系，并按照依赖顺序加载。但也可以通过显式配置来控制加载顺序。  @DependsOn 注解，在A类上加入@DependsOn(B.clas
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-01-02 15:30" pubdate>
+              2026-01-02
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Spring/" class="category-chain-item">Spring</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Spring/">#Spring</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
 
 
   <nav aria-label="navigation">
     <span class="pagination" id="pagination">
-      <span class="page-number current">1</span><a class="page-number" href="/page/2/#board">2</a><a class="page-number" href="/page/3/#board">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/#board">7</a><a class="extend next" rel="next" href="/page/2/#board"><i class="iconfont icon-arrowright"></i></a>
+      <span class="page-number current">1</span><a class="page-number" href="/page/2/#board">2</a><a class="page-number" href="/page/3/#board">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/#board">6</a><a class="extend next" rel="next" href="/page/2/#board"><i class="iconfont icon-arrowright"></i></a>
     </span>
   </nav>
 
