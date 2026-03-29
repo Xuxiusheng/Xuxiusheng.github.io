@@ -293,6 +293,69 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2026/03/29/Redis%E5%BA%95%E5%B1%82%E6%8F%AD%E7%A7%98%EF%BC%9AZipList/" target="_self">
+          Redis底层揭秘：ZipList
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/03/29/Redis%E5%BA%95%E5%B1%82%E6%8F%AD%E7%A7%98%EF%BC%9AZipList/" target="_self">
+        <div>
+          在 Redis 丰富的数据结构中，我们常常惊叹于 Hash的O(1) 查找效率，或是 Sorted Set中跳跃表的精妙设计。然而，在这些高性能特性的背后，还有一个更底层、更朴素的角色在默默支撑着内存的极致优化——它就是 ziplist（压缩列表）。 不同于传统链表依赖指针连接节点，ziplist选择一块连续的内存空间，通过紧凑的字节编码将数据挤在一起，支持正向与逆向遍历。这种设计虽然牺牲了部分C
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-03-29 14:00" pubdate>
+              2026-03-29
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Redis/" class="category-chain-item">Redis</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Redis/">#Redis</a>
+            
+              <a href="/tags/%E6%BA%90%E7%A0%81/">#源码</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2026/03/28/C%E8%AF%AD%E8%A8%80%E6%96%B9%E6%B3%95%E5%89%96%E6%9E%90%E7%AF%87/" target="_self">
           C语言方法剖析篇
         </a>
@@ -848,72 +911,11 @@
     </article>
   </div>
 
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2026/01/06/%E8%AE%B0%E5%BD%95%E6%A0%A1%E6%8B%9B%E6%9C%9F%E9%97%B4%E9%9D%9E%E5%B8%B8%E6%9C%89%E6%84%8F%E6%80%9D%E7%9A%84%E4%B8%80%E4%B8%AA%E6%89%8B%E6%92%95%E9%A2%98/" target="_self">
-          记录校招期间非常有意思的一个手撕题
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/01/06/%E8%AE%B0%E5%BD%95%E6%A0%A1%E6%8B%9B%E6%9C%9F%E9%97%B4%E9%9D%9E%E5%B8%B8%E6%9C%89%E6%84%8F%E6%80%9D%E7%9A%84%E4%B8%80%E4%B8%AA%E6%89%8B%E6%92%95%E9%A2%98/" target="_self">
-        <div>
-          今天面试了四维纵横，这里夸一夸面试官，非常有耐心，属于我遇到的为数不多的引导型面试官，面试体验真的超棒，而且出的题也相当有意思，非力扣题，和I&#x2F;O优化相关。              题目：向文件中写入10000000个数，数据范围不限，可以通过随机生成。再从文件中读出这些数，计算耗时              12345678910111213141516171819202122232
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-01-06 17:00" pubdate>
-              2026-01-06
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/Java/" class="category-chain-item">Java</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/Java/">#Java</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
 
 
   <nav aria-label="navigation">
     <span class="pagination" id="pagination">
-      <span class="page-number current">1</span><a class="page-number" href="/page/2/#board">2</a><a class="page-number" href="/page/3/#board">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/#board">6</a><a class="extend next" rel="next" href="/page/2/#board"><i class="iconfont icon-arrowright"></i></a>
+      <span class="page-number current">1</span><a class="page-number" href="/page/2/#board">2</a><a class="page-number" href="/page/3/#board">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/#board">7</a><a class="extend next" rel="next" href="/page/2/#board"><i class="iconfont icon-arrowright"></i></a>
     </span>
   </nav>
 
