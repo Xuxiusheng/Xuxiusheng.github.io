@@ -19,18 +19,19 @@
   <meta name="author" content="xxs不是小学生">
   <meta name="keywords" content="">
   
-    <meta name="description" content="在 Redis 丰富的数据结构中，我们常常惊叹于 Hash的O(1) 查找效率，或是 Sorted Set中跳跃表的精妙设计。然而，在这些高性能特性的背后，还有一个更底层、更朴素的角色在默默支撑着内存的极致优化——它就是 ziplist（压缩列表）。 不同于传统链表依赖指针连接节点，ziplist选择一块连续的内存空间，通过紧凑的字节编码将数据挤在一起，支持正向与逆向遍历。这种设计虽然牺牲了部分C">
+    <meta name="description" content="在Redis丰富的数据结构中，我们常常惊叹于 Hash的O(1) 查找效率，或是 Sorted Set中跳跃表的精妙设计。然而，在这些高性能特性的背后，还有一个更底层、更朴素的角色在默默支撑着内存的极致优化——它就是 ziplist（压缩列表）。 不同于传统链表依赖指针连接节点，ziplist选择一块连续的内存空间，通过紧凑的字节编码将数据挤在一起，支持正向与逆向遍历。这种设计虽然牺牲了部分CPU">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Redis底层揭秘：ZipList">
 <meta property="og:url" content="http://xuxiusheng.github.io/2026/03/29/Redis%E5%BA%95%E5%B1%82%E6%8F%AD%E7%A7%98%EF%BC%9AZipList/index.html">
 <meta property="og:site_name" content="xxs不是小学生">
-<meta property="og:description" content="在 Redis 丰富的数据结构中，我们常常惊叹于 Hash的O(1) 查找效率，或是 Sorted Set中跳跃表的精妙设计。然而，在这些高性能特性的背后，还有一个更底层、更朴素的角色在默默支撑着内存的极致优化——它就是 ziplist（压缩列表）。 不同于传统链表依赖指针连接节点，ziplist选择一块连续的内存空间，通过紧凑的字节编码将数据挤在一起，支持正向与逆向遍历。这种设计虽然牺牲了部分C">
+<meta property="og:description" content="在Redis丰富的数据结构中，我们常常惊叹于 Hash的O(1) 查找效率，或是 Sorted Set中跳跃表的精妙设计。然而，在这些高性能特性的背后，还有一个更底层、更朴素的角色在默默支撑着内存的极致优化——它就是 ziplist（压缩列表）。 不同于传统链表依赖指针连接节点，ziplist选择一块连续的内存空间，通过紧凑的字节编码将数据挤在一起，支持正向与逆向遍历。这种设计虽然牺牲了部分CPU">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/139.png">
 <meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/140.png">
 <meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/141.png">
+<meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/142.png">
 <meta property="article:published_time" content="2026-03-29T06:00:00.000Z">
-<meta property="article:modified_time" content="2026-03-29T15:41:12.058Z">
+<meta property="article:modified_time" content="2026-03-30T05:40:17.234Z">
 <meta property="article:author" content="xxs不是小学生">
 <meta property="article:tag" content="Redis">
 <meta property="article:tag" content="源码">
@@ -304,7 +305,7 @@
         
         
         
-          97 分钟
+          99 分钟
         
       </span>
     
@@ -355,7 +356,7 @@
             
               <div class="markdown-body">
                 
-                <p>在 Redis 丰富的数据结构中，我们常常惊叹于 Hash的O(1) 查找效率，或是 Sorted Set中跳跃表的精妙设计。然而，在这些高性能特性的背后，还有一个更底层、更<strong>朴素</strong>的角色在默默支撑着内存的极致优化——它就是 ziplist（压缩列表）。</p>
+                <p>在Redis丰富的数据结构中，我们常常惊叹于 Hash的O(1) 查找效率，或是 Sorted Set中跳跃表的精妙设计。然而，在这些高性能特性的背后，还有一个更底层、更<strong>朴素</strong>的角色在默默支撑着内存的极致优化——它就是 ziplist（压缩列表）。</p>
 <p>不同于传统链表依赖指针连接节点，ziplist选择一块连续的内存空间，通过紧凑的字节编码将数据<strong>挤</strong>在一起，支持正向与逆向遍历。这种设计虽然牺牲了部分CPU性能，却换来了惊人的内存节省，使其成为内存敏感场景的首选方案。本文将深入剖析压缩列表（ziplist），重点解析其紧凑的内存布局与变长编码机制，探讨其如何在节省内存与操作效率之间寻求平衡。</p>
 <h1 id="内存空间布局"><a href="#内存空间布局" class="headerlink" title="内存空间布局"></a>内存空间布局</h1><p>Redis 在ziplist.c的注释中已经详细交代了ziplist的结构，但光看代码难免有点枯燥。下面咱们用几张图来可视化一下，让抽象的结构变得不那么抽象。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs c">* ZIPLIST OVERALL LAYOUT<br>* ======================<br>*<br>* The general layout of the ziplist is as follows:<br>*<br>* &lt;zlbytes&gt; &lt;zltail&gt; &lt;zllen&gt; &lt;entry&gt; &lt;entry&gt; ... &lt;entry&gt; &lt;zlend&gt;<br>*<br>* NOTE: all fields are stored in little endian, <span class="hljs-keyword">if</span> not specified otherwise.<br>*<br>* &lt;<span class="hljs-type">uint32_t</span> zlbytes&gt; is an <span class="hljs-type">unsigned</span> integer to hold the number of bytes that<br>* the ziplist occupies, including the four bytes of the zlbytes field itself.<br>* This value needs to be stored to be able to resize the entire structure<br>* without the need to traverse it first.<br>*<br>* &lt;<span class="hljs-type">uint32_t</span> zltail&gt; is the offset to the last entry in the <span class="hljs-built_in">list</span>. This allows<br>* a pop operation on the far side of the <span class="hljs-built_in">list</span> without the need <span class="hljs-keyword">for</span> full<br>* traversal.<br>*<br>* &lt;<span class="hljs-type">uint16_t</span> zllen&gt; is the number of entries. When there are more than<br>* <span class="hljs-number">2</span>^<span class="hljs-number">16</span><span class="hljs-number">-2</span> entries, this value is <span class="hljs-built_in">set</span> to <span class="hljs-number">2</span>^<span class="hljs-number">16</span><span class="hljs-number">-1</span> and we need to traverse the<br>* entire <span class="hljs-built_in">list</span> to know how many items it holds.<br>*<br>* &lt;<span class="hljs-type">uint8_t</span> zlend&gt; is a special entry representing the end of the ziplist.<br>* Is encoded as a single byte equal to <span class="hljs-number">255.</span> No other normal entry starts<br>* with a byte <span class="hljs-built_in">set</span> to the value of <span class="hljs-number">255.</span><br></code></pre></td></tr></table></figure>
@@ -413,9 +414,8 @@
             <p>级联更新堪称ziplist的“阿喀琉斯之踵”，这个致命弱点直接把它锁死在了“小数据场景”里。究其根本，是因为 ziplist 的每个节点都死死“抓着”前一个节点的长度信息（prevlen），形成了一种紧密的依赖链条。一旦前一个节点“胖”了一圈，后面的节点就得跟着集体“挪窝”。而后来者Listpack 的出现，正是为了斩断这种“藕断丝连”的依赖关系，彻底终结了 ziplist 的级联噩梦。在 Redis 7.0及之后的现代版本中，ziplist已经被正式“抛弃”了。</p> 
           </div>
 
-
-
-
+<h1 id="ZipList-vs-LinkedList"><a href="#ZipList-vs-LinkedList" class="headerlink" title="ZipList vs. LinkedList"></a>ZipList vs. LinkedList</h1><p>linkedlist的每个entry都需存储前后指针，平均每个节点会产生16字节的内存冗余（prev与next指针）。在对内存资源高度敏感的场景下，这种固有的空间开销使其劣势显著，难以满足高效存储的需求。其结构如下：<br><img src="/img/article_img/142.png" srcset="/img/config/loading.gif" lazyload></p>
+<p>反观ziplist，它也存储了元数据，也存在内存冗余。但与linkedlist比起来，那简直就是<strong>精打细算</strong>的模范。哪怕是在<strong>最极端的挥霍情况</strong>下，每个 entry都占满最大空间，它浪费的内存也才14字节（prevlen[5字节]+encoding[9字节]），平均情况下远远达不到。最优情况下仅仅浪费2字节（prevlen[1字节]+encoding[1字节]）内存。</p>
 
                 
               </div>
@@ -507,6 +507,12 @@
                 <div class="post-prevnext my-3">
                   <article class="post-prev col-6">
                     
+                    
+                      <a href="/2026/03/30/Redis%E5%BA%95%E5%B1%82%E6%8F%AD%E7%A7%98%EF%BC%9AListPack/" title="Redis底层揭秘：ListPack">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Redis底层揭秘：ListPack</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
                     
                   </article>
                   <article class="post-next col-6">

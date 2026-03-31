@@ -293,6 +293,132 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2026/03/31/Redis%E5%BA%95%E5%B1%82%E6%8F%AD%E7%A7%98%EF%BC%9AQuickList/" target="_self">
+          Redis底层揭秘：QuickList
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/03/31/Redis%E5%BA%95%E5%B1%82%E6%8F%AD%E7%A7%98%EF%BC%9AQuickList/" target="_self">
+        <div>
+          在 Redis 的早期版本中，List 类型并没有一个统一的底层实现，而是根据数据量的大小，在两种数据结构之间动态切换：  轻量级选手 ZipList（压缩列表）：数据紧凑地挤在一块连续内存里，极度节省内存；但修改数据（特别是插入和删除）往往需要移动大量后续数据，甚至引发级联更新（牵一发而动全身），导致性能随着数据量增加呈断崖式下跌。仅限元素少、元素值小的场景。 重量级选手 LinkedList（
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-03-31 13:50" pubdate>
+              2026-03-31
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Redis/" class="category-chain-item">Redis</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Redis/">#Redis</a>
+            
+              <a href="/tags/%E6%BA%90%E7%A0%81/">#源码</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2026/03/30/Redis%E5%BA%95%E5%B1%82%E6%8F%AD%E7%A7%98%EF%BC%9AListPack/" target="_self">
+          Redis底层揭秘：ListPack
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/03/30/Redis%E5%BA%95%E5%B1%82%E6%8F%AD%E7%A7%98%EF%BC%9AListPack/" target="_self">
+        <div>
+          基本概念ListPack是Redis的新一代紧凑存储结构，为了在内存效率和操作性能之间寻找平衡，底层数据结构经历了多次迭代。从早期的linkedlist到ziplist（压缩列表）再到 quicklist，再到Redis 7.0全面普及的 listpack（紧凑列表），内存效率和操作性能之间的平衡性稳步上升。 listpack是Redis 5.0引入，并在Redis 7.0中彻底取代ziplist
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-03-30 15:30" pubdate>
+              2026-03-30
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Redis/" class="category-chain-item">Redis</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Redis/">#Redis</a>
+            
+              <a href="/tags/%E6%BA%90%E7%A0%81/">#源码</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2026/03/29/Redis%E5%BA%95%E5%B1%82%E6%8F%AD%E7%A7%98%EF%BC%9AZipList/" target="_self">
           Redis底层揭秘：ZipList
         </a>
@@ -301,7 +427,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2026/03/29/Redis%E5%BA%95%E5%B1%82%E6%8F%AD%E7%A7%98%EF%BC%9AZipList/" target="_self">
         <div>
-          在 Redis 丰富的数据结构中，我们常常惊叹于 Hash的O(1) 查找效率，或是 Sorted Set中跳跃表的精妙设计。然而，在这些高性能特性的背后，还有一个更底层、更朴素的角色在默默支撑着内存的极致优化——它就是 ziplist（压缩列表）。 不同于传统链表依赖指针连接节点，ziplist选择一块连续的内存空间，通过紧凑的字节编码将数据挤在一起，支持正向与逆向遍历。这种设计虽然牺牲了部分C
+          在Redis丰富的数据结构中，我们常常惊叹于 Hash的O(1) 查找效率，或是 Sorted Set中跳跃表的精妙设计。然而，在这些高性能特性的背后，还有一个更底层、更朴素的角色在默默支撑着内存的极致优化——它就是 ziplist（压缩列表）。 不同于传统链表依赖指针连接节点，ziplist选择一块连续的内存空间，通过紧凑的字节编码将数据挤在一起，支持正向与逆向遍历。这种设计虽然牺牲了部分CPU
         </div>
       </a>
 
@@ -780,130 +906,6 @@
             <i class="iconfont icon-tags"></i>
             
               <a href="/tags/%E8%BF%B7%E5%AE%AB%E9%97%AE%E9%A2%98/">#迷宫问题</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2026/01/30/CAS%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/" target="_self">
-          CAS底层原理
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/01/30/CAS%E5%BA%95%E5%B1%82%E5%8E%9F%E7%90%86/" target="_self">
-        <div>
-          CAS是一种无锁的原子操作，包含三个操作数：  内存位置(V) 期望值(E) 新值(N)  123456if (*V == E) &#123;    *V = N;    return true;&#125; else &#123;    return false;&#125; 不同的系统架构适配的汇编语言不同，所以有不同的实现，以x86为例: 123456789101112131415; x86
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-01-30 20:00" pubdate>
-              2026-01-30
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/" class="category-chain-item">计算机基础</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/CAS%E5%BA%95%E5%B1%82%E6%9C%BA%E5%88%B6/">#CAS底层机制</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2026/01/16/HelloAgents%E5%9F%BA%E7%A1%80/" target="_self">
-          Hello Agents-智能体基础
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/01/16/HelloAgents%E5%9F%BA%E7%A1%80/" target="_self">
-        <div>
-          心血来潮，想了解下最近大火的Agent，寻寻觅觅找到了datawhale开源的Agent教程，受益匪浅，本篇文章记录下自己的感悟。资源链接：Hello Agents 现在大火的LLM和Agent是两个不同的概念，LLM只会进行对话，相当于只有脑子没有手脚，不具备改造外部环境的能力，而Agent相当于为LLM这个大脑配备了手脚，赋予其操作工具的能力。              PT训练大脑，RL锻炼
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-01-16 16:00" pubdate>
-              2026-01-16
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E6%99%BA%E8%83%BD%E4%BD%93/" class="category-chain-item">智能体</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/">#读书笔记</a>
-            
-              <a href="/tags/Hello-Agents/">#Hello Agents</a>
             
           </div>
         

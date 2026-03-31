@@ -1,0 +1,858 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/config/fluid.png">
+  <link rel="icon" href="/img/config/personal.jpg">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="xxs不是小学生">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="基本概念ListPack是Redis的新一代紧凑存储结构，为了在内存效率和操作性能之间寻找平衡，底层数据结构经历了多次迭代。从早期的linkedlist到ziplist（压缩列表）再到 quicklist，再到Redis 7.0全面普及的 listpack（紧凑列表），内存效率和操作性能之间的平衡性稳步上升。 listpack是Redis 5.0引入，并在Redis 7.0中彻底取代ziplist">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis底层揭秘：ListPack">
+<meta property="og:url" content="http://xuxiusheng.github.io/2026/03/30/Redis%E5%BA%95%E5%B1%82%E6%8F%AD%E7%A7%98%EF%BC%9AListPack/index.html">
+<meta property="og:site_name" content="xxs不是小学生">
+<meta property="og:description" content="基本概念ListPack是Redis的新一代紧凑存储结构，为了在内存效率和操作性能之间寻找平衡，底层数据结构经历了多次迭代。从早期的linkedlist到ziplist（压缩列表）再到 quicklist，再到Redis 7.0全面普及的 listpack（紧凑列表），内存效率和操作性能之间的平衡性稳步上升。 listpack是Redis 5.0引入，并在Redis 7.0中彻底取代ziplist">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/143.png">
+<meta property="article:published_time" content="2026-03-30T07:30:00.000Z">
+<meta property="article:modified_time" content="2026-03-31T05:52:20.331Z">
+<meta property="article:author" content="xxs不是小学生">
+<meta property="article:tag" content="Redis">
+<meta property="article:tag" content="源码">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://xuxiusheng.github.io/img/article_img/143.png">
+  
+  
+  
+  <title>Redis底层揭秘：ListPack - xxs不是小学生</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/cnblogs/iconfont.css">
+<link rel="stylesheet" href="/css/email/iconfont.css">
+<link rel="stylesheet" href="/css/card.css">
+<link rel="stylesheet" href="/css/CV/iconfont.css">
+<link rel="stylesheet" href="/css/partial_encrypt.css">
+<link rel="stylesheet" href="/css/runtime.css">
+<link rel="stylesheet" href="/css/cv.css">
+<link rel="stylesheet" href="/css/articles/iconfont.css">
+<link rel="stylesheet" href="/css/reading/iconfont.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"xuxiusheng.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/config/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"2HT5rmC5XQuRugoXS6jx93oG-gzGzoHsz","app_key":"34FVPpMZGQcLXWdGF6FnOx9T","server_url":"https://2ht5rmc5.lc-cn-n1-shared.com","path":"window.location.pathname","ignore_local":true},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>xxs不是小学生のBlog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" target="_self" href="javascript:;" role="button"
+                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="icon iconfont icon-wenzhangshezhi"></i>
+                <span>文章</span>
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/archives/" target="_self">
+                    <i class="iconfont icon-archive-fill"></i>
+                    <span>归档</span>
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/categories/" target="_self">
+                    <i class="iconfont icon-category-fill"></i>
+                    <span>分类</span>
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/tags/" target="_self">
+                    <i class="iconfont icon-tags-fill"></i>
+                    <span>标签</span>
+                  </a>
+                
+              </div>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" target="_self">
+                <i class="icon iconfont icon-yuedu"></i>
+                <span>读书笔记</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/CV/" target="_self">
+                <i class="icon iconfont icon-jianli"></i>
+                <span>CV</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/config/main_3.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Redis底层揭秘：ListPack"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-03-30 15:30" pubdate>
+          2026年3月30日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          6.4k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          54 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Redis底层揭秘：ListPack</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h1><p>ListPack是Redis的新一代紧凑存储结构，为了在<strong>内存效率</strong>和<strong>操作性能</strong>之间寻找平衡，底层数据结构经历了多次迭代。从早期的linkedlist到ziplist（压缩列表）再到 quicklist，再到Redis 7.0全面普及的 listpack（紧凑列表），内存效率和操作性能之间的平衡性稳步上升。</p>
+<p>listpack是Redis 5.0引入，并在Redis 7.0中彻底取代ziplist成为众多数据类型（Hash、ZSET、List）底层默认存储格式的“新王”。</p>
+<p>要理解 listpack，必须先理解它的前任 ziplist 的致命缺陷：ziplist 为了实现双向遍历，在每个节点的头部存储了前一个节点的长度（prevlen）。这带来了一个严重的问题：<strong>连锁更新</strong>：</p>
+<ul>
+<li>依赖链条：如果节点 A 的长度发生变化（例如从 253 字节变为 255 字节），导致节点 B 的 prevlen 字段也必须随之扩容（1字节转化为5字节）。</li>
+<li>多米诺骨牌：B 的扩容又会导致 C 的 prevlen 变化。最坏情况下，修改一个节点会导致后续所有节点重新分配内存，时间复杂度飙升。</li>
+</ul>
+<p>连锁更新问题的根源在于<strong>相邻entry之间由于prevlen存在依赖关系</strong>。而listpack的破局之道在于：其保留了 ziplist 内存连续、紧凑存储的优点，但做了一个核心改变：它不再记录前一个节点的长度，而是记录当前节点自身的长度，并将其放在节点的末尾。</p>
+<p>下面我们就深入源码，从内存布局、核心编码以及关键操作三个维度，来剖析 listpack是如何在代码层面实现“紧凑”与“高效”的。</p>
+<h1 id="内存空间布局"><a href="#内存空间布局" class="headerlink" title="内存空间布局"></a>内存空间布局</h1><p>在 Redis 的源码实现中，listpack未声明独立的 struct 类型，直接采用 unsigned char * 指针来映射连续的内存块，通过指针运算直接管理内存布局。其内存布局如下：<br><img src="/img/article_img/143.png" srcset="/img/config/loading.gif" lazyload></p>
+<p>通过源码看一下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> *<span class="hljs-title function_">lpNew</span><span class="hljs-params">(<span class="hljs-type">size_t</span> capacity)</span> &#123;<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> *lp = lp_malloc(capacity &gt; LP_HDR_SIZE+<span class="hljs-number">1</span> ? capacity : LP_HDR_SIZE+<span class="hljs-number">1</span>);<br>    <span class="hljs-keyword">if</span> (lp == <span class="hljs-literal">NULL</span>) <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;<br>    lpSetTotalBytes(lp,LP_HDR_SIZE+<span class="hljs-number">1</span>); <span class="hljs-comment">// 小端序写入LP_BYTES</span><br>    lpSetNumElements(lp,<span class="hljs-number">0</span>); <span class="hljs-comment">// 小端序写入LP_LEN</span><br>    lp[LP_HDR_SIZE] = LP_EOF;<br>    <span class="hljs-keyword">return</span> lp;<br>&#125;<br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> lpSetTotalBytes(p,v) do &#123; \</span><br><span class="hljs-meta">    (p)[0] = (v)&amp;0xff; \</span><br><span class="hljs-meta">    (p)[1] = ((v)&gt;&gt;8)&amp;0xff; \</span><br><span class="hljs-meta">    (p)[2] = ((v)&gt;&gt;16)&amp;0xff; \</span><br><span class="hljs-meta">    (p)[3] = ((v)&gt;&gt;24)&amp;0xff; \</span><br><span class="hljs-meta">&#125; while(0)</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> lpSetNumElements(p,v) do &#123; \</span><br><span class="hljs-meta">    (p)[4] = (v)&amp;0xff; \</span><br><span class="hljs-meta">    (p)[5] = ((v)&gt;&gt;8)&amp;0xff; \</span><br><span class="hljs-meta">&#125; while(0)</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> lpSetNumElements(p,v) do &#123; \</span><br><span class="hljs-meta">    (p)[4] = (v)&amp;0xff; \</span><br><span class="hljs-meta">    (p)[5] = ((v)&gt;&gt;8)&amp;0xff; \</span><br><span class="hljs-meta">&#125; while(0)</span><br></code></pre></td></tr></table></figure>
+
+ <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c"> <span class="hljs-comment">/* Each entry in the listpack is either a string or an integer. */</span><br><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> &#123;</span><br>    <span class="hljs-comment">/* When string is used, it is provided with the length (slen). */</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> *sval;<br>    <span class="hljs-type">uint32_t</span> slen;<br>    <span class="hljs-comment">/* When integer is used, &#x27;sval&#x27; is NULL, and lval holds the value. */</span><br>    <span class="hljs-type">long</span> <span class="hljs-type">long</span> lval;<br>&#125; listpackEntry;<br></code></pre></td></tr></table></figure>
+<h1 id="源码解析"><a href="#源码解析" class="headerlink" title="源码解析"></a>源码解析</h1><p>尽管 listpack 的宏观结构颇为精简，但其核心逻辑却高度浓缩。为了深入剖析其底层实现，我们将重点聚焦于三个关键操作：元素的插入机制，以及基于字节流特性的正向与逆向遍历算法。掌握了这三点，便掌握了 listpack 的运行精髓。</p>
+<p>在 listpack 的底层实现中，插入、删除与替换操作并非独立存在，而是高度统一于 lpInsert 这一核心函数。通过传入不同的参数组合，lpInsert 能够灵活适配多种场景。代码如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">/*</span><br><span class="hljs-comment">    lp：目标listpack起始地址</span><br><span class="hljs-comment">    elestr：插入字符串</span><br><span class="hljs-comment">    eleint：插入整数</span><br><span class="hljs-comment">    size：插入数据长度</span><br><span class="hljs-comment">    p：插入位置（listpack中某个entry的起始地址）</span><br><span class="hljs-comment">    where：插入形式，插入p之前、之后以及直接替换p</span><br><span class="hljs-comment">    newp：返回操作后的新元素的地址</span><br><span class="hljs-comment"></span><br><span class="hljs-comment">    elestr与eleint至少有一个为NULL，两个如果都为NULL，删除p指向的entry</span><br><span class="hljs-comment">*/</span><br><span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> *<span class="hljs-title function_">lpInsert</span><span class="hljs-params">(<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> *lp, <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> *elestr, <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> *eleint,</span><br><span class="hljs-params">                        <span class="hljs-type">uint32_t</span> size, <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> *p, <span class="hljs-type">int</span> where, <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> **newp)</span><br>&#123;<br><br>    <span class="hljs-comment">/*</span><br><span class="hljs-comment">        #define LP_MAX_INT_ENCODING_LEN 9</span><br><span class="hljs-comment">        最大存储64位整数，加上头部，总共9字节</span><br><span class="hljs-comment">    */</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> intenc[LP_MAX_INT_ENCODING_LEN];<br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> backlen[LP_MAX_BACKLEN_SIZE];<br><br>    <span class="hljs-type">uint64_t</span> enclen; <span class="hljs-comment">// enclen = encoding + data</span><br>    <span class="hljs-type">int</span> delete = (elestr == <span class="hljs-literal">NULL</span> &amp;&amp; eleint == <span class="hljs-literal">NULL</span>);<br><br>    <span class="hljs-comment">/*</span><br><span class="hljs-comment">        如果是删除操作，相当于将当前p指向的entry替换为长度为0的字节流，</span><br><span class="hljs-comment">        因此将其等价为替换操作</span><br><span class="hljs-comment">    */</span><br>    <span class="hljs-keyword">if</span> (delete) where = LP_REPLACE;<br><br>    <span class="hljs-comment">/* </span><br><span class="hljs-comment">        如果是在当前p之后插入，向后移动，转换为LP_BEFORE</span><br><span class="hljs-comment">    */</span><br>    <span class="hljs-keyword">if</span> (where == LP_AFTER) &#123;<br>        p = lpSkip(p);<br>        where = LP_BEFORE;<br>        ASSERT_INTEGRITY(lp, p);<br>    &#125;<br><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> poff = p-lp;<br><br>    <span class="hljs-type">int</span> enctype;<br>    <span class="hljs-keyword">if</span> (elestr) &#123;<br>        <span class="hljs-comment">// 判断string是否可以转化为整数存储</span><br>        enctype = lpEncodeGetType(elestr,size,intenc,&amp;enclen);<br>        <span class="hljs-keyword">if</span> (enctype == LP_ENCODING_INT) eleint = intenc;<br>    &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (eleint) &#123;<br>        enctype = LP_ENCODING_INT;<br>        enclen = size;<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>        <span class="hljs-comment">// 删除操作 </span><br>        enctype = <span class="hljs-number">-1</span>;<br>        enclen = <span class="hljs-number">0</span>;<br>    &#125;<br><br>    <span class="hljs-comment">// 编码backlen字段</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> backlen_size = (!delete) ? lpEncodeBacklen(backlen,enclen) : <span class="hljs-number">0</span>;<br>    <span class="hljs-type">uint64_t</span> old_listpack_bytes = lpGetTotalBytes(lp);<br>    <span class="hljs-type">uint32_t</span> replaced_len  = <span class="hljs-number">0</span>;<br>    <span class="hljs-keyword">if</span> (where == LP_REPLACE) &#123;<br>        replaced_len = lpCurrentEncodedSizeUnsafe(p);<br>        replaced_len += lpEncodeBacklenBytes(replaced_len);<br>        ASSERT_INTEGRITY_LEN(lp, p, replaced_len);<br>    &#125;<br>    <span class="hljs-comment">// 计算新listpack的字节数</span><br>    <span class="hljs-type">uint64_t</span> new_listpack_bytes = old_listpack_bytes + enclen + backlen_size<br>                                  - replaced_len;<br>    <span class="hljs-keyword">if</span> (new_listpack_bytes &gt; UINT32_MAX) <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;<br><br><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> *dst = lp + poff; <br><br>    <span class="hljs-comment">/* 插入或替换之前保证空间足够 */</span><br>    <span class="hljs-keyword">if</span> (new_listpack_bytes &gt; old_listpack_bytes &amp;&amp;<br>        new_listpack_bytes &gt; lp_malloc_size(lp)) &#123;<br>        <span class="hljs-keyword">if</span> ((lp = lp_realloc(lp,new_listpack_bytes)) == <span class="hljs-literal">NULL</span>) <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;<br>        dst = lp + poff;<br>    &#125;<br><br>    <span class="hljs-comment">/*</span><br><span class="hljs-comment">        LP_BEFORE：插入位置之后的字节流后移</span><br><span class="hljs-comment">        LP_REPLACE：删除位置之后的字节流前移</span><br><span class="hljs-comment">    */</span><br>    <span class="hljs-keyword">if</span> (where == LP_BEFORE) &#123;<br>        memmove(dst+enclen+backlen_size,dst,old_listpack_bytes-poff);<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>        memmove(dst+enclen+backlen_size,<br>                dst+replaced_len,<br>                old_listpack_bytes-poff-replaced_len);<br>    &#125;<br><br>    <span class="hljs-comment">/* 内存收缩 */</span><br>    <span class="hljs-keyword">if</span> (new_listpack_bytes &lt; old_listpack_bytes) &#123;<br>        <span class="hljs-keyword">if</span> ((lp = lp_realloc(lp,new_listpack_bytes)) == <span class="hljs-literal">NULL</span>) <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;<br>        dst = lp + poff;<br>    &#125;<br><br>    <span class="hljs-comment">/* newp指向操作发生的地址 */</span><br>    <span class="hljs-keyword">if</span> (newp) &#123;<br>        *newp = dst;<br>        <span class="hljs-keyword">if</span> (delete &amp;&amp; dst[<span class="hljs-number">0</span>] == LP_EOF) *newp = <span class="hljs-literal">NULL</span>;<br>    &#125;<br><br>    <span class="hljs-comment">// 插入元素</span><br>    <span class="hljs-keyword">if</span> (!delete) &#123;<br>        <span class="hljs-keyword">if</span> (enctype == LP_ENCODING_INT) &#123;<br>            <span class="hljs-built_in">memcpy</span>(dst,eleint,enclen);<br>        &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (elestr) &#123;<br>            lpEncodeString(dst,elestr,size);<br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>            redis_unreachable();<br>        &#125;<br>        dst += enclen;<br>        <span class="hljs-built_in">memcpy</span>(dst,backlen,backlen_size);<br>        dst += backlen_size;<br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (where != LP_REPLACE || delete) &#123;<br>        <span class="hljs-type">uint32_t</span> num_elements = lpGetNumElements(lp);<br>        <span class="hljs-keyword">if</span> (num_elements != LP_HDR_NUMELE_UNKNOWN) &#123;<br>            <span class="hljs-keyword">if</span> (!delete)<br>                lpSetNumElements(lp,num_elements+<span class="hljs-number">1</span>);<br>            <span class="hljs-keyword">else</span><br>                lpSetNumElements(lp,num_elements<span class="hljs-number">-1</span>);<br>        &#125;<br>    &#125;<br>    lpSetTotalBytes(lp,new_listpack_bytes);<br>    <span class="hljs-keyword">return</span> lp;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>宏观审视 lpInsert，它统一封装了插入、删除及替换三大核心功能。深入剖析其微观逻辑，我们会发现“删除”操作被转化为为“替换为空”的处理机制。同时，该函数通过 LP_BEFORE 与 LP_REPLACE 等枚举参数，精确界定操作语义，从而灵活决定是将新元素插入至目标节点之前，还是直接覆盖现有节点。</p>
+<p>backlen 字段采用了高效的变长编码策略，旨在平衡存储空间与数值表示范围。其编码长度动态变化，从1 字节（7 位有效数据）起步，随数值增大逐级扩展至 5 字节。</p>
+<table>
+<thead>
+<tr>
+<th align="center">字节数</th>
+<th align="center">有效位数</th>
+<th align="center">数值范围</th>
+<th align="center">最大可表示值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">1 字节</td>
+<td align="center">7 位</td>
+<td align="center">0 ~ 127</td>
+<td align="center">2⁷ - 1 &#x3D; 127</td>
+</tr>
+<tr>
+<td align="center">2 字节</td>
+<td align="center">14 位</td>
+<td align="center">128 ~ 16,383</td>
+<td align="center">2¹⁴ - 1 &#x3D; 16,383</td>
+</tr>
+<tr>
+<td align="center">3 字节</td>
+<td align="center">21 位</td>
+<td align="center">16,384 ~ 2,097,151</td>
+<td align="center">2²¹ - 1 &#x3D; 2,097,151</td>
+</tr>
+<tr>
+<td align="center">4 字节</td>
+<td align="center">28 位</td>
+<td align="center">2,097,152 ~ 268,435,455</td>
+<td align="center">2²⁸ - 1 &#x3D; 268,435,455</td>
+</tr>
+<tr>
+<td align="center">5 字节</td>
+<td align="center">35 位</td>
+<td align="center">268,435,456+</td>
+<td align="center">实际只用 32 位 (受限于 listpack 总长)</td>
+</tr>
+</tbody></table>
+<p>那为什么每个字节只拿出 7 位来存数据呢？这其实是 backlen 为了<strong>变长编码</strong>不得不做的妥协。想象一下，你正站在当前 Entry 的门口，想要回头找上一个 Entry，但你根本不知道上一个家伙有多长。怎么办？listpack 的解法是：把长度的尾巴藏在上一段数据的末尾。<br>当你伸手去摸当前地址 p 的前一个字节时，你实际上摸到的是上一个 Entry backlen 的最后一个字节。但问题是，这个 backlen 到底是由几块拼图组成的？是 1 个字节还是 5 个？这就涉及到了那个精妙的“暗号”：起始字节的最高位必须是0，而后续字节的最高位全是 1。这就像是一个倒着写的路标，只要你读到最高位是 0，就知道：“停！这是长度的最高位，路标读完了，赶紧算出长度跳过去！这也是listpack逆序遍历函数中lpDecodeBacklen接口的核心所在：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> *<span class="hljs-title function_">lpPrev</span><span class="hljs-params">(<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> *lp, <span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> *p)</span> &#123;<br>    assert(p);<br>    <span class="hljs-keyword">if</span> (p-lp == LP_HDR_SIZE) <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;<br>    p--; <span class="hljs-comment">/* Seek the first backlen byte of the last element. */</span><br>    <span class="hljs-type">uint64_t</span> prevlen = lpDecodeBacklen(p);<br>    prevlen += lpEncodeBacklenBytes(prevlen);<br>    p -= prevlen<span class="hljs-number">-1</span>; <span class="hljs-comment">/* Seek the first byte of the previous entry. */</span><br>    lpAssertValidEntry(lp, lpBytes(lp), p);<br>    <span class="hljs-keyword">return</span> p;<br>&#125;<br><br><span class="hljs-type">static</span> <span class="hljs-keyword">inline</span> <span class="hljs-type">uint64_t</span> <span class="hljs-title function_">lpDecodeBacklen</span><span class="hljs-params">(<span class="hljs-type">unsigned</span> <span class="hljs-type">char</span> *p)</span> &#123;<br>    <span class="hljs-type">uint64_t</span> val = <span class="hljs-number">0</span>;<br>    <span class="hljs-type">uint64_t</span> shift = <span class="hljs-number">0</span>;<br>    <span class="hljs-keyword">do</span> &#123;<br>        val |= (<span class="hljs-type">uint64_t</span>)(p[<span class="hljs-number">0</span>] &amp; <span class="hljs-number">127</span>) &lt;&lt; shift;<br>        <span class="hljs-keyword">if</span> (!(p[<span class="hljs-number">0</span>] &amp; <span class="hljs-number">128</span>)) <span class="hljs-keyword">break</span>;<br>        shift += <span class="hljs-number">7</span>;<br>        p--;<br>        <span class="hljs-keyword">if</span> (shift &gt; <span class="hljs-number">28</span>) <span class="hljs-keyword">return</span> UINT64_MAX;<br>    &#125; <span class="hljs-keyword">while</span>(<span class="hljs-number">1</span>);<br>    <span class="hljs-keyword">return</span> val;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>正是 backlen 这一巧妙的结构设计：将其置于 Entry 末尾并结合变长识别机制，从根本上解耦了节点间的依赖关系。它摒弃了 ziplist 中记录前驱长度的冗余设计，从而彻底消除了因长度变化引发的级联更新风险。这一改进，使得 listpack 在保持内存紧凑的同时，实现了更稳定、更可预测的写入性能。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Redis/" class="category-chain-item">Redis</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Redis/" class="print-no-link">#Redis</a>
+      
+        <a href="/tags/%E6%BA%90%E7%A0%81/" class="print-no-link">#源码</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Redis底层揭秘：ListPack</div>
+      <div>http://xuxiusheng.github.io/2026/03/30/Redis底层揭秘：ListPack/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>xxs不是小学生</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年3月30日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2026/03/31/Redis%E5%BA%95%E5%B1%82%E6%8F%AD%E7%A7%98%EF%BC%9AQuickList/" title="Redis底层揭秘：QuickList">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Redis底层揭秘：QuickList</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/03/29/Redis%E5%BA%95%E5%B1%82%E6%8F%AD%E7%A7%98%EF%BC%9AZipList/" title="Redis底层揭秘：ZipList">
+                        <span class="hidden-mobile">Redis底层揭秘：ZipList</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.5.1/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"2HT5rmC5XQuRugoXS6jx93oG-gzGzoHsz","appKey":"34FVPpMZGQcLXWdGF6FnOx9T","path":"window.location.pathname","placeholder":"说点什么吧","avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"","emojiCDN":null,"emojiMaps":null,"enableQQ":false,"appid":"2HT5rmC5XQuRugoXS6jx93oG-gzGzoHsz","appkey":"34FVPpMZGQcLXWdGF6FnOx9T","app_id":"2HT5rmC5XQuRugoXS6jx93oG-gzGzoHsz","app_key":"34FVPpMZGQcLXWdGF6FnOx9T"},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://xuxiusheng.github.io/" target="_blank" rel="nofollow noopener"><strong>xxs不是小学生のBlog</strong><span></span></a> <div id="runtime_container"> 已经在星海中遨游了：<span id="runtime_days">0</span> 天 <span id="runtime_hours">0</span> 小时 <span id="runtime_mins">0</span> 分 <span id="runtime_secs">0</span> 秒 </div> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>由<strong>Hexo</strong>强力驱动</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>主题：<strong>Fluid</strong></span></a><br> <span>We are stupid but strong</span> 
+    </div>
+  
+  
+  
+    <!-- 备案信息 ICP for China -->
+    <div class="beian">
+  <span>
+    <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
+      京ICP证123456号
+    </a>
+  </span>
+  
+    
+      <span>
+        <a
+          href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=12345678"
+          rel="nofollow noopener"
+          class="beian-police"
+          target="_blank"
+        >
+          
+            <span style="visibility: hidden; width: 0">|</span>
+            <img src="/img/config/police_beian.png" srcset="/img/config/loading.gif" lazyload alt="police-icon"/>
+          
+          <span>京公网安备12345678号</span>
+        </a>
+      </span>
+    
+  
+</div>
+
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/card.js"></script>
+<script src="/js/encrypt_core.js"></script>
+<script src="/js/runtime.js"></script>
+<script src="/js/cv.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
