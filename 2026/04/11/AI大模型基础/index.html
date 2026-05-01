@@ -19,28 +19,28 @@
   <meta name="author" content="xxs不是小学生">
   <meta name="keywords" content="">
   
-    <meta name="description" content="概念业务中通常使用MySQL作为持久化数据库，并使用缓存来提升系统性能，同时使用缓存和数据库会存在数据一致性问题，而缓存一致性策略，或者也可以叫做缓存读写策略，是指在写数据或读数据时，数据库与缓存之间如何去维护数据一致性的方案。 换一个视角，从CAP理论视角来看，缓存属于AP系统，即保证分区容错和高可用，一致性采用最终一致性策略，所以，对于追求绝对一致性的场景，不适合引入缓存。">
+    <meta name="description" content="大模型基础概念大语言模型LLM大模型是Agent决策的大脑。为了帮助大家更好地进入 Agent 的学习状态，本文将重点盘点大模型相关的前置背景知识。下面，让我们一探究竟。大模型本身只能基于概率预测下一个词，通过文本与用户交互，无法根据决策结果主动执行动作，只能指导用户去操作。而Agent正是为大模型装上“手脚”，让它不仅具备思考能力，也能真正行动起来，从而将用户从繁琐的操作中解放出来。 当前的大语">
 <meta property="og:type" content="article">
-<meta property="og:title" content="缓存一致性策略">
-<meta property="og:url" content="http://xuxiusheng.github.io/2026/01/01/%E7%BC%93%E5%AD%98%E4%B8%80%E8%87%B4%E6%80%A7%E7%AD%96%E7%95%A5/index.html">
+<meta property="og:title" content="AI大模型基础">
+<meta property="og:url" content="http://xuxiusheng.github.io/2026/04/11/AI%E5%A4%A7%E6%A8%A1%E5%9E%8B%E5%9F%BA%E7%A1%80/index.html">
 <meta property="og:site_name" content="xxs不是小学生">
-<meta property="og:description" content="概念业务中通常使用MySQL作为持久化数据库，并使用缓存来提升系统性能，同时使用缓存和数据库会存在数据一致性问题，而缓存一致性策略，或者也可以叫做缓存读写策略，是指在写数据或读数据时，数据库与缓存之间如何去维护数据一致性的方案。 换一个视角，从CAP理论视角来看，缓存属于AP系统，即保证分区容错和高可用，一致性采用最终一致性策略，所以，对于追求绝对一致性的场景，不适合引入缓存。">
+<meta property="og:description" content="大模型基础概念大语言模型LLM大模型是Agent决策的大脑。为了帮助大家更好地进入 Agent 的学习状态，本文将重点盘点大模型相关的前置背景知识。下面，让我们一探究竟。大模型本身只能基于概率预测下一个词，通过文本与用户交互，无法根据决策结果主动执行动作，只能指导用户去操作。而Agent正是为大模型装上“手脚”，让它不仅具备思考能力，也能真正行动起来，从而将用户从繁琐的操作中解放出来。 当前的大语">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/13.png">
-<meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/14.png">
-<meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/15.png">
-<meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/16.png">
-<meta property="article:published_time" content="2026-01-01T08:00:00.000Z">
-<meta property="article:modified_time" content="2026-01-01T08:19:08.026Z">
+<meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/145.png">
+<meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/146.png">
+<meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/147.png">
+<meta property="og:image" content="http://xuxiusheng.github.io/img/article_img/148.png">
+<meta property="article:published_time" content="2026-04-11T14:20:00.000Z">
+<meta property="article:modified_time" content="2026-05-01T08:31:30.541Z">
 <meta property="article:author" content="xxs不是小学生">
-<meta property="article:tag" content="数据库">
-<meta property="article:tag" content="缓存">
+<meta property="article:tag" content="Agent">
+<meta property="article:tag" content="大模型">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://xuxiusheng.github.io/img/article_img/13.png">
+<meta name="twitter:image" content="http://xuxiusheng.github.io/img/article_img/145.png">
   
   
   
-  <title>缓存一致性策略 - xxs不是小学生</title>
+  <title>AI大模型基础 - xxs不是小学生</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -271,7 +271,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="缓存一致性策略"></span>
+            <span id="subtitle" data-typed-text="AI大模型基础"></span>
           
         </div>
 
@@ -282,8 +282,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2026-01-01 16:00" pubdate>
-          2026年1月1日 下午
+        <time datetime="2026-04-11 22:20" pubdate>
+          2026年4月11日 晚上
         </time>
       </span>
     
@@ -294,7 +294,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.9k 字
+          4.4k 字
         
       </span>
     
@@ -305,7 +305,7 @@
         
         
         
-          17 分钟
+          37 分钟
         
       </span>
     
@@ -342,108 +342,174 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">缓存一致性策略</h1>
+            <h1 id="seo-header">AI大模型基础</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h1><p>业务中通常使用MySQL作为持久化数据库，并使用缓存来提升系统性能，同时使用缓存和数据库会存在数据一致性问题，而缓存一致性策略，或者也可以叫做缓存读写策略，是指在写数据或读数据时，数据库与缓存之间如何去维护数据一致性的方案。</p>
-<p>换一个视角，从CAP理论视角来看，缓存属于AP系统，即保证分区容错和高可用，一致性采用最终一致性策略，所以，对于追求绝对一致性的场景，不适合引入缓存。</p>
+                <h1 id="大模型基础概念"><a href="#大模型基础概念" class="headerlink" title="大模型基础概念"></a>大模型基础概念</h1><h2 id="大语言模型LLM"><a href="#大语言模型LLM" class="headerlink" title="大语言模型LLM"></a>大语言模型LLM</h2><p>大模型是Agent决策的大脑。为了帮助大家更好地进入 Agent 的学习状态，本文将重点盘点大模型相关的前置背景知识。下面，让我们一探究竟。<br><img src="/img/article_img/145.png" srcset="/img/config/loading.gif" lazyload><br>大模型本身只能<strong>基于概率预测下一个词</strong>，通过文本与用户交互，无法根据决策结果主动执行动作，只能指导用户去操作。而Agent正是为大模型装上“手脚”，让它不仅具备思考能力，也能真正行动起来，从而将用户从繁琐的操作中解放出来。</p>
+<p>当前的大语言模型（Large Language Models，LLMs）几乎全部基于Transformer架构，兼具理解与生成能力，既能理解人类语言，也能生成相应的回复。“大”主要体现在两方面：</p>
+<ul>
+<li>预训练数据规模庞大，使模型能从中汲取海量世界知识。</li>
+<li>参数体量庞大（达数十亿甚至百亿级），足以承载这些知识。</li>
+</ul>
 <div class="note note-info">
-            <p>CAP理论：简单来说，一个分布式系统只能同时满足AP或者CP，不存在CAP系统，CA系统只存在于单机环境</p> <ul> <li>Consistency：强一致性，任何节点在任何时间返回的数据相同</li> <li>Availability：高可用，所有请求能够在有限时间内被响应，即使某些节点故障，依然能够返回有效数据（不一定是最新数据）</li> <li>Partition Tolerance：分区容错性，发生网络分区后能够继续提供服务</li> </ul> 
+            <p>大语言模型利用海量文本数据学习人类语言的结构、语法与语义，这一过程通常通过自监督学习完成。在自监督学习框架下，模型通过预测序列中的下一个词或标记来为输入数据生成标签，即根据已有上文预测后续内容，这种方式也被称为<strong>自回归</strong>（Auto-regression）。<br>训练过程主要分为两个阶段：<strong>预训练</strong>（Pre-training）与<strong>微调</strong>（Fine-tuning）。</p> <ul> <li>预训练阶段：模型从一个规模庞大、来源多样的数据集中学习，通常涵盖网站、书籍、文章等不同来源的数十亿词汇。该阶段使模型能够掌握通用的语言模式和表征。</li> <li>微调阶段：模型在与目标任务或领域相关的更小、更聚焦的数据集上继续训练。这有助于模型进一步调整其语言理解能力，以更好地适应具体任务的特殊要求。</li> </ul> 
+          </div>
+<p>当前的大语言模型几乎全部基于Transformer架构，下面我们来简要介绍一下这一核心架构。</p>
+<h2 id="Transformer架构"><a href="#Transformer架构" class="headerlink" title="Transformer架构"></a>Transformer架构</h2><p>参考<a target="_blank" rel="noopener" href="https://blog.eimoon.com/p/transformer-explained/">Transformer</a>，我觉得写的超级详细。</p>
+<p><img src="/img/article_img/146.png" srcset="/img/config/loading.gif" lazyload></p>
+<p>Transformer架构主要由编码器（左）和解码器（右）两大组件构成。其中，编码器负责理解输入信息，解码器则负责生成输出序列。接下来，我们顺着数据流转的方向，从输入端，即编码器部分开始，逐步剖析Transformer的内部运作机制。本文以中英翻译为例，中文（我是一个学生）翻译为英文（I am a student）。</p>
+<h3 id="文本数值化"><a href="#文本数值化" class="headerlink" title="文本数值化"></a>文本数值化</h3><p>计算机只能处理数字，无法直接理解自然语言。因此，处理文本的第一步是将其转换为数字形式。这一转换过程称为“标记化”（Tokenization），它会依据预定义的词表，将文本中的每个词元与一个唯一的数字标识一一对应起来。完成映射后，模型会将这些Token ID转换为富含语义信息的高维嵌入向量，作为后续前向传播过程的输入。<br><img src="/img/article_img/147.png" srcset="/img/config/loading.gif" lazyload></p>
+<h3 id="位置编码"><a href="#位置编码" class="headerlink" title="位置编码"></a>位置编码</h3><p>Transformer的核心是自注意力机制。它的强大之处在于能同时关注句子中的所有词，一步到位地捕捉它们之间的关系。但这种“全局视野”也带来一个致命问题：它完全不关心词的顺序。在模型看来，“猫追老鼠”和“老鼠追猫”毫无区别。解决方案是<strong>位置编码</strong>。做法很简单：为每个位置生成一个代表“坐标”的向量，直接加到词嵌入上。这样，每个词的输入向量就同时包含了“它是什么”和“它在哪里”两种信息。模型也因此具备了感知顺序的能力。位置编码的维度与嵌入向量维度相同。以绝对位置编码为例，第pos 个词向量的第i个索引对应的数值定义如下：<br><img src="/img/article_img/148.png" srcset="/img/config/loading.gif" lazyload></p>
+
+<div id="pe-viz-container" style="max-width: 800px; margin: 20px auto; font-family: sans-serif; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); color: #333;">
+    <h4 style="text-align: center; margin-bottom: 20px;">Transformer 位置编码 (Positional Encoding) 可视化</h4>
+    
+    <div style="display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 20px; justify-content: center; background: #f9f9f9; padding: 15px; border-radius: 6px;">
+        <div style="display: flex; flex-direction: column; align-items: center;">
+            <label style="font-size: 14px; font-weight: bold; margin-bottom: 5px;">序列长度 (Sequence Length): <span id="len-val">50</span></label>
+            <input type="range" id="seq-len" min="10" max="100" value="50" style="width: 150px;">
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center;">
+            <label style="font-size: 14px; font-weight: bold; margin-bottom: 5px;">嵌入维度 (d_model): <span id="dim-val">64</span></label>
+            <input type="range" id="d-model" min="16" max="128" step="2" value="64" style="width: 150px;">
+        </div>
+        <div style="align-self: flex-end; font-size: 12px; color: #666;">
+            * 点击下方热力图的列可切换波形展示
+        </div>
+    </div>
+
+    <div id="heatmap-area" style="overflow-x: auto; text-align: center; margin-bottom: 30px;">
+        <div style="font-size: 13px; font-weight: bold; margin-bottom: 5px;">位置编码矩阵 (y:位置, x:维度)</div>
+        <svg id="pe-heatmap"/>
+    </div>
+
+    <div id="wave-area" style="text-align: center;">
+        <div id="wave-title" style="font-size: 13px; font-weight: bold; margin-bottom: 5px;">维度 i=0 的正弦/余弦波形</div>
+        <svg id="pe-wave"/>
+    </div>
+</div>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+(function() {
+    let selectedDim = 0;
+    const margin = {top: 20, right: 30, bottom: 40, left: 40};
+    
+    function updateViz() {
+        const seqLen = +d3.select("#seq-len").property("value");
+        const dModel = +d3.select("#d-model").property("value");
+        d3.select("#len-val").text(seqLen);
+        d3.select("#dim-val").text(dModel);
+        
+        if (selectedDim >= dModel) selectedDim = 0;
+        drawHeatmap(seqLen, dModel);
+        drawWave(seqLen, dModel, selectedDim);
+    }
+
+    function calculatePE(pos, i, dModel) {
+        const divTerm = Math.pow(10000, (2 * Math.floor(i / 2)) / dModel);
+        return i % 2 === 0 ? Math.sin(pos / divTerm) : Math.cos(pos / divTerm);
+    }
+
+    function drawHeatmap(seqLen, dModel) {
+        const width = Math.min(700, window.innerWidth - 80);
+        const height = 300;
+        const cellSizeW = width / dModel;
+        const cellSizeH = height / seqLen;
+
+        const svg = d3.select("#pe-heatmap")
+            .attr("width", width)
+            .attr("height", height);
+        
+        svg.selectAll("*").remove();
+
+        const colorScale = d3.scaleDiverging()
+            .domain([-1, 0, 1])
+            .interpolator(d3.interpolateRdBu);
+
+        for (let pos = 0; pos < seqLen; pos++) {
+            for (let i = 0; i < dModel; i++) {
+                const val = calculatePE(pos, i, dModel);
+                svg.append("rect")
+                    .attr("x", i * cellSizeW)
+                    .attr("y", pos * cellSizeH)
+                    .attr("width", cellSizeW)
+                    .attr("height", cellSizeH)
+                    .attr("fill", colorScale(val))
+                    .on("mousedown", () => {
+                        selectedDim = i;
+                        drawWave(seqLen, dModel, i);
+                    })
+                    .append("title")
+                    .text(`位置: ${pos}, 维度: ${i}, 值: ${val.toFixed(3)}`);
+            }
+        }
+    }
+
+    function drawWave(seqLen, dModel, dim) {
+        d3.select("#wave-title").text(`维度 i=${dim} (${dim % 2 === 0 ? '正弦' : '余弦'}) 的波形`);
+        
+        const width = Math.min(700, window.innerWidth - 80);
+        const height = 200;
+        const innerWidth = width - margin.left - margin.right;
+        const innerHeight = height - margin.top - margin.bottom;
+
+        const svg = d3.select("#pe-wave")
+            .attr("width", width)
+            .attr("height", height);
+        
+        svg.selectAll("*").remove();
+
+        const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
+
+        const x = d3.scaleLinear().domain([0, seqLen - 1]).range([0, innerWidth]);
+        const y = d3.scaleLinear().domain([-1.1, 1.1]).range([innerHeight, 0]);
+
+        g.append("g")
+            .attr("transform", `translate(0,${innerHeight})`)
+            .call(d3.axisBottom(x).ticks(10));
+        
+        g.append("g").call(d3.axisLeft(y).ticks(5));
+
+        const data = d3.range(seqLen).map(pos => ({pos, val: calculatePE(pos, dim, dModel)}));
+
+        const line = d3.line()
+            .x(d => x(d.pos))
+            .y(d => y(d.val))
+            .curve(d3.curveMonotoneX);
+
+        g.append("path")
+            .datum(data)
+            .attr("fill", "none")
+            .attr("stroke", "#4682b4")
+            .attr("stroke-width", 2.5)
+            .attr("d", line);
+
+        g.selectAll(".dot")
+            .data(data)
+            .enter().append("circle")
+            .attr("cx", d => x(d.pos))
+            .attr("cy", d => y(d.val))
+            .attr("r", 3)
+            .attr("fill", "#4682b4");
+    }
+
+    d3.select("#seq-len").on("input", updateViz);
+    d3.select("#d-model").on("input", updateViz);
+    
+    updateViz();
+    window.addEventListener("resize", updateViz);
+})();
+</script>
+
+
+<div class="note note-info">
+            <p>位置编码分为绝对位置编码和相对位置编码：</p> <ul> <li>绝对位置编码：给每个位置生成一个固定的向量加到词向量上（如正弦&#x2F;余弦编码）</li> <li>相对位置编码：在计算注意力分数时，直接加入两个词汇之间的距离信息</li> </ul> <p>绝对位置编码有两大主要缺陷：</p> <ul> <li>外推性差：外推性是指模型在处理更长的序列时的泛化能力<ul> <li>可学习的绝对编码： 受到预设矩阵大小的严格限制。如果模型训练时最大长度设为 512，那么在推理时如果遇到第 513 个词，模型将直接报错或无法处理，因为它根本没有第 513 个位置的编码向量</li> <li>正弦&#x2F;余弦绝对编码： 虽然数学公式允许无限延伸，理论上可以生成任意位置的编码，但在实际应用中，模型在训练阶段从未见过超出长度的编码组合。因此，在未知的长区间内，注意力机制无法正确分配权重，导致性能断崖式下跌</li> </ul> </li> <li>绝对位置编码直接加在词向量上，当序列较长时，位置编码的数值可能与词向量的语义信息相互干扰，影响表征质量。</li> </ul> 
           </div>
 
-<h1 id="三大策略"><a href="#三大策略" class="headerlink" title="三大策略"></a>三大策略</h1><h2 id="旁路缓存模式"><a href="#旁路缓存模式" class="headerlink" title="旁路缓存模式"></a>旁路缓存模式</h2><h3 id="写场景"><a href="#写场景" class="headerlink" title="写场景"></a>写场景</h3><ul>
-<li>更新DB</li>
-<li>删除cache</li>
-</ul>
-<p><img src="/img/article_img/13.png" srcset="/img/config/loading.gif" lazyload></p>
-<table style="width: 100%; border-collapse: collapse;">
-<thead>
-<tr>
-<th style="width: 15%; text-align: left; padding: 8px; border: 1px solid #ddd;">策略</th>
-<th style="width: 60%; text-align: left; padding: 8px; border: 1px solid #ddd;">一致性风险</th>
-<th style="width: 10%; text-align: center; padding: 8px; border: 1px solid #ddd;">推荐度</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="padding: 8px; border: 1px solid #ddd;"><strong>先更新缓存，再更新数据库</strong></td>
-<td style="padding: 8px; border: 1px solid #ddd;">⚠️ <strong>高风险</strong>：缓存更新成功，数据库更新失败 → 缓存新值，数据库旧值</td>
-<td style="padding: 8px; border: 1px solid #ddd; text-align: center;">❌ 不推荐</td>
-</tr>
-<tr>
-<td style="padding: 8px; border: 1px solid #ddd;"><strong>先更新数据库，再更新缓存</strong></td>
-<td style="padding: 8px; border: 1px solid #ddd;">⚠️ <strong>高风险</strong>：数据库更新成功，缓存更新失败 → 数据库新值，缓存旧值</td>
-<td style="padding: 8px; border: 1px solid #ddd; text-align: center;">❌ 不推荐</td>
-</tr>
-<tr>
-<td style="padding: 8px; border: 1px solid #ddd;"><strong>先删除缓存，再更新数据库</strong></td>
-<td style="padding: 8px; border: 1px solid #ddd;">⚠️ <strong>高并发下风险高</strong>：读请求可能读到旧值并写入缓存</td>
-<td style="padding: 8px; border: 1px solid #ddd; text-align: center;">❌ 不推荐</td>
-</tr>
-<tr>
-<td style="padding: 8px; border: 1px solid #ddd;"><strong>先更新数据库，再删除缓存</strong></td>
-<td style="padding: 8px; border: 1px solid #ddd;">⚠️ <strong>风险低</strong>：理论上存在不一致，但概率极小</td>
-<td style="padding: 8px; border: 1px solid #ddd; text-align: center;">✅ 推荐</td>
-</tr>
-</tbody>
-</table>
-
-<p><strong>为什么先更新DB，再删除Cache？</strong> 先删除Cache，再更新DB可以吗，<strong>当然不可以</strong>，数据一致性风险很高，考虑下边这个场景：</p>
-<ol>
-<li>客户端A发起写请求，删除Cache</li>
-<li>客户端B发起读请求，发现Cache不在，查询DB并写入缓存（缓存旧值）</li>
-<li>客户端A写DB（DB新值）</li>
-</ol>
-<p>所以，采用<strong>先删后写</strong>的策略，那先删后写一定可以保证数据一致性嘛？不能够完全保证，但是！<strong>出现一致性问题的概率很低</strong></p>
-<ol>
-<li>客户端A发起读请求，没有命中缓存，查询DB</li>
-<li>客户端B发起写请求，没有命中缓存，写DB（DB新值）</li>
-<li>客户端A将查询到的数据写缓存（缓存旧值）</li>
-</ol>
-<p>以上场景会出现数据一致性问题，但是为什么说概率很小呢？</p>
-<ul>
-<li>两个请求需要命中同一份数据且数据在缓存中不存在</li>
-<li>13执行时间远小于2执行时间，但是13是读DB+写缓存，2是写DB，缓存写的时间要远小于硬盘写，前者纳秒级，后者毫秒级</li>
-</ul>
-<p>那这么说的话，为什么是删缓存而不是直接写缓存呢？<strong>删除操作执行速度更快</strong>，在多写情况下，频繁更新容易出现瓶颈</p>
-<h3 id="读场景"><a href="#读场景" class="headerlink" title="读场景"></a>读场景</h3><ul>
-<li>读Cache，未命中读DB</li>
-<li>数据加载到Cache<br><img src="/img/article_img/14.png" srcset="/img/config/loading.gif" lazyload></li>
-</ul>
-<p>旁路缓存模式下，DB和Cache操作是同步的，因为需要<strong>保证缓存写和DB写的顺序一致</strong>，因此旁路缓存不适合多写场景，而且频繁的删除会影响缓存命中率；此外，首次请求的数据一定不在Cache中</p>
-<p>有杠精要问了，那我一定要先删缓存再写DB呢？怎么办？<strong>延时双删！！！！</strong><br>先说一句，如果是强一致场景，必须先写DB，再删缓存，先删再写适合于能容忍一定程度不一致的场景，延时双删是指删除缓存之后，间隔一小段时间再次进行删除，中间的这段间隔存在数据不一致风险，因此这个间隔需要尽可能地小，但同时也要保证间隔时间大于写DB的时间</p>
-<h2 id="读写穿透"><a href="#读写穿透" class="headerlink" title="读写穿透"></a>读写穿透</h2><p>读写穿透和旁路缓存一样，区别只在于将操作DB的任务交给了缓存去做，不需要RD去操作DB，完全面向缓存</p>
-<h3 id="写场景-1"><a href="#写场景-1" class="headerlink" title="写场景"></a>写场景</h3><p><img src="/img/article_img/15.png" srcset="/img/config/loading.gif" lazyload></p>
-<h3 id="读场景-1"><a href="#读场景-1" class="headerlink" title="读场景"></a>读场景</h3><p><img src="/img/article_img/16.png" srcset="/img/config/loading.gif" lazyload></p>
-<h2 id="异步写入"><a href="#异步写入" class="headerlink" title="异步写入"></a>异步写入</h2><p>之前也说了，旁路缓存和读写穿透DB和缓存属于同步操作，在高并发写场景下性能极差，异步缓存写入思想很简单，就是同步更新缓存，异步写DB，但是这种方案的一致性风险很高，因此需要额外的机制保证异步写DB一定成功，分布式系统主从同步、MySQL的Buffer Pool刷盘都用到了异步写入</p>
-<h1 id="删除缓存重试机制"><a href="#删除缓存重试机制" class="headerlink" title="删除缓存重试机制"></a>删除缓存重试机制</h1><p>上边说的三种一致性策略，无论是删除还是写入，其实都存在由于各种各样原因导致失败的情况，比如删除缓存失败，一旦失败，除非后续有新的写请求，否则缓存中的一直是旧值，可以通过缓存删除重试来解决这个问题。</p>
-
-<pre>
-<code class="mermaid">
-flowchart TD
-    A[应用服务: 更新数据库] --> B[应用服务: 尝试删除缓存]
-    B --> C{删除是否成功?}
-    C -- 是 --> D[流程结束]
-    C -- 否/异常 --> E[应用服务: 发送删除消息到消息队列]
-
-    E --> F[消息队列持久化存储消息]
-
-    F --> G[重试消费者: 拉取消息]
-    G --> H[重试消费者: 尝试删除缓存]
-    H --> I{删除是否成功?}
-    I -- 是 --> J[重试消费者: 确认消费消息从队列移除]
-    I -- 否 --> K[重试消费者: 消息处理失败]
-
-    K --> L{重试次数超过上限?}
-    L -- 否 --> M[消息队列: 重新投递消息等待下一次重试]
-    L -- 是 --> N[重试消费者: 放入死信队列并告警人工介入]
-
-    M --> G
-</code>
-</pre>
-<h1 id="一种无侵入式一致性解决方案"><a href="#一种无侵入式一致性解决方案" class="headerlink" title="一种无侵入式一致性解决方案"></a>一种无侵入式一致性解决方案</h1><p>通过监听MySQL binlog，自动触发缓存删除，本质上属于异步写入策略，但是其对业务代码没有侵入性，高并发性能很好</p>
+<h3 id="编码器模块"><a href="#编码器模块" class="headerlink" title="编码器模块"></a>编码器模块</h3><p>Transformer 的编码器由多个相同的模块堆叠而成，每个模块内部主要包含两个子层：自注意力层和前馈神经网络层。</p>
 
                 
               </div>
@@ -462,7 +528,7 @@ flowchart TD
     
       <span class="category-chain">
         
-  <a href="/categories/Redis/" class="category-chain-item">Redis</a>
+  <a href="/categories/Agent/" class="category-chain-item">Agent</a>
   
   
 
@@ -477,9 +543,9 @@ flowchart TD
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/%E7%BC%93%E5%AD%98/" class="print-no-link">#缓存</a>
+        <a href="/tags/Agent/" class="print-no-link">#Agent</a>
       
-        <a href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/" class="print-no-link">#数据库</a>
+        <a href="/tags/%E5%A4%A7%E6%A8%A1%E5%9E%8B/" class="print-no-link">#大模型</a>
       
     </div>
   
@@ -491,8 +557,8 @@ flowchart TD
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>缓存一致性策略</div>
-      <div>http://xuxiusheng.github.io/2026/01/01/缓存一致性策略/</div>
+      <div>AI大模型基础</div>
+      <div>http://xuxiusheng.github.io/2026/04/11/AI大模型基础/</div>
     </div>
     <div class="license-meta">
       
@@ -504,7 +570,7 @@ flowchart TD
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2026年1月1日</div>
+          <div>2026年4月11日</div>
         </div>
       
       
@@ -531,29 +597,6 @@ flowchart TD
 
 
 
-              
-                <div class="post-prevnext my-3">
-                  <article class="post-prev col-6">
-                    
-                    
-                      <a href="/2026/01/01/Redis%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B/" title="Redis基本数据类型">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Redis基本数据类型</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
-                  </article>
-                  <article class="post-next col-6">
-                    
-                    
-                      <a href="/2026/01/01/TCP%E7%B2%98%E5%8C%85%E9%97%AE%E9%A2%98/" title="TCP粘包问题">
-                        <span class="hidden-mobile">TCP粘包问题</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
-                    
-                  </article>
-                </div>
               
             </div>
 
@@ -636,21 +679,6 @@ flowchart TD
 
   
 
-
-
-  <script>
-  Fluid.utils.createScript('https://lib.baomitu.com/mermaid/11.10.1/mermaid.min.js', function() {
-    mermaid.initialize({"theme":"default","flowchart":{"useMaxWidth":false}});
-
-    Fluid.utils.listenDOMLoaded(function() {
-      Fluid.events.registerRefreshCallback(function() {
-        if ('mermaid' in window) {
-          mermaid.init();
-        }
-      });
-    });
-  });
-</script>
 
 
 
