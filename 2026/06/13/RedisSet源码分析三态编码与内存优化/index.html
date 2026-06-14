@@ -1,0 +1,988 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/config/fluid.png">
+  <link rel="icon" href="/img/config/personal.jpg">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="xxs不是小学生">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="在使用 Redis 时，Set 可能是最”不起眼”的数据结构——SADD 加元素，SINTER 求交集，几十个元素的小集合用起来毫不费力。但如果你打开 OBJECT ENCODING 看一眼，会发现 Redis 并不是简单地在每个 Set 里塞一个哈希表：它有时返回 intset，有时返回 listpack，有时才是 hashtable。              Redis 7.2之前，Set只">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis Set 源码分析：三态编码与内存优化">
+<meta property="og:url" content="http://xuxiusheng.github.io/2026/06/13/RedisSet%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B8%89%E6%80%81%E7%BC%96%E7%A0%81%E4%B8%8E%E5%86%85%E5%AD%98%E4%BC%98%E5%8C%96/index.html">
+<meta property="og:site_name" content="xxs不是小学生">
+<meta property="og:description" content="在使用 Redis 时，Set 可能是最”不起眼”的数据结构——SADD 加元素，SINTER 求交集，几十个元素的小集合用起来毫不费力。但如果你打开 OBJECT ENCODING 看一眼，会发现 Redis 并不是简单地在每个 Set 里塞一个哈希表：它有时返回 intset，有时返回 listpack，有时才是 hashtable。              Redis 7.2之前，Set只">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-06-13T14:40:00.000Z">
+<meta property="article:modified_time" content="2026-06-14T12:48:47.827Z">
+<meta property="article:author" content="xxs不是小学生">
+<meta property="article:tag" content="Redis">
+<meta property="article:tag" content="源码">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>Redis Set 源码分析：三态编码与内存优化 - xxs不是小学生</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/cnblogs/iconfont.css">
+<link rel="stylesheet" href="/css/email/iconfont.css">
+<link rel="stylesheet" href="/css/card.css">
+<link rel="stylesheet" href="/css/CV/iconfont.css">
+<link rel="stylesheet" href="/css/partial_encrypt.css">
+<link rel="stylesheet" href="/css/runtime.css">
+<link rel="stylesheet" href="/css/cv.css">
+<link rel="stylesheet" href="/css/articles/iconfont.css">
+<link rel="stylesheet" href="/css/reading/iconfont.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"xuxiusheng.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/config/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":"2HT5rmC5XQuRugoXS6jx93oG-gzGzoHsz","app_key":"34FVPpMZGQcLXWdGF6FnOx9T","server_url":"https://2ht5rmc5.lc-cn-n1-shared.com","path":"window.location.pathname","ignore_local":true},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 8.1.1"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>xxs不是小学生のBlog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" target="_self" href="javascript:;" role="button"
+                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="icon iconfont icon-wenzhangshezhi"></i>
+                <span>文章</span>
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/archives/" target="_self">
+                    <i class="iconfont icon-archive-fill"></i>
+                    <span>归档</span>
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/categories/" target="_self">
+                    <i class="iconfont icon-category-fill"></i>
+                    <span>分类</span>
+                  </a>
+                
+                  
+                  
+                  
+                  <a class="dropdown-item" href="/tags/" target="_self">
+                    <i class="iconfont icon-tags-fill"></i>
+                    <span>标签</span>
+                  </a>
+                
+              </div>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" target="_self">
+                <i class="icon iconfont icon-yuedu"></i>
+                <span>读书笔记</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>友链</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/CV/" target="_self">
+                <i class="icon iconfont icon-jianli"></i>
+                <span>CV</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/config/main_3.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Redis Set 源码分析：三态编码与内存优化"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-06-13 22:40" pubdate>
+          2026年6月13日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          7.1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          60 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Redis Set 源码分析：三态编码与内存优化</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>在使用 Redis 时，Set 可能是最”不起眼”的数据结构——<code>SADD</code> 加元素，<code>SINTER</code> 求交集，几十个元素的小集合用起来毫不费力。但如果你打开 <code>OBJECT ENCODING</code> 看一眼，会发现 Redis 并不是简单地在每个 Set 里塞一个哈希表：它有时返回 <code>intset</code>，有时返回 <code>listpack</code>，有时才是 <code>hashtable</code>。</p>
+<div class="note note-info">
+            <p>Redis 7.2之前，Set只有intset和hashtable两种底层结构，7.2版本之后引入了listpack作为混合类型小集合的底层结构。</p> 
+          </div>
+
+<p>这背后是 Redis 最核心的内存优化哲学：<strong>一个数据结构的”最佳实现”不是绝对的，取决于它处于什么样的规模和包含什么样的元素。</strong> 小集合用哈希表是浪费，大集合用数组是灾难。Redis 的做法是让 Set 在三种内部编码之间自适应切换，处处体现着系统编程中”用少量 CPU 换大量内存（时间换空间）”的经典权衡。</p>
+<h2 id="设计问题：为什么需要三种编码？"><a href="#设计问题：为什么需要三种编码？" class="headerlink" title="设计问题：为什么需要三种编码？"></a>设计问题：为什么需要三种编码？</h2><p>在讨论代码之前，先想一个问题：如果 Redis 用一个统一的数据结构存所有 Set，会有什么问题？</p>
+<p>用哈希表存一切，O(1) 的增删查确实快。但 Redis 作为内存数据库，内存即成本。一个普通的哈希表条目（dictEntry）在 64 位系统上是 24 字节（key 指针 8 + value 联合体 8 + next 指针 8），这还没算哈希桶数组本身的开销。你存一个 3 字节的字符串 “foo”，光是存储它的结构体就要 24 字节，再加上 SDS 字符串本身的内存，开销是数据的十倍以上。</p>
+<p>但也不能一刀切用紧凑数组。数组在元素少时省内存（无指针开销），但在上千个元素时 O(N) 的查找会让 <code>SISMEMBER</code> 慢得不可接受。更何况 Set 的元素可以是任意字符串，纯整数数组根本存不了 “hello”。</p>
+<p>Redis 的选择是把”用哪种数据结构”的决定延迟到运行时，通过<strong>两个维度的判断</strong>来动态选择：</p>
+<table>
+<thead>
+<tr>
+<th>判断维度</th>
+<th>阈值配置</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>元素是否全是整数？</td>
+<td>无配置（运行时判断）</td>
+<td>是 → 优先考虑 intset；否 → listpack 或 HT</td>
+</tr>
+<tr>
+<td>元素数量有多少？</td>
+<td><code>set-max-intset-entries</code>（默认 512）</td>
+<td>≤512 且全整数 → intset</td>
+</tr>
+<tr>
+<td>元素数量 + 单大小？</td>
+<td><code>set-max-listpack-entries</code>（默认 128）<br><code>set-max-listpack-value</code>（默认 32B）</td>
+<td>都满足 → listpack；否则 → HT</td>
+</tr>
+</tbody></table>
+
+<pre>
+<code class="mermaid">
+flowchart TD
+    START([开始]) --> CHECK{小数据量且全为整数?}
+    
+    CHECK -->|是| INTSET["INTSET\n有序数组\n2/4/8字节宽度自适应\n二分查找 O(log N)"]
+    CHECK -->|否,存在非整数| LISTPACK["LISTPACK\n连续内存块,变长编码\n线性查找 O(N)\nN小可接受"]
+    
+    INTSET -->|触发条件1: 加入第一个非整数字符串| LISTPACK
+    INTSET -->|触发条件2: 超过512个整数| HT["HT\n哈希表\nO(1)查找\ntagged pointer省value字段"]
+    
+    LISTPACK -->|触发条件: 超过128个元素 或 某个元素超过32字节| HT
+    
+    HT --> END1([大数据量稳定状态])
+    LISTPACK --> END2([小数据量混合类型稳定状态])
+    INTSET --> END3([小数据量纯整数稳定状态])
+    
+    style INTSET fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px,color:#1b5e20
+    style LISTPACK fill:#fff9c4,stroke:#f57f17,stroke-width:2px,color:#e65100
+    style HT fill:#ffccbc,stroke:#bf360c,stroke-width:2px,color:#bf360c
+    style CHECK fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+    style START fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+    style END1 fill:#ffccbc,stroke:#bf360c,stroke-width:1px,color:#bf360c
+    style END2 fill:#fff9c4,stroke:#f57f17,stroke-width:1px,color:#e65100
+    style END3 fill:#c8e6c9,stroke:#2e7d32,stroke-width:1px,color:#1b5e20
+</code>
+</pre>
+
+<p>综上，Set底层结构变更规则如下：</p>
+<ul>
+<li>小数据量（小于512）且均为整数：intset</li>
+<li>小数据量（小于128）且存在字符串：listpack</li>
+<li>大数据量：hashtable</li>
+</ul>
+<div class="note note-warning">
+            <p>没有万能的数据结构，只有最适配应用场景的数据结构，底层结构的升级是单向的，以避免底层结构频繁变换导致时间延迟。</p> <p>listpack和intset的转化阈值不同根本在于intset通过二分查找数据，而listpack是线性搜索，所以转化阈值设置的相对较低。</p> 
+          </div>
+
+<h2 id="Intset"><a href="#Intset" class="headerlink" title="Intset"></a>Intset</h2><h3 id="intset-的自适应宽度设计"><a href="#intset-的自适应宽度设计" class="headerlink" title="intset 的自适应宽度设计"></a>intset 的自适应宽度设计</h3><p>intset 是整个 Set 实现中最精巧的数据结构。它的设计动机很明确：如果几个整数就能完成任务，为什么要动用哈希表？</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">intset</span> &#123;</span><br>    <span class="hljs-type">uint32_t</span> encoding;   <span class="hljs-comment">// 每个元素的字节数：2、4 或 8</span><br>    <span class="hljs-type">uint32_t</span> length;     <span class="hljs-comment">// 元素个数</span><br>    <span class="hljs-type">int8_t</span> contents[];   <span class="hljs-comment">// 柔性数组，紧跟结构体头部</span><br>&#125; intset;<br></code></pre></td></tr></table></figure>
+
+<p><strong>为什么 encoding 存字节数而不是枚举值？</strong> 假设 encoding 存 <code>0=INT16, 1=INT32, 2=INT64</code>，每次计算”第 N 个元素的偏移地址”都需要走分支判断偏移量。直接存 <code>sizeof(int16_t)=2</code> 等值，偏移公式直接就是 <code>offset = N * encoding</code>，省掉分支判断，对热路径上的二分查找非常重要。</p>
+<div class="note note-info">
+            <p>补充一点，redis内部存储统一使用小端序，绝大多数生产环境本身就是小端序。选择小端序可以让Redis在内存中处理数据时，无需进行额外的字节序转换，从而获得更好的性能。之所以需要统一字节序是为了跨平台兼容因为redis是一个分布式服务，同一个集群的机器节点字节序可能不统一，避免不同节点直接的数据解析错误。</p> <ul> <li>小端序的优势在于从低位开始计算的硬件效率，CPU可以在读取第一个字节后立即开始计算，无需等待所有字节加载完毕。在大端序下，则必须等待所有字节到达才能从高位开始运算</li> <li>网络传输采用大端序主要是历史原因，采用大端序可以在接收到头部数据后快速判断报文类型、长度等关键信息，因此当时的TCP&#x2F;IP协议制定的时候采用了大端序</li> </ul> 
+          </div>
+
+<h3 id="intset编码升级"><a href="#intset编码升级" class="headerlink" title="intset编码升级"></a>intset编码升级</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs c">intset *<span class="hljs-title function_">intsetAdd</span><span class="hljs-params">(intset *is, <span class="hljs-type">int64_t</span> value, <span class="hljs-type">uint8_t</span> *success)</span> &#123;<br>    <span class="hljs-type">uint8_t</span> valenc = _intsetValueEncoding(value);<br>    <span class="hljs-comment">//...</span><br>    <span class="hljs-keyword">if</span> (valenc &gt; intrev32ifbe(is-&gt;encoding)) &#123;<br>        <span class="hljs-keyword">return</span> intsetUpgradeAndAdd(is,value);<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>        <span class="hljs-comment">/* Abort if the value is already present in the set.</span><br><span class="hljs-comment">         * This call will populate &quot;pos&quot; with the right position to insert</span><br><span class="hljs-comment">         * the value when it cannot be found. */</span><br>        <span class="hljs-keyword">if</span> (intsetSearch(is,value,&amp;pos)) &#123;<br>            <span class="hljs-keyword">if</span> (success) *success = <span class="hljs-number">0</span>;<br>            <span class="hljs-keyword">return</span> is;<br>        &#125;<br>    <span class="hljs-comment">// ...</span><br>    <span class="hljs-keyword">return</span> is;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>升级前：encoding&#x3D;2(INT16), length&#x3D;3, contents&#x3D;[1, 3, 5]</p>
+
+<pre>
+<code class="mermaid">
+flowchart LR
+    subgraph Header [8字节头部]
+        A["encoding<br>4字节<br>0x02 0x00 0x00 0x00"]
+        B["length<br>4字节<br>0x03 0x00 0x00 0x00"]
+    end
+
+    subgraph Data [6字节数据]
+        C["[0]<br>0x01 0x00"]
+        D["[1]<br>0x03 0x00"]
+        E["[2]<br>0x05 0x00"]
+    end
+
+    Header --> Data
+</code>
+</pre>
+
+<p>加入 65536，超出 INT16 集合（范围 [-32768, 32767]），触发编码升级，升级后：</p>
+
+<pre>
+<code class="mermaid">
+flowchart LR
+    subgraph Header [8字节头部]
+        A["encoding<br>4字节<br>0x04 0x00 0x00 0x00"]
+        B["length<br>4字节<br>0x04 0x00 0x00 0x00"]
+    end
+
+    subgraph Data [16字节数据]
+        C["[0]<br>0x01 0x00 0x00 0x00"]
+        D["[1]<br>0x03 0x00 0x00 0x00"]
+        E["[2]<br>0x05 0x00 0x00 0x00"]
+        F["[3]<br>0x00 0x00 0x01 0x00"]
+    end
+
+    Header --> Data
+</code>
+</pre>
+
+<p>intset编码升级后需要将原始intset的已有数据和新数据写入到新的位置，升级扩容时是优先<strong>原地扩容</strong>。<strong>在移动数据时，是从后向前遍历</strong>，因为新旧编码宽度不同，正向遍历会导致写入位置覆盖尚未移动的旧数据。从后向前保证每个位置的源数据在被读取之前不会被新数据覆盖。<br>编码升级后插入新数据时不需要二分查找插入位置，因为新数据的插入位置只能是开头或者末尾，因为如果触发编码升级，一定是小于当前编码的最小值或者大于当前编码的最大值。</p>
+<div class="note note-warning">
+            <p><strong>一个重要的设计选择：编码只升级不降级。</strong> 即使删除了导致升级的那个超大值，编码仍保留在 INT32。Redis 认为，降级需要遍历所有元素验证”是否还能用小编码”，然后重新分配和拷贝整块内存，CPU 代价不小。而实际生产环境中，留着一个稍大的编码多占几十到几百字节，比每次删除都去检查降级条件更划算。这是内存数据库经典的 tradeoff：<strong>省 CPU 就是在省延迟，而内存省到一定程度就够了。</strong></p> 
+          </div>
+
+<h2 id="Hashtable"><a href="#Hashtable" class="headerlink" title="Hashtable"></a>Hashtable</h2><h3 id="dict-的-tagged-pointer-零分配优化"><a href="#dict-的-tagged-pointer-零分配优化" class="headerlink" title="dict 的 tagged pointer 零分配优化"></a>dict 的 tagged pointer 零分配优化</h3><p>当 Set 规模变大（超过 128 个元素或某个元素超过 32 字节），编码升级到 HT（哈希表）。Set 只需要 key（元素值），不需要 value。dict 为此实现了一套基于 tagged pointer 的存储优化：<strong>在负载因子 1.0 左右时，绝大多数元素的存储零额外分配。</strong></p>
+<div class="note note-warning">
+            <p>C语言中如果一个指针指向NULL，其值为全0</p> 
+          </div>
+
+<p>理解 tagged pointer 之前，必须先看清 dict 的物理布局。dict 的核心是两张哈希表：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">dict</span> &#123;</span><br>    dictType *type;<br>    dictEntry **ht_table[<span class="hljs-number">2</span>];   <span class="hljs-comment">// 两张哈希表，每张是一个&quot;桶数组&quot;</span><br>    <span class="hljs-type">unsigned</span> <span class="hljs-type">long</span> ht_used[<span class="hljs-number">2</span>];  <span class="hljs-comment">// 每张表的元素数量</span><br>    <span class="hljs-type">long</span> rehashidx;            <span class="hljs-comment">// -1 表示不在 rehash，≥0 表示正在渐进式搬迁</span><br>    <span class="hljs-type">signed</span> <span class="hljs-type">char</span> ht_size_exp[<span class="hljs-number">2</span>]; <span class="hljs-comment">// 桶数以 2 为底的指数：桶数 = 1 &lt;&lt; exp</span><br>&#125;;<br></code></pre></td></tr></table></figure>
+<p>正常状态下只有 <code>ht_table[0]</code> 在使用，<code>ht_table[1]</code> 为空。当负载因子触发扩容时，<code>ht_table[1]</code> 被分配为更大的一张表，然后通过渐进式 rehash 逐桶将元素从 table[0] 迁移到 table[1]，完成后 table[1] 变成新的 table[0]。</p>
+<p>每张哈希表本质上是一个 <strong><code>dictEntry*</code> 类型的数组</strong>，数组的每个槽位（bucket）存一个指针，这个指针指向该桶上的链表：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs text">ht_table[0] (dictEntry* 数组):<br>  bucket[0] → NULL<br>  bucket[1] → [key:&quot;foo&quot; | next] → [key:&quot;bar&quot; | next] → NULL   ← 碰撞链<br>  bucket[2] → [key:&quot;baz&quot; | next] → NULL                         ← 单元素链<br>  bucket[3] → NULL<br>  ...<br></code></pre></td></tr></table></figure>
+<p>bucket 指针指向一个 <code>dictEntry</code> 节点，节点之间用 <code>next</code> 指针串联：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">dictEntry</span> &#123;</span><br>    <span class="hljs-type">void</span> *key;           <span class="hljs-comment">// 8 字节：指向 key 的指针（SDS 字符串）</span><br>    <span class="hljs-class"><span class="hljs-keyword">union</span> &#123;</span>              <span class="hljs-comment">// 8 字节：value 的存储（指针 / uint64 / int64 / double）</span><br>        <span class="hljs-type">void</span> *val;<br>        <span class="hljs-type">uint64_t</span> u64;<br>        <span class="hljs-type">int64_t</span> s64;<br>        <span class="hljs-type">double</span> d;<br>    &#125; v;<br>    <span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">dictEntry</span> *<span class="hljs-title">next</span>;</span> <span class="hljs-comment">// 8 字节：下一个节点</span><br>&#125;;<br></code></pre></td></tr></table></figure>
+
+<p>一个 <code>dictEntry</code> 占 24 字节。对于一个 Hash 类型（<code>HSET myhash field value</code>），key 是 field，value 是实际的 value，两个字段都用上了，24 字节物有所值。</p>
+<p>但 Set 不需要 value。如果 Set 也分配完整的 <code>dictEntry</code>，每个节点浪费了 8 字节的 <code>v</code> 联合体——1000 万个元素就是 80MB 的纯浪费。</p>
+<p>64 位系统上，<strong>zmalloc 返回的地址至少是 8 字节对齐的，即任何有效地址的二进制最低 3 位永远是 <code>000</code></strong>。这意味着在桶里存一个”指向 dictEntry 的指针”时，这个 8 字节值的低 3 位<strong>不参与表示地址</strong>。</p>
+<p>Redis 的思路是：既然这 3 个 bit 在表示指针时用不上，就用它们来标记”这个桶里存的到底是什么”。读取时先看低 3 位，再决定如何解析这个 8 字节值。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">// 桶指针的四种可能状态</span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> ENTRY_PTR_NORMAL      0  <span class="hljs-comment">// 000 → 指向完整 dictEntry（带 value 字段）</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> ENTRY_PTR_IS_ODD_KEY  1  <span class="hljs-comment">// XX1 → 桶里直接就是 key！不是指针！</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> ENTRY_PTR_IS_EVEN_KEY 2  <span class="hljs-comment">// 010 → 桶里直接就是 key（偶数地址）</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> ENTRY_PTR_NO_VALUE    4  <span class="hljs-comment">// 100 → 指向 dictEntryNoValue（无 value 字段）</span></span><br></code></pre></td></tr></table></figure>
+
+<p><strong>状态 A：空桶</strong></p>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs 1c">bucket[<span class="hljs-number">5</span>] <span class="hljs-punctuation">=</span> <span class="hljs-literal">NULL</span> <span class="hljs-punctuation">(</span><span class="hljs-number">0</span>x0000000000000000<span class="hljs-punctuation">)</span><br>→ 这个桶没有任何元素<br></code></pre></td></tr></table></figure>
+
+<p>无关 tagged pointer。但正是因为很多桶是空的，哈希表才需要精心控制负载因子，空桶也是 8 字节的槽位。</p>
+<p><strong>状态 B：桶内只有一个元素（最常见，利用 ODD_KEY）</strong></p>
+<figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs tap">bucket[5] = 0x00007f18a8000101  ←<span class="hljs-number"> 8 </span>字节值（64位指针，16位十六进制）<br>             低<span class="hljs-number"> 3 </span>位 =<span class="hljs-number"> 001 </span>→ ENTRY_PTR_IS_ODD_KEY<br>             这就是 SDS key 指针本身！<br></code></pre></td></tr></table></figure>
+
+<p>此时<strong>不分配任何 dictEntry</strong>。桶数组的 8 字节槽位直接存了 SDS 指针。为什么 SDS 指针天然 <code>bit0 = 1</code>？因为 <code>sds</code> 是 <code>char*</code> 类型，指向字符串内容的第一个字符；而 zmalloc 返回的原始地址是偶数（8 字节对齐），sds 结构在这之前有一个 1 字节的 header，所以 sds 指针 &#x3D; 偶数 + 1 &#x3D; 奇数。<strong><code>keys_are_odd = 1</code> 告诉 dict “所有 key 的 bit0 已经是 1，不需要显式 <code>| 0x1</code>“。</strong></p>
+<p><strong>状态 C：桶内有两个或更多元素（碰撞链）</strong></p>
+<figure class="highlight x86asm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs x86asm">bucket[<span class="hljs-number">5</span>] = <span class="hljs-number">0x00007f18a8000604</span>  ← <span class="hljs-number">8</span> 字节值<br>             低 <span class="hljs-number">3</span> 位 = <span class="hljs-number">100</span> → ENTRY_PTR_NO_VALUE<br>             抹掉低<span class="hljs-number">3</span>位 → <span class="hljs-number">0x00007f18a8000600</span> → 指向 dictEntryNoValue<br><br>dictEntryNoValue 结构体（<span class="hljs-number">16</span> 字节）:<br><span class="hljs-meta">  .key</span>  = <span class="hljs-number">0x00007f18a8000101</span>  → SDS <span class="hljs-string">&quot;hello&quot;</span>  (又是 ODD_KEY!)<br><span class="hljs-meta">  .next</span> = <span class="hljs-number">0x00007f18a8000301</span>  → SDS <span class="hljs-string">&quot;world&quot;</span>  (又是 ODD_KEY!)<br></code></pre></td></tr></table></figure>
+
+<p><code>dictEntryNoValue</code>只含 <code>key</code> 和 <code>next</code> 两个指针，16 字节，比完整 <code>dictEntry</code> 的 24 字节省了 33%。而且碰撞链上的后续元素仍然可以走 ODD_KEY 零分配。</p>
+<table>
+<thead>
+<tr>
+<th>桶内元素数</th>
+<th>实际内存布局</th>
+<th>每个元素的平均开销</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1 个</td>
+<td>bucket 槽位直接存 SDS 指针（ODD_KEY）</td>
+<td><strong>0 字节</strong></td>
+</tr>
+<tr>
+<td>2 个</td>
+<td>1 个 dictEntryNoValue（16B）+ 1 个 ODD_KEY</td>
+<td><strong>平均 8 字节</strong></td>
+</tr>
+<tr>
+<td>3 个</td>
+<td>2 个 dictEntryNoValue（32B）+ 1 个 ODD_KEY</td>
+<td><strong>平均 10.67 字节</strong></td>
+</tr>
+<tr>
+<td>N 个（N≥2）</td>
+<td>(N-1) 个 dictEntryNoValue + 尾节点 ODD_KEY</td>
+<td>16×(N-1)&#x2F;N 字节</td>
+</tr>
+</tbody></table>
+<p>碰撞链的最后一个节点依然可以走ODD零分配，实际负载下，负载因子约 1.0 时绝大多数桶只有 1 个元素，碰撞比例极低——<strong>每个这样的桶享受完整的零分配</strong>。假设 1000 万元素分布在约 1000 万个桶中，不走 tagged pointer 需要 240MB 的 dictEntry 开销；优化后，单元素桶零开销，少量双元素桶仅有 16 字节，总 overhead 骤降到几 MB 级别。</p>
+<p>Redis Set 的实现是内存数据库设计中”<strong>自适应</strong>“思想的典型案例。三态编码不是三个独立的数据结构，而是<strong>同一个逻辑集合在不同生命周期阶段的物理表达</strong>：</p>
+<ul>
+<li><strong>新生期</strong>（INTSET）：纯整数、量小——用最紧凑的有序数组，二分查找够快，内存效率最大化</li>
+<li><strong>成长期</strong>（LISTPACK）：混入字符串、量适中——用连续内存块，线性查找因为量小所以可接受</li>
+<li><strong>成熟期</strong>（HT）：量大到一定程度——用哈希表保证 O(1) 操作，但通过 tagged pointer 避免 value 浪费</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Redis/" class="category-chain-item">Redis</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Redis/" class="print-no-link">#Redis</a>
+      
+        <a href="/tags/%E6%BA%90%E7%A0%81/" class="print-no-link">#源码</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Redis Set 源码分析：三态编码与内存优化</div>
+      <div>http://xuxiusheng.github.io/2026/06/13/RedisSet源码分析三态编码与内存优化/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>xxs不是小学生</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年6月13日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/05/01/Pandora_PandoraBoot%E7%B1%BB%E9%9A%94%E7%A6%BB%E5%8E%9F%E7%90%86%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/" title="Pandora/PandoraBoot类隔离原理深度解析">
+                        <span class="hidden-mobile">Pandora/PandoraBoot类隔离原理深度解析</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.5.1/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"2HT5rmC5XQuRugoXS6jx93oG-gzGzoHsz","appKey":"34FVPpMZGQcLXWdGF6FnOx9T","path":"window.location.pathname","placeholder":"说点什么吧","avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"","emojiCDN":null,"emojiMaps":null,"enableQQ":false,"appid":"2HT5rmC5XQuRugoXS6jx93oG-gzGzoHsz","appkey":"34FVPpMZGQcLXWdGF6FnOx9T","app_id":"2HT5rmC5XQuRugoXS6jx93oG-gzGzoHsz","app_key":"34FVPpMZGQcLXWdGF6FnOx9T"},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  <script>
+  Fluid.utils.createScript('https://lib.baomitu.com/mermaid/11.10.1/mermaid.min.js', function() {
+    mermaid.initialize({"theme":"default","flowchart":{"useMaxWidth":false}});
+
+    Fluid.utils.listenDOMLoaded(function() {
+      Fluid.events.registerRefreshCallback(function() {
+        if ('mermaid' in window) {
+          mermaid.init();
+        }
+      });
+    });
+  });
+</script>
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://xuxiusheng.github.io/" target="_blank" rel="nofollow noopener"><strong>xxs不是小学生のBlog</strong><span></span></a> <div id="runtime_container"> 已经在星海中遨游了：<span id="runtime_days">0</span> 天 <span id="runtime_hours">0</span> 小时 <span id="runtime_mins">0</span> 分 <span id="runtime_secs">0</span> 秒 </div> <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>由<strong>Hexo</strong>强力驱动</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>主题：<strong>Fluid</strong></span></a><br> <span>We are stupid but strong</span> 
+    </div>
+  
+  
+  
+    <!-- 备案信息 ICP for China -->
+    <div class="beian">
+  <span>
+    <a href="http://beian.miit.gov.cn/" target="_blank" rel="nofollow noopener">
+      京ICP证123456号
+    </a>
+  </span>
+  
+    
+      <span>
+        <a
+          href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=12345678"
+          rel="nofollow noopener"
+          class="beian-police"
+          target="_blank"
+        >
+          
+            <span style="visibility: hidden; width: 0">|</span>
+            <img src="/img/config/police_beian.png" srcset="/img/config/loading.gif" lazyload alt="police-icon"/>
+          
+          <span>京公网安备12345678号</span>
+        </a>
+      </span>
+    
+  
+</div>
+
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/card.js"></script>
+<script src="/js/encrypt_core.js"></script>
+<script src="/js/runtime.js"></script>
+<script src="/js/cv.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

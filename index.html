@@ -293,6 +293,69 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2026/06/13/RedisSet%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B8%89%E6%80%81%E7%BC%96%E7%A0%81%E4%B8%8E%E5%86%85%E5%AD%98%E4%BC%98%E5%8C%96/" target="_self">
+          Redis Set 源码分析：三态编码与内存优化
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/06/13/RedisSet%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E4%B8%89%E6%80%81%E7%BC%96%E7%A0%81%E4%B8%8E%E5%86%85%E5%AD%98%E4%BC%98%E5%8C%96/" target="_self">
+        <div>
+          在使用 Redis 时，Set 可能是最”不起眼”的数据结构——SADD 加元素，SINTER 求交集，几十个元素的小集合用起来毫不费力。但如果你打开 OBJECT ENCODING 看一眼，会发现 Redis 并不是简单地在每个 Set 里塞一个哈希表：它有时返回 intset，有时返回 listpack，有时才是 hashtable。              Redis 7.2之前，Set只
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-06-13 22:40" pubdate>
+              2026-06-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Redis/" class="category-chain-item">Redis</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Redis/">#Redis</a>
+            
+              <a href="/tags/%E6%BA%90%E7%A0%81/">#源码</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2026/05/01/Pandora_PandoraBoot%E7%B1%BB%E9%9A%94%E7%A6%BB%E5%8E%9F%E7%90%86%E6%B7%B1%E5%BA%A6%E8%A7%A3%E6%9E%90/" target="_self">
           Pandora/PandoraBoot类隔离原理深度解析
         </a>
@@ -847,67 +910,6 @@
               <a href="/tags/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/">#读书笔记</a>
             
               <a href="/tags/Hello-Agents/">#Hello Agents</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2026/02/05/LZF/" target="_self">
-          LZF压缩算法
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/02/05/LZF/" target="_self">
-        <div>
-          基本原理LZF(Lempel-Ziv-Free)压缩算法是一种快速、轻量级的无损数据压缩算法,设计目标是在压缩速度和压缩率之间取得良好平衡，特别适合对实时性要求较高的场景。Redis的quicklistNode压缩就采用了LZF算法。 LZF采用字典压缩思想：用“偏移量+长度”对重复出现的数据进行编码，从而减少冗余。  核心思想：当一段数据之前出现过，只需记录：(1) 回溯距离(offset)；(
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-02-05 22:30" pubdate>
-              2026-02-05
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/" class="category-chain-item">计算机基础</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9F%BA%E7%A1%80/">#计算机基础</a>
             
           </div>
         
